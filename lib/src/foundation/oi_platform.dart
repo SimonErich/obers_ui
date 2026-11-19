@@ -70,13 +70,36 @@ class OiPlatformData {
       'keyboardVisible: $keyboardVisible, inputModality: $inputModality)';
 }
 
-/// An [InheritedWidget] that provides [OiPlatformData] to its descendants.
+/// The independently observable parts of [OiPlatformData].
+///
+/// A widget that reads only one aspect through [OiPlatform.inputModalityOf],
+/// [OiPlatform.platformOf] or [OiPlatform.keyboardHeightOf] is rebuilt only
+/// when that aspect changes.
+///
+/// {@category Foundation}
+enum OiPlatformAspect {
+  /// [OiPlatformData.platform].
+  platform,
+
+  /// [OiPlatformData.inputModality].
+  inputModality,
+
+  /// [OiPlatformData.keyboardHeight] and [OiPlatformData.keyboardVisible].
+  keyboard,
+}
+
+/// An [InheritedModel] that provides [OiPlatformData] to its descendants.
 ///
 /// Wrap your app root (or any subtree) with [OiPlatform] to expose
 /// platform context. [OiApp] includes this automatically.
 ///
+/// [of] and [maybeOf] depend on the whole [OiPlatformData], including the
+/// keyboard insets, which change on every frame while the on-screen keyboard
+/// animates. Widgets that only need one value should use the aspect accessors
+/// ([inputModalityOf], [platformOf], [keyboardHeightOf]) instead.
+///
 /// {@category Foundation}
-class OiPlatform extends InheritedWidget {
+class OiPlatform extends InheritedModel<OiPlatformAspect> {
   /// Creates an [OiPlatform] with explicit [data].
   const OiPlatform({required this.data, required super.child, super.key});
 
@@ -122,8 +145,61 @@ class OiPlatform extends InheritedWidget {
     return context.dependOnInheritedWidgetOfExactType<OiPlatform>()?.data;
   }
 
+  /// Returns the current [OiInputModality] and rebuilds [context] only when
+  /// the modality changes, not when the keyboard insets do.
+  ///
+  /// Asserts that an [OiPlatform] exists in the widget tree.
+  static OiInputModality inputModalityOf(BuildContext context) =>
+      _aspectOf(context, OiPlatformAspect.inputModality).inputModality;
+
+  /// Returns the host [TargetPlatform] and rebuilds [context] only when it
+  /// changes.
+  ///
+  /// Asserts that an [OiPlatform] exists in the widget tree.
+  static TargetPlatform platformOf(BuildContext context) =>
+      _aspectOf(context, OiPlatformAspect.platform).platform;
+
+  /// Returns the on-screen keyboard height and rebuilds [context] only when
+  /// the keyboard insets change.
+  ///
+  /// Asserts that an [OiPlatform] exists in the widget tree.
+  static double keyboardHeightOf(BuildContext context) =>
+      _aspectOf(context, OiPlatformAspect.keyboard).keyboardHeight;
+
+  static OiPlatformData _aspectOf(
+    BuildContext context,
+    OiPlatformAspect aspect,
+  ) {
+    final result = InheritedModel.inheritFrom<OiPlatform>(
+      context,
+      aspect: aspect,
+    );
+    assert(result != null, 'No OiPlatform found in context');
+    return result!.data;
+  }
+
   @override
   bool updateShouldNotify(OiPlatform oldWidget) => data != oldWidget.data;
+
+  @override
+  bool updateShouldNotifyDependent(
+    OiPlatform oldWidget,
+    Set<OiPlatformAspect> dependencies,
+  ) {
+    final old = oldWidget.data;
+    for (final aspect in dependencies) {
+      final changed = switch (aspect) {
+        OiPlatformAspect.platform => data.platform != old.platform,
+        OiPlatformAspect.inputModality =>
+          data.inputModality != old.inputModality,
+        OiPlatformAspect.keyboard =>
+          data.keyboardHeight != old.keyboardHeight ||
+              data.keyboardVisible != old.keyboardVisible,
+      };
+      if (changed) return true;
+    }
+    return false;
+  }
 }
 
 /// Extensions on [BuildContext] for convenient platform access.
@@ -136,5 +212,7 @@ extension OiPlatformExt on BuildContext {
   OiPlatformData get platform => OiPlatform.of(this);
 
   /// The current [OiInputModality] from the nearest [OiPlatform].
-  OiInputModality get inputModality => OiPlatform.of(this).inputModality;
+  ///
+  /// Rebuilds only when the modality changes.
+  OiInputModality get inputModality => OiPlatform.inputModalityOf(this);
 }

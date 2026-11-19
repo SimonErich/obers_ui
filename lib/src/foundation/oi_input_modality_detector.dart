@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb, visibleForTesting;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/_hover_detect_stub.dart'
@@ -14,6 +16,10 @@ import 'package:obers_ui/src/foundation/oi_platform.dart';
 ///
 /// On web, the initial modality is seeded from the `hover` media query: if the
 /// device does not support hover, the initial modality is [OiInputModality.touch].
+/// On native platforms it is seeded from [defaultTargetPlatform]: Android, iOS
+/// and Fuchsia start in [OiInputModality.touch], desktop platforms in
+/// [OiInputModality.pointer]. The first pointer event of the other kind
+/// switches it.
 ///
 /// {@category Foundation}
 class OiInputModalityDetector extends StatefulWidget {
@@ -22,6 +28,16 @@ class OiInputModalityDetector extends StatefulWidget {
 
   /// The widget below this widget in the tree.
   final Widget child;
+
+  /// Pins the modality every detector starts in, instead of deriving it from
+  /// the platform.
+  ///
+  /// `flutter test` reports Android as the host platform, so without a pin
+  /// every widget test would start in [OiInputModality.touch] and lay out with
+  /// 48 dp touch targets. Test suites that assert desktop layouts set this to
+  /// [OiInputModality.pointer] once in `flutter_test_config.dart`.
+  @visibleForTesting
+  static OiInputModality? debugInitialModalityOverride;
 
   @override
   State<OiInputModalityDetector> createState() =>
@@ -34,9 +50,30 @@ class _OiInputModalityDetectorState extends State<OiInputModalityDetector> {
   @override
   void initState() {
     super.initState();
-    _modality = supportsHoverMediaQuery()
-        ? OiInputModality.pointer
-        : OiInputModality.touch;
+    _modality = _initialModality();
+  }
+
+  /// The modality to assume before the first pointer event arrives.
+  ///
+  /// Starting a phone in pointer mode would lay every tappable out without
+  /// its minimum touch target and then re-lay it out mid-gesture on the first
+  /// touch.
+  static OiInputModality _initialModality() {
+    final override = OiInputModalityDetector.debugInitialModalityOverride;
+    if (override != null) return override;
+    if (!supportsHoverMediaQuery()) return OiInputModality.touch;
+    // On web the hover media query is the authority.
+    if (kIsWeb) return OiInputModality.pointer;
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+      case TargetPlatform.iOS:
+      case TargetPlatform.fuchsia:
+        return OiInputModality.touch;
+      case TargetPlatform.linux:
+      case TargetPlatform.macOS:
+      case TargetPlatform.windows:
+        return OiInputModality.pointer;
+    }
   }
 
   void _onPointerEvent(PointerEvent event) {

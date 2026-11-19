@@ -103,7 +103,7 @@ class _OiBubbleChartState extends State<OiBubbleChart> {
         widget.interactionMode != OiChartInteractionMode.auto) {
       return widget.interactionMode!;
     }
-    final modality = OiPlatform.of(context).inputModality;
+    final modality = OiPlatform.inputModalityOf(context);
     return modality == OiInputModality.touch
         ? OiChartInteractionMode.touch
         : OiChartInteractionMode.pointer;
