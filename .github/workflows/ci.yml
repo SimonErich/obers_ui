@@ -43,6 +43,8 @@ jobs:
       # Goldens are gated by the dedicated Golden Tests workflow. Exclude them
       # here so a cosmetic pixel diff never breaks the coverage gate.
       - run: flutter test --coverage --exclude-tags golden
+      - name: Calendar and Gantt date maths across daylight-saving changes
+        run: TZ=America/New_York flutter test test/src/composites/scheduling/scheduling_dst_test.dart
       - name: Check coverage
         uses: VeryGoodOpenSource/very_good_coverage@v3
         with:
