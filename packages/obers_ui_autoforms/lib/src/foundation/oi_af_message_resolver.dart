@@ -52,6 +52,20 @@ abstract class OiAfMessageResolver {
   String datePastError(BuildContext context) => 'Must be a past date.';
   String differentFromField(BuildContext context) => 'Must be different.';
   String notInList(BuildContext context) => 'This value is not allowed.';
+  String invalidIpAddress(BuildContext context) => 'Invalid IP address.';
+  String invalidIpV4Address(BuildContext context) => 'Must be an IPv4 address.';
+  String invalidIpV6Address(BuildContext context) => 'Must be an IPv6 address.';
+  String notMultipleOf(BuildContext context, num factor) =>
+      'Must be a multiple of $factor.';
+  String decimalPlaces(BuildContext context, int min, int? max) =>
+      'Must have ${max != null ? '$min to $max' : '$min'} decimal places.';
+  String digitsBetween(BuildContext context, int min, int max) =>
+      'Must have between $min and $max digits.';
+  String itemsNotDistinct(BuildContext context) => 'All items must be unique.';
+  String dateTodayOrLater(BuildContext context) => 'Must be today or later.';
+  String dateTodayOrEarlier(BuildContext context) =>
+      'Must be today or earlier.';
+  String buildDataFailed(BuildContext context) => 'Failed to build form data.';
 }
 
 /// Default English message resolver.

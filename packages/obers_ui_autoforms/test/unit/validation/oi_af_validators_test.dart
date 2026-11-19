@@ -1009,4 +1009,208 @@ void main() {
       );
     });
   });
+
+  // ═════════════════════════════════════════════════════════════════════════
+  //  STRICT FORMATS
+  // ═════════════════════════════════════════════════════════════════════════
+
+  group('OiAfValidators.email strictness', () {
+    final validator = OiAfValidators.email<TestField>();
+    Object? check(String value) =>
+        validator(_ctx<String>(TestField.email, value));
+
+    test('accepts ordinary addresses', () {
+      expect(check('first.last+tag@mail.example.co.uk'), isNull);
+      expect(check("o'neil_1@ex-ample.org"), isNull);
+    });
+
+    test('rejects a domain without a top-level domain', () {
+      expect(check('a@b'), isNotNull);
+    });
+
+    test('rejects a leading dot in the local part', () {
+      expect(check('.a@x.com'), isNotNull);
+    });
+
+    test('rejects a trailing dot in the local part', () {
+      expect(check('a.@x.com'), isNotNull);
+    });
+
+    test('rejects consecutive dots in the local part', () {
+      expect(check('a..b@x.com'), isNotNull);
+    });
+  });
+
+  group('OiAfValidators.url strictness', () {
+    final validator = OiAfValidators.url<TestField>();
+    Object? check(String value) =>
+        validator(_ctx<String>(TestField.name, value));
+
+    test('accepts a URL with path, query and port', () {
+      expect(check('https://example.com:8080/a/b?c=d#e'), isNull);
+    });
+
+    test('rejects a bare scheme', () {
+      expect(check('http:'), isNotNull);
+    });
+
+    test('rejects a scheme without an authority', () {
+      expect(check('https:foo'), isNotNull);
+    });
+
+    test('rejects an empty host', () {
+      expect(check('http://'), isNotNull);
+      expect(check('http:///path'), isNotNull);
+    });
+
+    test('custom schemes without an authority need a body', () {
+      final mailto = OiAfValidators.url<TestField>(protocols: ['mailto']);
+      expect(
+        mailto(_ctx<String>(TestField.name, 'mailto:a@example.com')),
+        isNull,
+      );
+      expect(mailto(_ctx<String>(TestField.name, 'mailto:')), isNotNull);
+    });
+  });
+
+  group('OiAfValidators.ipAddress', () {
+    final validator = OiAfValidators.ipAddress<TestField>();
+    Object? check(String value) =>
+        validator(_ctx<String>(TestField.name, value));
+
+    test('passes for null and empty', () {
+      expect(validator(_ctx<String>(TestField.name, null)), isNull);
+      expect(check(''), isNull);
+    });
+
+    test('accepts IPv4 addresses', () {
+      expect(check('192.168.0.1'), isNull);
+      expect(check('0.0.0.0'), isNull);
+      expect(check('255.255.255.255'), isNull);
+    });
+
+    test('rejects IPv4 octets with leading zeros', () {
+      expect(check('01.002.003.004'), isNotNull);
+    });
+
+    test('rejects out-of-range and short IPv4 addresses', () {
+      expect(check('256.1.1.1'), isNotNull);
+      expect(check('1.2.3'), isNotNull);
+    });
+
+    test('accepts IPv6 addresses', () {
+      expect(check('::'), isNull);
+      expect(check('::1'), isNull);
+      expect(check('2001:db8::8a2e:370:7334'), isNull);
+      expect(check('2001:0db8:85a3:0000:0000:8a2e:0370:7334'), isNull);
+      expect(check('::ffff:192.168.0.1'), isNull);
+    });
+
+    test('rejects strings that only look like IPv6', () {
+      expect(check(':::'), isNotNull);
+      expect(check('12:34'), isNotNull);
+      expect(check('abc:'), isNotNull);
+      expect(check('1:2:3:4:5:6:7:8:9'), isNotNull);
+    });
+
+    test('v4Only rejects IPv6 and v6Only rejects IPv4', () {
+      final v4 = OiAfValidators.ipAddress<TestField>(v4Only: true);
+      final v6 = OiAfValidators.ipAddress<TestField>(v6Only: true);
+      expect(v4(_ctx<String>(TestField.name, '::1')), isNotNull);
+      expect(v4(_ctx<String>(TestField.name, '10.0.0.1')), isNull);
+      expect(v6(_ctx<String>(TestField.name, '10.0.0.1')), isNotNull);
+      expect(v6(_ctx<String>(TestField.name, '::1')), isNull);
+    });
+  });
+
+  // ═════════════════════════════════════════════════════════════════════════
+  //  NUMERIC EDGE CASES
+  // ═════════════════════════════════════════════════════════════════════════
+
+  group('OiAfValidators.integer non-finite values', () {
+    final validator = OiAfValidators.integer<TestField>();
+
+    test('fails for NaN instead of throwing', () {
+      expect(validator(_ctx<num?>(TestField.age, double.nan)), isNotNull);
+    });
+
+    test('fails for infinity instead of throwing', () {
+      expect(validator(_ctx<num?>(TestField.age, double.infinity)), isNotNull);
+      expect(
+        validator(_ctx<num?>(TestField.age, double.negativeInfinity)),
+        isNotNull,
+      );
+    });
+  });
+
+  group('OiAfValidators.digitsBetween', () {
+    final validator = OiAfValidators.digitsBetween<TestField>(2, 4);
+
+    test('passes inside the range and ignores the sign', () {
+      expect(validator(_ctx<num?>(TestField.age, 12)), isNull);
+      expect(validator(_ctx<num?>(TestField.age, -1234)), isNull);
+    });
+
+    test('fails outside the range', () {
+      expect(validator(_ctx<num?>(TestField.age, 1)), isNotNull);
+      expect(validator(_ctx<num?>(TestField.age, 12345)), isNotNull);
+    });
+
+    test('fails for NaN and infinity instead of throwing', () {
+      expect(validator(_ctx<num?>(TestField.age, double.nan)), isNotNull);
+      expect(validator(_ctx<num?>(TestField.age, double.infinity)), isNotNull);
+    });
+  });
+
+  group('OiAfValidators.multipleOf fractions', () {
+    final validator = OiAfValidators.multipleOf<TestField>(0.1);
+
+    test('accepts decimal multiples despite float rounding', () {
+      expect(validator(_ctx<num?>(TestField.age, 0.3)), isNull);
+      expect(validator(_ctx<num?>(TestField.age, 0.5)), isNull);
+      expect(validator(_ctx<num?>(TestField.age, 1234.5)), isNull);
+      expect(validator(_ctx<num?>(TestField.age, 0.1 + 0.2)), isNull);
+    });
+
+    test('still rejects values that are not multiples', () {
+      expect(validator(_ctx<num?>(TestField.age, 0.35)), isNotNull);
+      expect(validator(_ctx<num?>(TestField.age, 0.01)), isNotNull);
+    });
+
+    test('fails for NaN, infinity and a zero factor instead of throwing', () {
+      expect(validator(_ctx<num?>(TestField.age, double.nan)), isNotNull);
+      expect(validator(_ctx<num?>(TestField.age, double.infinity)), isNotNull);
+      final zero = OiAfValidators.multipleOf<TestField>(0);
+      expect(zero(_ctx<num?>(TestField.age, 4)), isNotNull);
+    });
+  });
+
+  group('OiAfValidators.decimal', () {
+    test('counts the places of ordinary values', () {
+      final two = OiAfValidators.decimal<TestField>(2, maxPlaces: 2);
+      expect(two(_ctx<num?>(TestField.age, 1.25)), isNull);
+      expect(two(_ctx<num?>(TestField.age, 1.5)), isNotNull);
+      expect(two(_ctx<num?>(TestField.age, 1.125)), isNotNull);
+      expect(two(_ctx<num?>(TestField.age, 3)), isNotNull);
+    });
+
+    test('counts the places of values printed in exponent form', () {
+      final seven = OiAfValidators.decimal<TestField>(7, maxPlaces: 7);
+      expect(seven(_ctx<num?>(TestField.age, 1e-7)), isNull);
+      final none = OiAfValidators.decimal<TestField>(0, maxPlaces: 0);
+      expect(none(_ctx<num?>(TestField.age, 1e-7)), isNotNull);
+      expect(none(_ctx<num?>(TestField.age, 1e21)), isNull);
+    });
+
+    test('ignores float rounding noise', () {
+      final one = OiAfValidators.decimal<TestField>(1, maxPlaces: 1);
+      expect(one(_ctx<num?>(TestField.age, 0.1 + 0.2)), isNull);
+    });
+
+    test('fails for NaN and infinity', () {
+      final any = OiAfValidators.decimal<TestField>(0);
+      expect(any(_ctx<num?>(TestField.age, double.nan)), isNotNull);
+      expect(any(_ctx<num?>(TestField.age, double.infinity)), isNotNull);
+    });
+  });
 }
