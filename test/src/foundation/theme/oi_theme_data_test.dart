@@ -75,6 +75,27 @@ void main() {
         expect(theme.colors.primary.base, equals(brandColor));
       });
 
+      test('textOnPrimary follows the brand swatch foreground', () {
+        const black = Color(0xFF000000);
+        const white = Color(0xFFFFFFFF);
+
+        // A light brand colour needs dark text on top of it.
+        final yellow = OiThemeData.fromBrand(color: const Color(0xFFFFEB3B));
+        expect(yellow.colors.primary.foreground, black);
+        expect(yellow.colors.textOnPrimary, black);
+
+        final yellowDark = OiThemeData.fromBrand(
+          color: const Color(0xFFFFEB3B),
+          brightness: Brightness.dark,
+        );
+        expect(yellowDark.colors.textOnPrimary, black);
+
+        // A dark brand colour keeps white text.
+        final rose = OiThemeData.fromBrand(color: brandColor);
+        expect(rose.colors.primary.foreground, white);
+        expect(rose.colors.textOnPrimary, white);
+      });
+
       test(
         'primary swatch is derived from brand color via OiColorSwatch.from',
         () {
