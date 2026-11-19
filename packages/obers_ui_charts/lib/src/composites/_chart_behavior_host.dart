@@ -108,9 +108,7 @@ mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
     final ctrl = effectiveController;
 
     // Restore hidden series → legend state.
-    for (final id in settings.hiddenSeriesIds) {
-      ctrl.toggleSeries(id);
-    }
+    settings.hiddenSeriesIds.forEach(ctrl.toggleSeries);
 
     // Restore viewport.
     if (settings.viewport != null) {

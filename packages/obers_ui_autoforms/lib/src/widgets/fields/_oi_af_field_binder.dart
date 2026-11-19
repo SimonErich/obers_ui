@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_enums.dart';
 import 'package:obers_ui_autoforms/src/runtime/controller/oi_af_controller.dart';
@@ -125,7 +127,7 @@ mixin OiAfFieldBinderMixin<
   void onFieldSubmitted(String value) {
     if (form.isLastFocusableField(fieldEnum) &&
         form.submitOnEnterFromLastField) {
-      form.submit();
+      unawaited(form.submit());
     } else {
       form.focusNextField(fieldEnum);
     }

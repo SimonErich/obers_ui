@@ -45,9 +45,7 @@ void main() {
 
       // Iterate via iterable
       final collected = <int>[];
-      for (final item in buffer) {
-        collected.add(item);
-      }
+      buffer.forEach(collected.add);
       expect(collected, [20, 30, 40, 50]);
     });
 

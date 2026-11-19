@@ -4,7 +4,8 @@ description: >-
   for obers_ui. Provides OiAfForm, OiAfController, and 20+ field widget
   wrappers with comprehensive validation, derived fields, and conditional
   visibility.
-version: 0.1.0
+version: 0.1.2
+repository: https://github.com/SimonErich/obers_ui/tree/main/packages/obers_ui_autoforms
 publish_to: 'none'
 
 environment:
@@ -21,4 +22,4 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  very_good_analysis: ^7.0.0
+  very_good_analysis: ^10.0.0

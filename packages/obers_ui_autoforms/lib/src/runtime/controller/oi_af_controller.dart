@@ -196,7 +196,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     }
     _notifyFields(mutated);
     notifyListeners();
-    if (validate) this.validate();
+    if (validate) unawaited(this.validate());
   }
 
   void rebase(Map<TField, Object?> values, {bool validate = false}) {
@@ -211,7 +211,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     _globalErrors.clear();
     _notifyFields(mutated);
     notifyListeners();
-    if (validate) this.validate();
+    if (validate) unawaited(this.validate());
   }
 
   void restore(
@@ -1337,10 +1337,12 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     for (final field in _fieldOrder) {
       final def = _definitions[field]!;
       if (def.validateOnInit) {
-        _fieldControllers[field]!.validate(
-          trigger: OiAfValidationTrigger.init,
-          effectiveMode: OiAfValidateMode.onInit,
-          form: this,
+        unawaited(
+          _fieldControllers[field]!.validate(
+            trigger: OiAfValidationTrigger.init,
+            effectiveMode: OiAfValidateMode.onInit,
+            form: this,
+          ),
         );
       }
     }
@@ -1368,10 +1370,12 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
 
     // Validate this field based on mode
     final effectiveMode = _effectiveValidateMode(field);
-    _fieldControllers[field]!.validate(
-      trigger: OiAfValidationTrigger.change,
-      effectiveMode: effectiveMode,
-      form: this,
+    unawaited(
+      _fieldControllers[field]!.validate(
+        trigger: OiAfValidationTrigger.change,
+        effectiveMode: effectiveMode,
+        form: this,
+      ),
     );
 
     notifyListeners();
@@ -1380,10 +1384,12 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
   void _handleFieldFocusChanged(TField field, {required bool focused}) {
     if (!focused) {
       // Blur — trigger validation
-      _fieldControllers[field]!.validate(
-        trigger: OiAfValidationTrigger.blur,
-        effectiveMode: _effectiveValidateMode(field),
-        form: this,
+      unawaited(
+        _fieldControllers[field]!.validate(
+          trigger: OiAfValidationTrigger.blur,
+          effectiveMode: _effectiveValidateMode(field),
+          form: this,
+        ),
       );
     }
     notifyListeners();
@@ -1421,10 +1427,12 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
   void _revalidateFieldsFor(TField changedField) {
     for (final def in _definitions.values) {
       if (def.revalidateWhen.contains(changedField)) {
-        _fieldControllers[def.field]!.validate(
-          trigger: OiAfValidationTrigger.dependencyChange,
-          effectiveMode: _effectiveValidateMode(def.field),
-          form: this,
+        unawaited(
+          _fieldControllers[def.field]!.validate(
+            trigger: OiAfValidationTrigger.dependencyChange,
+            effectiveMode: _effectiveValidateMode(def.field),
+            form: this,
+          ),
         );
       }
     }

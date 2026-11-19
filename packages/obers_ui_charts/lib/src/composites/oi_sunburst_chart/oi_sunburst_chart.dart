@@ -371,14 +371,10 @@ class _OiSunburstChartState<TNode> extends State<OiSunburstChart<TNode>> {
           var computedMaxDepth = 0;
           void measureDepth(_SbNode<TNode> n) {
             if (n.depth > computedMaxDepth) computedMaxDepth = n.depth;
-            for (final c in n.children) {
-              measureDepth(c);
-            }
+            n.children.forEach(measureDepth);
           }
 
-          for (final r in _cachedRoots) {
-            measureDepth(r);
-          }
+          _cachedRoots.forEach(measureDepth);
           final effectiveMaxDepth = widget.maxDepth != null
               ? math.min(widget.maxDepth!, computedMaxDepth)
               : computedMaxDepth;

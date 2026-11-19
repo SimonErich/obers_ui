@@ -25,7 +25,7 @@ void main() {
 
   group('OiChartLegend', () {
     testWidgets('renders all series items with correct labels', (
-      WidgetTester tester,
+      tester,
     ) async {
       await tester.pumpChartApp(
         const OiChartLegend(items: [redItem, blueItem, hiddenItem]),
@@ -37,7 +37,7 @@ void main() {
     });
 
     testWidgets('tapping a legend item fires onToggle callback', (
-      WidgetTester tester,
+      tester,
     ) async {
       String? toggledId;
 
@@ -55,7 +55,7 @@ void main() {
     });
 
     testWidgets('tapping second item fires onToggle with correct id', (
-      WidgetTester tester,
+      tester,
     ) async {
       String? toggledId;
 
@@ -73,7 +73,7 @@ void main() {
     });
 
     testWidgets('hidden series items have reduced opacity (0.4)', (
-      WidgetTester tester,
+      tester,
     ) async {
       await tester.pumpChartApp(
         const OiChartLegend(items: [redItem, hiddenItem]),
@@ -89,7 +89,7 @@ void main() {
     });
 
     testWidgets('visible item has full opacity (1.0)', (
-      WidgetTester tester,
+      tester,
     ) async {
       await tester.pumpChartApp(const OiChartLegend(items: [redItem]));
 
@@ -98,7 +98,7 @@ void main() {
     });
 
     testWidgets('custom itemBuilder replaces default rendering', (
-      WidgetTester tester,
+      tester,
     ) async {
       const customKey = Key('custom_legend_item');
       var builderCallCount = 0;
@@ -126,7 +126,7 @@ void main() {
     });
 
     testWidgets('itemBuilder receives correct index values', (
-      WidgetTester tester,
+      tester,
     ) async {
       final indices = <int>[];
 
@@ -145,7 +145,7 @@ void main() {
 
     testWidgets(
       'itemBuilder receives onTap and onDoubleTap when callbacks set',
-      (WidgetTester tester) async {
+      (tester) async {
         VoidCallback? capturedTap;
         VoidCallback? capturedDoubleTap;
 
@@ -168,7 +168,7 @@ void main() {
     );
 
     testWidgets('itemBuilder receives null callbacks when not set', (
-      WidgetTester tester,
+      tester,
     ) async {
       VoidCallback? capturedTap;
       VoidCallback? capturedDoubleTap;
@@ -190,7 +190,7 @@ void main() {
     });
 
     testWidgets('double-tap fires onExclusiveFocus callback', (
-      WidgetTester tester,
+      tester,
     ) async {
       String? focusedId;
 
@@ -211,7 +211,7 @@ void main() {
     });
 
     testWidgets('legend renders with key oi_chart_legend', (
-      WidgetTester tester,
+      tester,
     ) async {
       await tester.pumpChartApp(const OiChartLegend(items: [redItem]));
 
@@ -219,7 +219,7 @@ void main() {
     });
 
     testWidgets('individual items have per-item keys', (
-      WidgetTester tester,
+      tester,
     ) async {
       await tester.pumpChartApp(
         const OiChartLegend(items: [redItem, blueItem]),

@@ -210,7 +210,7 @@ void main() {
       TestField? changedField;
       bool? wasFromUser;
       fc
-        ..onValueChanged = (field, {required bool fromUser}) {
+        ..onValueChanged = (field, {required fromUser}) {
           changedField = field;
           wasFromUser = fromUser;
         }
@@ -331,7 +331,7 @@ void main() {
       TestField? changedField;
       bool? wasFocused;
       fc
-        ..onFocusChanged = (field, {required bool focused}) {
+        ..onFocusChanged = (field, {required focused}) {
           changedField = field;
           wasFocused = focused;
         }

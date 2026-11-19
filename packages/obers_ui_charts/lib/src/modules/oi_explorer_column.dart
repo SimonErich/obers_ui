@@ -64,7 +64,6 @@ class OiExplorerColumn<T> {
   ///
   /// The returned value is typed as `dynamic` so that numeric, String, and
   /// [DateTime] values can all be represented through the same interface.
-  // ignore: avoid_annotating_with_dynamic
   final dynamic Function(T item) accessor;
 
   /// The semantic type of this column's values.
