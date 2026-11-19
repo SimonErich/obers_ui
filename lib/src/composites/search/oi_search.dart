@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/_oi_latest_request.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
@@ -166,6 +167,7 @@ class _OiSearchState extends State<OiSearch> {
   late TextEditingController _textController;
   late FocusNode _inputFocusNode;
   Timer? _debounceTimer;
+  final OiLatestRequest _searches = OiLatestRequest();
   bool _loading = false;
   int _highlightedIndex = -1;
   Map<String, List<OiSearchResult>> _resultsByCategory = {};
@@ -185,6 +187,7 @@ class _OiSearchState extends State<OiSearch> {
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _searches.cancel();
     _textController.dispose();
     _inputFocusNode.dispose();
     super.dispose();
@@ -208,6 +211,8 @@ class _OiSearchState extends State<OiSearch> {
   void _onQueryChanged(String query) {
     _debounceTimer?.cancel();
     if (query.isEmpty) {
+      // A search still on its way must not bring its results back.
+      _searches.cancel();
       setState(() {
         _resultsByCategory = {};
         _highlightedIndex = -1;
@@ -218,34 +223,33 @@ class _OiSearchState extends State<OiSearch> {
     _debounceTimer = Timer(widget.debounce, () => _performSearch(query));
   }
 
-  Future<void> _performSearch(String query) async {
+  Future<void> _performSearch(String query) {
     setState(() => _loading = true);
 
-    final results = <String, List<OiSearchResult>>{};
-    try {
-      final futures = widget.sources.map((source) async {
-        final sourceResults = await source.search(query);
-        return MapEntry(
-          source.category,
-          sourceResults.take(source.maxResults).toList(),
+    void apply(Map<String, List<OiSearchResult>> results) => setState(() {
+      _resultsByCategory = results;
+      _loading = false;
+      _highlightedIndex = _allResults.isEmpty ? -1 : 0;
+    });
+
+    return _searches.run(
+      () async {
+        final entries = await Future.wait(
+          widget.sources.map((source) async {
+            final sourceResults = await source.search(query);
+            return MapEntry(
+              source.category,
+              sourceResults.take(source.maxResults).toList(),
+            );
+          }),
         );
-      });
-
-      final entries = await Future.wait(futures);
-      for (final entry in entries) {
-        results[entry.key] = entry.value;
-      }
-    } on Exception {
-      // Silently handle search errors; results stay empty.
-    }
-
-    if (mounted) {
-      setState(() {
-        _resultsByCategory = results;
-        _loading = false;
-        _highlightedIndex = _allResults.isEmpty ? -1 : 0;
-      });
-    }
+        return Map.fromEntries(entries);
+      },
+      active: () => mounted,
+      onResult: apply,
+      // Search errors are handled silently; results stay empty.
+      onError: (_, _) => apply({}),
+    );
   }
 
   // ── Selection ─────────────────────────────────────────────────────────────
@@ -272,6 +276,8 @@ class _OiSearchState extends State<OiSearch> {
     final results = _allResults;
 
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      // Nothing to move through; clamping to an empty range would throw.
+      if (results.isEmpty) return KeyEventResult.handled;
       setState(() {
         _highlightedIndex = (_highlightedIndex + 1).clamp(
           0,
@@ -282,6 +288,7 @@ class _OiSearchState extends State<OiSearch> {
     }
 
     if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      if (results.isEmpty) return KeyEventResult.handled;
       setState(() {
         _highlightedIndex = (_highlightedIndex - 1).clamp(
           0,

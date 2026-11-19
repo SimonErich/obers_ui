@@ -6,6 +6,7 @@ import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/foundation/_oi_latest_request.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
@@ -109,6 +110,8 @@ class OiSearchOverlay extends StatefulWidget {
     this.recentSearchesLabel = 'Recent Searches',
     this.clearRecentLabel = 'Clear',
     this.clearRecentSemanticLabel = 'Clear recent searches',
+    this.errorStateTitle = 'Search failed',
+    this.errorStateDescription = 'Something went wrong. Please try again.',
     super.key,
   });
 
@@ -166,6 +169,12 @@ class OiSearchOverlay extends StatefulWidget {
   /// Screen-reader label of the button that clears the recent searches.
   final String clearRecentSemanticLabel;
 
+  /// Title shown when the search fails.
+  final String errorStateTitle;
+
+  /// Description shown when the search fails.
+  final String errorStateDescription;
+
   @override
   State<OiSearchOverlay> createState() => _OiSearchOverlayState();
 }
@@ -177,9 +186,13 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
   List<OiSearchSuggestion> _results = [];
   bool _isLoading = false;
   bool _hasSearched = false;
+
+  /// Whether the last search failed; shown instead of the empty state.
+  bool _hasError = false;
   String? _selectedCategory;
   int _highlightedIndex = -1;
   Timer? _debounceTimer;
+  final OiLatestRequest _searches = OiLatestRequest();
 
   @override
   void initState() {
@@ -190,6 +203,7 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _searches.cancel();
     _searchController
       ..removeListener(_onQueryChanged)
       ..dispose();
@@ -206,9 +220,12 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
     final query = _searchController.text.trim();
 
     if (query.isEmpty) {
+      // A search still on its way must not bring its results back.
+      _searches.cancel();
       setState(() {
         _results = [];
         _hasSearched = false;
+        _hasError = false;
         _isLoading = false;
         _highlightedIndex = -1;
       });
@@ -221,28 +238,32 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
   }
 
   Future<void> _performSearch(String query) async {
-    if (widget.onSearch == null) return;
+    final onSearch = widget.onSearch;
+    if (onSearch == null) return;
 
-    try {
-      final results = await widget.onSearch!(query, _selectedCategory);
-      if (!mounted) return;
-      setState(() {
+    await _searches.run(
+      () => onSearch(query, _selectedCategory),
+      active: () => mounted,
+      onResult: (results) => setState(() {
         _results = results;
         _hasSearched = true;
+        _hasError = false;
         _isLoading = false;
         _highlightedIndex = -1;
-      });
-    } on Exception {
-      if (!mounted) return;
-      setState(() {
+      }),
+      onError: (_, _) => setState(() {
         _results = [];
         _hasSearched = true;
+        _hasError = true;
         _isLoading = false;
-      });
-    }
+        _highlightedIndex = -1;
+      }),
+    );
   }
 
   void _selectCategory(String? key) {
+    // The search below replaces the one a pending debounce would start.
+    _debounceTimer?.cancel();
     setState(() {
       _selectedCategory = key;
       _highlightedIndex = -1;
@@ -479,6 +500,15 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
             ),
           ),
         ],
+      );
+    }
+
+    // Error state after a failed search.
+    if (_hasError) {
+      return OiEmptyState(
+        title: widget.errorStateTitle,
+        description: widget.errorStateDescription,
+        icon: OiIcons.alertCircle,
       );
     }
 

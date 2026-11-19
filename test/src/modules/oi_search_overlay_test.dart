@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
@@ -232,5 +233,211 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  // ── Regression: async races, debounce, failures ────────────────────────────
+
+  group('async search', () {
+    const apple = OiSearchSuggestion(key: 'a', title: 'Apple');
+    const abacus = OiSearchSuggestion(key: 'ab', title: 'Abacus');
+
+    late Map<String, Completer<List<OiSearchSuggestion>>> requests;
+    late List<String> calls;
+
+    Future<List<OiSearchSuggestion>> search(String query, String? category) {
+      calls.add('$query/$category');
+      return (requests[query] = Completer<List<OiSearchSuggestion>>()).future;
+    }
+
+    setUp(() {
+      requests = {};
+      calls = [];
+    });
+
+    testWidgets('a slow earlier search does not replace newer results', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        buildOverlay(onSearch: search),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText), 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.enterText(find.byType(EditableText), 'ab');
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(requests.keys, ['a', 'ab']);
+
+      // The newer search answers first, the older one afterwards.
+      requests['ab']!.complete([abacus]);
+      await tester.pumpAndSettle();
+      expect(find.text('Abacus'), findsOneWidget);
+
+      requests['a']!.complete([apple]);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Abacus'), findsOneWidget);
+      expect(find.text('Apple'), findsNothing);
+    });
+
+    testWidgets('a stale search does not end the loading state', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        buildOverlay(onSearch: search),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText), 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.enterText(find.byType(EditableText), 'ab');
+      await tester.pump(const Duration(milliseconds: 350));
+
+      requests['a']!.complete([apple]);
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byType(OiProgress), findsOneWidget);
+
+      requests['ab']!.complete([abacus]);
+      await tester.pumpAndSettle();
+      expect(find.byType(OiProgress), findsNothing);
+      expect(find.text('Abacus'), findsOneWidget);
+    });
+
+    testWidgets('a search answering after the query was cleared is dropped', (
+      tester,
+    ) async {
+      OiSearchSuggestion? tapped;
+      await tester.pumpObers(
+        buildOverlay(onSearch: search, onSuggestionTap: (s) => tapped = s),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText), 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.enterText(find.byType(EditableText), '');
+      await tester.pump();
+
+      requests['a']!.complete([apple]);
+      await tester.pumpAndSettle();
+      expect(find.text('Apple'), findsNothing);
+
+      // The dropped result cannot be reached from the keyboard either.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(tapped, isNull);
+    });
+
+    testWidgets('choosing a category cancels the pending debounce', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        buildOverlay(
+          onSearch: search,
+          categories: const [OiSearchCategory(key: 'docs', label: 'Docs')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText), 'a');
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(calls, isEmpty);
+
+      await tester.tap(find.text('Docs'));
+      await tester.pump();
+      expect(calls, ['a/docs']);
+
+      // The debounce started by typing must not search a second time.
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(calls, ['a/docs']);
+
+      requests['a']!.complete([apple]);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('a failed search shows the error state, not "no results"', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        buildOverlay(onSearch: search),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText), 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      requests['a']!.completeError(Exception('offline'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(OiProgress), findsNothing);
+      expect(find.text('Search failed'), findsOneWidget);
+      expect(find.text('No results found'), findsNothing);
+    });
+
+    testWidgets('a search that throws an Error ends the loading state', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        buildOverlay(onSearch: search),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText), 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      requests['a']!.completeError(StateError('backend down'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(OiProgress), findsNothing);
+      expect(find.text('Search failed'), findsOneWidget);
+    });
+
+    testWidgets('the error state clears when the next search succeeds', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        buildOverlay(onSearch: search),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText), 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      requests['a']!.completeError(Exception('offline'));
+      await tester.pumpAndSettle();
+      expect(find.text('Search failed'), findsOneWidget);
+
+      await tester.enterText(find.byType(EditableText), 'ab');
+      await tester.pump(const Duration(milliseconds: 350));
+      requests['ab']!.complete([abacus]);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Search failed'), findsNothing);
+      expect(find.text('Abacus'), findsOneWidget);
+    });
+
+    testWidgets('error texts can be replaced', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 800,
+          height: 600,
+          child: OiSearchOverlay(
+            label: 'Test Search',
+            onSearch: search,
+            errorStateTitle: 'Suche fehlgeschlagen',
+            errorStateDescription: 'Bitte erneut versuchen.',
+          ),
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText), 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      requests['a']!.completeError(Exception('offline'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Suche fehlgeschlagen'), findsOneWidget);
+      expect(find.text('Bitte erneut versuchen.'), findsOneWidget);
+    });
   });
 }
