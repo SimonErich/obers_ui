@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/composites/search/oi_combo_box.dart';
+import 'package:obers_ui/src/composites/search/oi_combo_box_labels.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -411,4 +412,561 @@ void main() {
 
     expect(created, equals('Mango'));
   });
+
+  // ── Regression: empty lists, load more, async races ────────────────────────
+
+  group('keyboard navigation on an empty list', () {
+    testWidgets('arrow down does not throw', (tester) async {
+      await tester.pumpObers(_comboBox(items: const []));
+      await _open(tester);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('No results'), findsOneWidget);
+    });
+
+    testWidgets('arrow up does not throw', (tester) async {
+      await tester.pumpObers(_comboBox(items: const []));
+      await _open(tester);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('load more', () {
+    Widget paged(Future<List<String>> Function(String) search) => SizedBox(
+      width: 400,
+      height: 600,
+      child: OiComboBox<String>(
+        label: 'Fruit',
+        labelOf: (item) => item,
+        search: search,
+        moreAvailable: true,
+        loadMore: () async => ['M1'],
+      ),
+    );
+
+    testWidgets('appends each loaded item once after an async search', (
+      tester,
+    ) async {
+      await tester.pumpObers(paged((_) async => ['A1', 'A2']));
+      await _open(tester);
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.pump();
+      expect(find.text('A1'), findsOneWidget);
+
+      await _tapOption(tester, 'Load more…');
+
+      expect(find.text('A1'), findsOneWidget);
+      expect(find.text('A2'), findsOneWidget);
+      expect(find.text('M1'), findsOneWidget);
+    });
+
+    testWidgets('works when the search returns an unmodifiable list', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        paged((_) async => List<String>.unmodifiable(['A1', 'A2'])),
+      );
+      await _open(tester);
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.pump();
+
+      await _tapOption(tester, 'Load more…');
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('M1'), findsOneWidget);
+    });
+  });
+
+  group('async search', () {
+    testWidgets('a slow earlier search does not replace newer results', (
+      tester,
+    ) async {
+      final requests = <String, Completer<List<String>>>{};
+      await tester.pumpObers(
+        _comboBox(
+          items: const [],
+          search: (query) =>
+              (requests[query] = Completer<List<String>>()).future,
+        ),
+      );
+      await _open(tester);
+      // The search that opening starts.
+      await tester.pump(const Duration(milliseconds: 250));
+      requests['']!.complete(const []);
+      await _flush(tester);
+
+      final input = find.byType(EditableText).first;
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.enterText(input, 'ab');
+      await tester.pump(const Duration(milliseconds: 250));
+      expect(requests.keys, containsAll(<String>['a', 'ab']));
+
+      // The newer search answers first, the older one afterwards.
+      requests['ab']!.complete(['Abacus']);
+      await _flush(tester);
+      expect(find.text('Abacus'), findsOneWidget);
+
+      requests['a']!.complete(['Apple', 'Avocado']);
+      await _flush(tester);
+
+      expect(find.text('Abacus'), findsOneWidget);
+      expect(find.text('Apple'), findsNothing);
+      expect(find.text('Avocado'), findsNothing);
+    });
+
+    testWidgets('a stale search does not end the loading state', (
+      tester,
+    ) async {
+      final requests = <String, Completer<List<String>>>{};
+      await tester.pumpObers(
+        _comboBox(
+          items: const [],
+          search: (query) =>
+              (requests[query] = Completer<List<String>>()).future,
+        ),
+      );
+      await _open(tester);
+      await tester.pump(const Duration(milliseconds: 250));
+      requests['']!.complete(const []);
+      await _flush(tester);
+
+      final input = find.byType(EditableText).first;
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.enterText(input, 'ab');
+      await tester.pump(const Duration(milliseconds: 250));
+
+      requests['a']!.complete(['Apple']);
+      await _flush(tester);
+
+      expect(find.text('Loading…'), findsOneWidget);
+      expect(find.text('Apple'), findsNothing);
+
+      requests['ab']!.complete(['Abacus']);
+      await _flush(tester);
+      expect(find.text('Loading…'), findsNothing);
+      expect(find.text('Abacus'), findsOneWidget);
+    });
+
+    testWidgets('a search that throws an Error ends the loading state', (
+      tester,
+    ) async {
+      final completer = Completer<List<String>>();
+      await tester.pumpObers(
+        _comboBox(items: const [], search: (query) => completer.future),
+      );
+      await _open(tester);
+      await tester.pump(const Duration(milliseconds: 250));
+      expect(find.text('Loading…'), findsOneWidget);
+
+      completer.completeError(StateError('backend down'));
+      await _flush(tester);
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Loading…'), findsNothing);
+      expect(find.text('No results'), findsOneWidget);
+    });
+
+    testWidgets('a search that throws synchronously ends the loading state', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        _comboBox(
+          items: const [],
+          search: (query) => throw StateError('backend down'),
+        ),
+      );
+      await _open(tester);
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Loading…'), findsNothing);
+    });
+  });
+
+  // ── Regression: trigger, highlight order, labels ───────────────────────────
+
+  group('trigger keyboard access', () {
+    for (final key in [
+      LogicalKeyboardKey.enter,
+      LogicalKeyboardKey.space,
+      LogicalKeyboardKey.arrowDown,
+    ]) {
+      testWidgets('${key.debugName} opens the dropdown from the focused '
+          'trigger', (tester) async {
+        await tester.pumpObers(_comboBox());
+        expect(find.text('Apple'), findsNothing);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        await tester.sendKeyEvent(key);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Apple'), findsOneWidget);
+      });
+    }
+
+    testWidgets('a disabled trigger does not open from the keyboard', (
+      tester,
+    ) async {
+      await tester.pumpObers(_comboBox(enabled: false));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Apple'), findsNothing);
+    });
+
+    testWidgets('escape returns focus to the trigger', (tester) async {
+      await tester.pumpObers(_comboBox());
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Apple'), findsNothing);
+
+      // The trigger has focus again, so it reopens from the keyboard.
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.text('Apple'), findsOneWidget);
+    });
+  });
+
+  group('highlight', () {
+    // Renders the highlighted option with a trailing "<".
+    Widget marked(
+      String item, {
+      required bool highlighted,
+      required bool selected,
+    }) => Text(highlighted ? '$item<' : item);
+
+    List<String> optionTexts(WidgetTester tester) => tester
+        .widgetList<Text>(
+          find.descendant(
+            of: find.byType(SingleChildScrollView),
+            matching: find.byType(Text),
+          ),
+        )
+        .map((t) => t.data!)
+        .toList();
+
+    testWidgets('follows the on-screen order with recent items', (
+      tester,
+    ) async {
+      String? selected;
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiComboBox<String>(
+            label: 'Fruit',
+            labelOf: (item) => item,
+            items: const ['Apple', 'Banana', 'Cherry'],
+            recentItems: const ['Cherry'],
+            onSelect: (v) => selected = v,
+            optionBuilder: marked,
+          ),
+        ),
+      );
+      await _open(tester);
+
+      // The first option on screen is highlighted, and only that one.
+      expect(optionTexts(tester), [
+        'Recent',
+        'Cherry<',
+        'Apple',
+        'Banana',
+        'Cherry',
+      ]);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      expect(optionTexts(tester), [
+        'Recent',
+        'Cherry',
+        'Apple<',
+        'Banana',
+        'Cherry',
+      ]);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(selected, 'Apple');
+    });
+
+    testWidgets('follows the on-screen order of grouped items', (
+      tester,
+    ) async {
+      String? selected;
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiComboBox<String>(
+            label: 'Fruit',
+            labelOf: (item) => item,
+            items: const ['Apple', 'Banana', 'Avocado'],
+            groupBy: (item) => item[0],
+            onSelect: (v) => selected = v,
+            optionBuilder: marked,
+          ),
+        ),
+      );
+      await _open(tester);
+      expect(optionTexts(tester), ['A', 'Apple<', 'Avocado', 'B', 'Banana']);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      expect(optionTexts(tester), ['A', 'Apple', 'Avocado<', 'B', 'Banana']);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(selected, 'Avocado');
+    });
+
+    testWidgets('typing highlights the first match, not a recent item', (
+      tester,
+    ) async {
+      String? selected;
+      await tester.pumpObers(
+        _comboBox(recentItems: const ['Cherry'], onSelect: (v) => selected = v),
+      );
+      await _open(tester);
+
+      await tester.enterText(find.byType(EditableText).first, 'ban');
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(selected, 'Banana');
+    });
+
+    testWidgets('marks one option when two items are equal', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiComboBox<String>(
+            label: 'Fruit',
+            labelOf: (item) => item,
+            items: const ['Apple', 'Apple', 'Banana'],
+            optionBuilder: marked,
+          ),
+        ),
+      );
+      await _open(tester);
+
+      expect(optionTexts(tester), ['Apple<', 'Apple', 'Banana']);
+    });
+
+    testWidgets('does not compare every option with every other on rebuild', (
+      tester,
+    ) async {
+      final items = [for (var i = 0; i < 40; i++) _CountingItem('Item $i')];
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiComboBox<_CountingItem>(
+            label: 'Items',
+            labelOf: (item) => item.name,
+            items: items,
+          ),
+        ),
+      );
+      await _open(tester);
+
+      _CountingItem.comparisons = 0;
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+
+      expect(_CountingItem.comparisons, lessThanOrEqualTo(items.length));
+    });
+
+    testWidgets('survives a parent rebuild with an equal items list', (
+      tester,
+    ) async {
+      String? selected;
+      late StateSetter rebuild;
+      await tester.pumpObers(
+        StatefulBuilder(
+          builder: (context, setState) {
+            rebuild = setState;
+            return _comboBox(
+              // A new list instance on every build.
+              items: [..._fruits],
+              onSelect: (v) => selected = v,
+            );
+          },
+        ),
+      );
+      await _open(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+
+      rebuild(() {});
+      await tester.pump();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(selected, 'Cherry');
+    });
+
+    testWidgets('stays on the same item when the items change', (
+      tester,
+    ) async {
+      String? selected;
+      var items = _fruits;
+      late StateSetter rebuild;
+      await tester.pumpObers(
+        StatefulBuilder(
+          builder: (context, setState) {
+            rebuild = setState;
+            return _comboBox(items: items, onSelect: (v) => selected = v);
+          },
+        ),
+      );
+      await _open(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+
+      rebuild(() => items = ['Apricot', ..._fruits]);
+      await tester.pump();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(selected, 'Cherry');
+    });
+  });
+
+  group('labels', () {
+    testWidgets('default to English', (tester) async {
+      await tester.pumpObers(_comboBox(items: const [], onCreate: (_) {}));
+      await _open(tester);
+      expect(find.text('Search…'), findsOneWidget);
+
+      await tester.enterText(find.byType(EditableText).first, 'Mango');
+      await tester.pump();
+      expect(find.text('Create "Mango"'), findsOneWidget);
+    });
+
+    testWidgets('are replaced by OiComboBoxLabels', (tester) async {
+      final completer = Completer<List<String>>();
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiComboBox<String>(
+            label: 'Obst',
+            labelOf: (item) => item,
+            search: (_) => completer.future,
+            moreAvailable: true,
+            loadMore: () async => const [],
+            labels: const OiComboBoxLabels(
+              searchPlaceholder: 'Suchen',
+              loading: 'Wird geladen',
+              loadMore: 'Mehr laden',
+            ),
+          ),
+        ),
+      );
+      await _open(tester);
+      expect(find.text('Suchen'), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 250));
+      expect(find.text('Wird geladen'), findsOneWidget);
+
+      completer.complete(['Apfel']);
+      await _flush(tester);
+      expect(find.text('Mehr laden'), findsOneWidget);
+    });
+
+    testWidgets('create label is built from the query', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiComboBox<String>(
+            label: 'Obst',
+            labelOf: (item) => item,
+            onCreate: (_) {},
+            labels: OiComboBoxLabels(
+              create: (query) => '„$query“ anlegen',
+            ),
+          ),
+        ),
+      );
+      await _open(tester);
+      await tester.enterText(find.byType(EditableText).first, 'Mango');
+      await tester.pump();
+
+      expect(find.text('„Mango“ anlegen'), findsOneWidget);
+    });
+  });
+}
+
+/// Opens the dropdown by tapping the trigger.
+Future<void> _open(WidgetTester tester) async {
+  await tester.tap(find.byType(GestureDetector).first);
+  await tester.pumpAndSettle();
+}
+
+/// Activates the dropdown row showing [text].
+///
+/// The dropdown sits in a `CompositedTransformFollower`, which test taps do
+/// not reach, so the row's own tap handler is invoked.
+Future<void> _tapOption(WidgetTester tester, String text) async {
+  tester
+      .widget<GestureDetector>(
+        find
+            .ancestor(
+              of: find.text(text),
+              matching: find.byType(GestureDetector),
+            )
+            .first,
+      )
+      .onTap!();
+  await tester.pump();
+  await tester.pump();
+}
+
+@immutable
+class _CountingItem {
+  const _CountingItem(this.name);
+
+  static int comparisons = 0;
+
+  final String name;
+
+  @override
+  bool operator ==(Object other) {
+    comparisons++;
+    return other is _CountingItem && other.name == name;
+  }
+
+  @override
+  int get hashCode => name.hashCode;
+}
+
+/// Lets a completed future deliver its result, then builds the frame showing
+/// it. A single pump draws its frame before it runs the pending microtasks.
+Future<void> _flush(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump();
 }
