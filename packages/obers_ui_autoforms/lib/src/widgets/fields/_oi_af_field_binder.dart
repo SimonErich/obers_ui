@@ -116,7 +116,20 @@ mixin OiAfFieldBinderMixin<
   /// The current field value, cast to [TValue].
   ///
   /// This is the primary typed access point for widget build methods.
-  TValue? get typedValue => fieldCtrl.value as TValue?;
+  ///
+  /// Throws a [FlutterError] naming the field when the stored value has
+  /// another type, for example an `int` set into a field bound to a slider,
+  /// which holds a `double`.
+  TValue? get typedValue {
+    final value = fieldCtrl.value;
+    if (value is TValue?) return value;
+    throw FlutterError(
+      'Field $fieldEnum holds a value of type ${value.runtimeType}, but '
+      '${widget.runtimeType} expects $TValue.\n'
+      'Set a $TValue for this field (initialValue, set(), patch(), rebase() '
+      'or a derive callback), or bind it to a widget for its type.',
+    );
+  }
 
   /// Called when the user changes the value.
   void onValueChanged(TValue? value) {

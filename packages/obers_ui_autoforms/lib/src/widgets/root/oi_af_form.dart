@@ -106,8 +106,21 @@ class _OiAfFormState<TField extends Enum, TData>
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.detach();
       _attach();
-    } else if (oldWidget.messageResolver != widget.messageResolver) {
-      widget.controller.messageResolver = widget.messageResolver;
+    } else {
+      widget.controller.updateAttachment(
+        validateMode: widget.validateMode,
+        submitOnEnterFromLastField: widget.submitOnEnterFromLastField,
+        focusFirstInvalidFieldOnSubmitFailure:
+            widget.focusFirstInvalidFieldOnSubmitFailure,
+        clearGlobalErrorsOnFieldChange: widget.clearGlobalErrorsOnFieldChange,
+        // Only a change of the prop itself overrides the controller, so an
+        // unrelated rebuild keeps controller.disable() / enable().
+        enabled: oldWidget.enabled != widget.enabled ? widget.enabled : null,
+        onSubmit: widget.onSubmit,
+        onSubmitResult: widget.onSubmitResult,
+        errorMapper: widget.errorMapper,
+        messageResolver: widget.messageResolver,
+      );
     }
   }
 
@@ -138,6 +151,7 @@ class _OiAfFormState<TField extends Enum, TData>
     return OiAfScope(
       rawController: widget.controller,
       messageResolver: widget.messageResolver,
+      enabled: widget.controller.isEnabled,
       child: widget.child,
     );
   }

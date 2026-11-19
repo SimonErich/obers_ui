@@ -6352,6 +6352,17 @@ addFormValidator(validator)
 | `onBlurThenChange` | **Default.** Validate on blur first, then on each change |
 | `onInit` | Validate immediately |
 
+### Controller Behavior
+
+- `controller.set(field, value)` and `controller.patch(values)` are programmatic changes: they mark fields dirty but **not** touched. Pass `markTouched: true` to treat them like user edits. `restore(values)` in its default `patchCurrent` mode goes through `patch`, so a restored draft is dirty but untouched.
+- `isValid` only looks at visible + enabled fields; `isDirty` and `isTouched` look at every registered field, hidden and disabled ones included.
+- `rebase(values)` / `restore(values, mode: rebaseInitial)` re-evaluate `visibleWhen` / `enabledWhen` and recompute derived fields, like `reset()`.
+- `OiAfForm` applies changed props (`enabled`, `validateMode`, `onSubmit`, …) to the attached controller on rebuild. An unchanged `enabled` prop leaves `controller.disable()` / `enable()` alone.
+- Call `controller.dispose()` when the owner goes away. It disposes the field controllers; async validators and a pending submit that finish later are ignored.
+- Async validators: a run overtaken by a newer one (or by the value changing) never applies its result and resolves to the newer outcome, so typing during a slow submit does not fail a valid form.
+- A derived-field cycle or a `dependsOn` naming an unregistered field throws a `StateError` from the controller constructor.
+- `defineFields()` runs inside the base constructor: fields initialised in the declaration or initialiser list are available, fields assigned in the subclass constructor **body** are not.
+
 ### Tags
 
 | Tag | Widgets |

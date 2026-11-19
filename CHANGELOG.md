@@ -35,6 +35,7 @@ from the git history, using the commits that changed `version:` in
 - Semantics for `OiSwitch`, `OiCheckbox`, `OiRadio`, `OiTabs` and `OiSlider`
 - `OiTappable` honors `backgroundOverride` on interaction states
 - `obers_ui_autoforms`: `OiAfMessageResolver` is used for validation messages
+- `obers_ui_autoforms`: `OiAfController.updateAttachment` (how `OiAfForm` applies changed props), `OiAfController.dispose` now also disposes the field controllers, `OiAfScope.enabled`, and `OiAfMessageResolver` messages for `ipAddress`, `multipleOf`, `decimal`, `digitsBetween`, `distinct`, the today-inclusive date rules and a failed `buildData`
 - README files for `obers_ui_charts` and `obers_ui_autoforms`
 
 ### Changed
@@ -48,6 +49,9 @@ from the git history, using the commits that changed `version:` in
 - `obers_ui_charts` and `obers_ui_autoforms` use very_good_analysis ^10, like the root package, and share its version number
 - CI runs the tests of both sub-packages and analyzes the example app; all workflows read the Flutter version from `.tool-versions`
 - Build output and lockfiles of the sub-packages are no longer tracked
+- `obers_ui_autoforms`: `OiAfController.set` and `patch` (and so `restore` in `patchCurrent` mode) no longer mark fields touched; pass `markTouched: true` to `set` / `patch` for the old behaviour
+- `obers_ui_autoforms`: `OiAfValidators.email` requires a top-level domain and rejects leading, trailing and doubled dots; `url` requires a host for http(s), ftp(s) and ws(s); `ipAddress` validates IPv6 properly and rejects IPv4 octets with leading zeros
+- `obers_ui_autoforms`: a circular or unregistered derived-field dependency throws a `StateError` instead of failing an assertion
 
 ### Fixed
 
@@ -69,6 +73,10 @@ from the git history, using the commits that changed `version:` in
 - `OiSheet` autofocus
 - `OiExportButton` menu had a transparent surface
 - `obers_ui_autoforms`: field controllers are notified on form-level batch mutations
+- `obers_ui_autoforms`: `OiAfForm` applies changed props (`enabled`, `validateMode`, `onSubmit`, `onSubmitResult`, `errorMapper`, …) to an already attached controller
+- `obers_ui_autoforms`: a validation overtaken by a newer one no longer reports the field invalid, and a result for an old value no longer lands on a changed, hidden, disabled or reset field
+- `obers_ui_autoforms`: `rebase` and `restore(rebaseInitial)` re-evaluate `visibleWhen` / `enabledWhen` and derived fields
+- `obers_ui_autoforms`: `integer`, `digitsBetween` and `multipleOf` no longer throw on NaN, infinity or a zero factor; `multipleOf` and `decimal` tolerate binary rounding (`multipleOf(0.1)` accepts 0.3)
 - `obers_ui_charts`: `OiTileMap` wraps markers across the antimeridian and pins every visible world copy
 
 ### Removed

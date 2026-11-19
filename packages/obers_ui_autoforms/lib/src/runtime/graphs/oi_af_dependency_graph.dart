@@ -27,6 +27,10 @@ class OiAfDependencyGraph<TField extends Enum> {
 
   /// Builds the dependency graph from field definitions and computes the
   /// topological sort order with full cycle detection.
+  ///
+  /// Throws a [StateError] when derived fields depend on each other in a
+  /// circle or on a field that is not registered. Both are checked in release
+  /// builds too: a cycle would otherwise recurse until the stack overflows.
   void build({
     required Map<TField, OiAfFieldDefinition<TField, dynamic>> definitions,
     required List<TField> fieldOrder,
@@ -47,18 +51,19 @@ class OiAfDependencyGraph<TField extends Enum> {
 
     void visit(TField field) {
       if (visited.contains(field)) return;
-      assert(
-        !inStack.contains(field),
-        'Circular derived dependency detected involving field $field.',
-      );
+      if (inStack.contains(field)) {
+        throw StateError(
+          'Circular derived dependency detected involving field $field.',
+        );
+      }
       inStack.add(field);
       final def = definitions[field]!;
       for (final dep in def.dependsOn) {
-        assert(
-          definitions.containsKey(dep),
-          'Field $field depends on unregistered field $dep.',
-        );
-        if (definitions[dep]!.derive != null) {
+        final dependency = definitions[dep];
+        if (dependency == null) {
+          throw StateError('Field $field depends on unregistered field $dep.');
+        }
+        if (dependency.derive != null) {
           visit(dep);
         }
       }
