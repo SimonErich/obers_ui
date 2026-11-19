@@ -97,6 +97,76 @@ void main() {
       expect(ctrl.isEnabled, isFalse);
     });
 
+    testWidgets(
+      'a changed enabled prop notifies the controller listeners once, '
+      'after the frame',
+      (tester) async {
+        final ctrl = _Ctrl();
+        addTearDown(ctrl.dispose);
+        final seen = <bool>[];
+
+        await tester.pumpWidget(
+          pumpFormWithController(controller: ctrl, child: _fields),
+        );
+        ctrl.addListener(() => seen.add(ctrl.isEnabled));
+
+        await tester.pumpWidget(
+          pumpFormWithController(
+            controller: ctrl,
+            enabled: false,
+            child: _fields,
+          ),
+        );
+        expect(seen, [false]);
+
+        // Same enabled value, another prop changed: nothing to announce.
+        await tester.pumpWidget(
+          pumpFormWithController(
+            controller: ctrl,
+            enabled: false,
+            validateMode: OiAfValidateMode.onChange,
+            child: _fields,
+          ),
+        );
+        expect(seen, [false]);
+
+        await tester.pumpWidget(
+          pumpFormWithController(
+            controller: ctrl,
+            validateMode: OiAfValidateMode.onChange,
+            child: _fields,
+          ),
+        );
+        expect(seen, [false, true]);
+      },
+    );
+
+    testWidgets('a controller disposed in the same frame is not notified', (
+      tester,
+    ) async {
+      final ctrl = _Ctrl();
+      var notified = 0;
+
+      await tester.pumpWidget(
+        pumpFormWithController(controller: ctrl, child: _fields),
+      );
+      ctrl.addListener(() => notified++);
+
+      // Registered first, so it runs before the notification the form queues
+      // while it rebuilds.
+      tester.binding.addPostFrameCallback((_) => ctrl.dispose());
+      await tester.pumpWidget(
+        pumpFormWithController(
+          controller: ctrl,
+          enabled: false,
+          child: _fields,
+        ),
+      );
+
+      expect(notified, 0);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('a new onSubmit replaces the old closure', (tester) async {
       final ctrl = _Ctrl();
       addTearDown(ctrl.dispose);

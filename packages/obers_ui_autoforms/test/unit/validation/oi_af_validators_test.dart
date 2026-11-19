@@ -1183,6 +1183,70 @@ void main() {
       final zero = OiAfValidators.multipleOf<TestField>(0);
       expect(zero(_ctx<num?>(TestField.age, 4)), isNotNull);
     });
+
+    test('keeps accepting the usual fractional factors', () {
+      for (final (factor, value) in <(num, num)>[
+        (0.1, 12345.6),
+        (0.01, 19.99),
+        (0.01, 1234567.89),
+        (0.05, 0.15),
+        (0.25, 7.75),
+        (0.001, 1.005),
+        (2.5, 7.5),
+      ]) {
+        final v = OiAfValidators.multipleOf<TestField>(factor);
+        expect(
+          v(_ctx<num?>(TestField.age, value)),
+          isNull,
+          reason: '$value is a multiple of $factor',
+        );
+      }
+    });
+
+    test('keeps rejecting near misses of the usual fractional factors', () {
+      for (final (factor, value) in <(num, num)>[
+        (0.1, 12345.65),
+        (0.01, 19.995),
+        (0.05, 0.16),
+        (0.25, 7.8),
+        (0.001, 1.0055),
+      ]) {
+        final v = OiAfValidators.multipleOf<TestField>(factor);
+        expect(
+          v(_ctx<num?>(TestField.age, value)),
+          isNotNull,
+          reason: '$value is not a multiple of $factor',
+        );
+      }
+    });
+
+    test('the rounding tolerance never reaches half a unit', () {
+      final one = OiAfValidators.multipleOf<TestField>(1);
+      expect(one(_ctx<num?>(TestField.age, 1000000000000000.5)), isNotNull);
+      expect(one(_ctx<num?>(TestField.age, 1000000000000000.0)), isNull);
+
+      final two = OiAfValidators.multipleOf<TestField>(2.0);
+      expect(two(_ctx<num?>(TestField.age, 250000000000001)), isNotNull);
+      expect(two(_ctx<num?>(TestField.age, 250000000000002)), isNull);
+    });
+
+    test('fails for a non-finite factor', () {
+      final infinite = OiAfValidators.multipleOf<TestField>(double.infinity);
+      expect(infinite(_ctx<num?>(TestField.age, 4)), isNotNull);
+      expect(infinite(_ctx<num?>(TestField.age, 0)), isNotNull);
+      final nan = OiAfValidators.multipleOf<TestField>(double.nan);
+      expect(nan(_ctx<num?>(TestField.age, 4)), isNotNull);
+    });
+  });
+
+  group('OiAfValidators.decimal large values', () {
+    test('counts the places of a large value with a fraction', () {
+      final one = OiAfValidators.decimal<TestField>(1, maxPlaces: 1);
+      expect(one(_ctx<num?>(TestField.age, 1000000000000000.5)), isNull);
+      final none = OiAfValidators.decimal<TestField>(0, maxPlaces: 0);
+      expect(none(_ctx<num?>(TestField.age, 1000000000000000.5)), isNotNull);
+      expect(none(_ctx<num?>(TestField.age, 1000000000000000.0)), isNull);
+    });
   });
 
   group('OiAfValidators.decimal', () {

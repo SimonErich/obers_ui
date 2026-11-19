@@ -315,8 +315,23 @@ void main() {
 
       validator.calls.single.gate.complete('is bad');
 
-      expect(await pending, isTrue);
+      // The reset value was never validated, so the run cannot vouch for it.
+      expect(await pending, isFalse);
       expect(fc.errors, isEmpty);
+      expect(fc.isValidationCurrent, isFalse);
+    });
+
+    test('isValidationCurrent follows the value', () async {
+      final ctrl = TestController();
+      addTearDown(ctrl.dispose);
+      final fc = ctrl.fieldController(TestField.name);
+      expect(fc.isValidationCurrent, isFalse);
+
+      await ctrl.validate(field: TestField.name);
+      expect(fc.isValidationCurrent, isTrue);
+
+      ctrl.set<String>(TestField.name, 'changed');
+      expect(fc.isValidationCurrent, isFalse);
     });
   });
 
@@ -366,6 +381,77 @@ void main() {
 
       expect(ctrl.isFieldVisible(TestField.name), isTrue);
       expect(ctrl.get<String>(TestField.fullName), 'zzz!');
+    });
+
+    test('a derived value supplied in the map wins over derive', () {
+      final ctrl = conditional();
+      addTearDown(ctrl.dispose);
+
+      ctrl.rebase({TestField.name: 'b', TestField.fullName: 'Custom'});
+
+      expect(ctrl.get<String>(TestField.name), 'b');
+      expect(ctrl.get<String>(TestField.fullName), 'Custom');
+      expect(ctrl.isDirty, isFalse);
+    });
+
+    test('restore(rebaseInitial) keeps a stored derived value', () {
+      final ctrl = conditional();
+      addTearDown(ctrl.dispose);
+
+      ctrl.restore({
+        TestField.name: 'b',
+        TestField.fullName: 'Custom',
+      }, mode: OiAfRestoreMode.rebaseInitial);
+
+      expect(ctrl.get<String>(TestField.fullName), 'Custom');
+    });
+
+    test('a derived field the user overrode is not re-derived', () {
+      final ctrl = conditional();
+      addTearDown(ctrl.dispose);
+      ctrl.fieldController(TestField.fullName).setValue('Mine');
+
+      ctrl.rebase({TestField.name: 'c'});
+
+      expect(ctrl.get<String>(TestField.name), 'c');
+      expect(ctrl.get<String>(TestField.fullName), 'Mine');
+    });
+
+    test('an alwaysDerived field is re-derived after a user edit', () {
+      final ctrl = TestController(
+        onDefineFields: (ctrl) {
+          ctrl
+            ..addTextField(TestField.name, initialValue: 'aaa')
+            ..addTextField(
+              TestField.fullName,
+              dependsOn: [TestField.name],
+              derivedOverrideMode: OiAfDerivedOverrideMode.alwaysDerived,
+              derive: (form) => '${form.getOr<String>(TestField.name, '')}!',
+            );
+        },
+      );
+      addTearDown(ctrl.dispose);
+      ctrl.fieldController(TestField.fullName).setValue('Mine');
+
+      ctrl.rebase({TestField.name: 'c'});
+
+      expect(ctrl.get<String>(TestField.fullName), 'c!');
+    });
+
+    test('reset() after a rebase derives from the rebased values', () {
+      final ctrl = conditional();
+      addTearDown(ctrl.dispose);
+
+      ctrl
+        ..rebase({TestField.name: 'zzz'})
+        ..set<String>(TestField.name, 'edited');
+      expect(ctrl.get<String>(TestField.fullName), 'edited!');
+
+      ctrl.reset();
+
+      expect(ctrl.get<String>(TestField.name), 'zzz');
+      expect(ctrl.get<String>(TestField.fullName), 'zzz!');
+      expect(ctrl.isDirty, isFalse);
     });
   });
 

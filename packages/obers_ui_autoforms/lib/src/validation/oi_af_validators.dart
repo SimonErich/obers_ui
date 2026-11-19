@@ -1264,15 +1264,24 @@ abstract final class OiAfValidators {
     }
   }
 
+  /// The largest distance from a whole number that still counts as rounding
+  /// noise. The relative tolerance below grows with the value and would reach
+  /// half a unit, accepting every number, from about 1e14 on.
+  static const _maxIntegerTolerance = 0.01;
+
   /// Whether [value] is a whole number once binary rounding noise (a few
   /// units in the last place) is ignored.
   static bool _isNearInteger(double value) {
     if (!value.isFinite) return false;
-    return (value - value.roundToDouble()).abs() <= value.abs() * 4e-15;
+    final relative = value.abs() * 4e-15;
+    final tolerance = relative < _maxIntegerTolerance
+        ? relative
+        : _maxIntegerTolerance;
+    return (value - value.roundToDouble()).abs() <= tolerance;
   }
 
   static bool _isMultipleOf(num value, num factor) {
-    if (factor == 0) return false;
+    if (factor == 0 || !factor.isFinite) return false;
     if (value is int && factor is int) return value % factor == 0;
     return _isNearInteger(value / factor);
   }

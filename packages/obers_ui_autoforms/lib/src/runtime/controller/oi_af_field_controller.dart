@@ -81,6 +81,10 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
   /// runs can wait for the outcome instead of reporting one of their own.
   Completer<void>? _validationSettled;
 
+  /// Whether the last completed run judged the value and state the field has
+  /// now. Everything that makes a run in flight stale clears it as well.
+  bool _validationCurrent = false;
+
   bool _disposed = false;
 
   String? _displayLabel;
@@ -139,6 +143,18 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
 
   /// Whether an async validation is in progress.
   bool get isValidating => _isValidating;
+
+  /// Whether the field has a validation verdict for its current value.
+  ///
+  /// False before the first validation, while one is running, and after
+  /// anything that made the last verdict stale: a new value, the field being
+  /// hidden or disabled, a reset or a rebase. A submit only goes ahead once
+  /// this holds for every visible and enabled field.
+  bool get isValidationCurrent => _validationCurrent && !_isValidating;
+
+  /// Whether the validators left errors on the field (backend and runtime
+  /// errors not counted).
+  bool get hasValidationErrors => _validationErrors.isNotEmpty;
 
   /// Whether this field has any errors.
   bool get hasErrors => !isValid;
@@ -364,16 +380,17 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
   /// Resolves to whether the field passed. A run that is overtaken, by a
   /// newer [validate] call or by the value changing underneath it, never
   /// applies its own result: it waits for the validation that replaced it and
-  /// resolves to that outcome. A run cancelled without a replacement (field
-  /// hidden, disabled, reset or disposed) resolves to whether validation
-  /// errors are left on the field; hiding, disabling and resetting clear them.
+  /// resolves to that outcome. A run cancelled without a replacement resolves
+  /// to `true` when the field is skipped anyway (hidden or disabled), and to
+  /// `false` otherwise (reset, rebased, disposed, or hidden and shown again):
+  /// nothing has judged the value the field holds now, see
+  /// [isValidationCurrent].
   Future<bool> validate({
     required OiAfValidateMode effectiveMode,
     required OiAfReader<TField> form,
     OiAfValidationTrigger trigger = OiAfValidationTrigger.manual,
   }) async {
-    if (!_isVisible && _definition.excludeWhenHidden) return true;
-    if (!_isEnabled && _definition.skipValidationWhenDisabled) return true;
+    if (_skipsValidation) return true;
     if (!shouldValidateForTrigger(trigger, effectiveMode)) {
       return isValid;
     }
@@ -381,6 +398,7 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
     _validationVersion++;
     final version = _validationVersion;
     _isValidating = true;
+    _validationCurrent = false;
     _activeRun = (effectiveMode: effectiveMode, form: form, trigger: trigger);
     _validationSettled ??= Completer<void>();
     notifyListeners();
@@ -440,19 +458,27 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
       ..clear()
       ..addAll(errors);
     _endValidation();
+    _validationCurrent = true;
     observerGetter?.call()?.onFieldValidated(_definition.field, errors);
     notifyListeners();
 
     return errors.isEmpty;
   }
 
-  /// The outcome for a run that was overtaken: whatever is left on the field
-  /// once no validation is in flight any more.
+  /// Whether the field is left out of validation in its current state.
+  bool get _skipsValidation =>
+      (!_isVisible && _definition.excludeWhenHidden) ||
+      (!_isEnabled && _definition.skipValidationWhenDisabled);
+
+  /// The outcome for a run that was overtaken, once no validation is in
+  /// flight any more: the verdict of the run that replaced it. Without one
+  /// the field only passes when it is skipped; a value nobody judged does not.
   Future<bool> _settledResult() async {
     while (_isValidating) {
       await _validationSettled!.future;
     }
-    return _validationErrors.isEmpty;
+    if (_skipsValidation) return true;
+    return _validationCurrent && _validationErrors.isEmpty;
   }
 
   /// Marks the run in flight as finished and wakes the runs waiting on it.
@@ -463,12 +489,13 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
     _validationSettled = null;
   }
 
-  /// Makes the result of a validation in flight stale.
+  /// Makes the last verdict and the result of a validation in flight stale.
   ///
   /// Returns the arguments of the cancelled run, or null when none was
   /// running. Callers notify listeners themselves.
   _OiAfValidationRun<TField>? _cancelValidation() {
     _validationVersion++;
+    _validationCurrent = false;
     final run = _activeRun;
     if (_isValidating) _endValidation();
     return run;

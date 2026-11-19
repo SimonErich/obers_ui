@@ -75,7 +75,8 @@ from the git history, using the commits that changed `version:` in
 - `obers_ui_autoforms`: field controllers are notified on form-level batch mutations
 - `obers_ui_autoforms`: `OiAfForm` applies changed props (`enabled`, `validateMode`, `onSubmit`, `onSubmitResult`, `errorMapper`, …) to an already attached controller
 - `obers_ui_autoforms`: a validation overtaken by a newer one no longer reports the field invalid, and a result for an old value no longer lands on a changed, hidden, disabled or reset field
-- `obers_ui_autoforms`: `rebase` and `restore(rebaseInitial)` re-evaluate `visibleWhen` / `enabledWhen` and derived fields
+- `obers_ui_autoforms`: `submit()` and a form-wide `validate()` only pass once every visible and enabled field has a verdict for its current value: fields that changed, were reset, rebased, or hidden and shown again while validators were running are validated again first
+- `obers_ui_autoforms`: `rebase` and `restore(rebaseInitial)` re-evaluate `visibleWhen` / `enabledWhen` and derived fields; a derived value given in the map and a derived field the user overrode are kept
 - `obers_ui_autoforms`: `integer`, `digitsBetween` and `multipleOf` no longer throw on NaN, infinity or a zero factor; `multipleOf` and `decimal` tolerate binary rounding (`multipleOf(0.1)` accepts 0.3)
 - `obers_ui_charts`: `OiTileMap` wraps markers across the antimeridian and pins every visible world copy
 
