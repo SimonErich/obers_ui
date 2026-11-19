@@ -157,6 +157,20 @@ void main() {
   // ── Accessibility ────────────────────────────────────────────────────────
 
   group('Accessibility', () {
+    testWidgets('a tappable card announces alt once and the version label', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        _card(alt: 'Landscape', versionLabel: 'v2', onTap: () {}),
+      );
+
+      final node = tester.getSemantics(find.text('v2'));
+      expect(node.label, 'Landscape\nv2');
+      expect(node, isSemantics(isButton: true, hasTapAction: true));
+      handle.dispose();
+    });
+
     testWidgets('has semantics with alt text', (tester) async {
       final handle = tester.ensureSemantics();
       try {

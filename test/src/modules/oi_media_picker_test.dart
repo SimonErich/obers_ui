@@ -24,6 +24,35 @@ Widget _wrap(Widget child) {
 }
 
 void main() {
+  testWidgets('a gallery item announces its size and its thumbnail', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      _wrap(
+        const OiMediaPicker(
+          label: 'Media Picker',
+          galleryItems: [
+            OiMediaItem(
+              key: 'a',
+              name: 'Photo.jpg',
+              sizeBytes: 2048,
+              thumbnail: Text('thumb preview'),
+            ),
+          ],
+        ),
+      ),
+      surfaceSize: const Size(800, 600),
+    );
+
+    final item = tester.getSemantics(find.text('thumb preview'));
+    expect(item.label, contains('Photo.jpg'));
+    expect(item.label, contains('thumb preview'));
+    expect(item.label, contains('KB'));
+    expect(item, isSemantics(isButton: true, hasTapAction: true));
+    handle.dispose();
+  });
+
   testWidgets('renders gallery items', (tester) async {
     final items = _sampleItems(count: 3);
 

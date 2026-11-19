@@ -708,8 +708,9 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // No semanticLabel: the row shows the title, and a semanticLabel
+            // would replace what the row announces, hiding the category.
             OiTappable(
-              semanticLabel: article.title,
               onTap: () => setState(() => _selectedArticle = article),
               child: Padding(
                 padding: EdgeInsets.symmetric(

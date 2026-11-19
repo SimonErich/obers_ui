@@ -396,8 +396,7 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
     final isSelected = _selectedKeys.contains(item.key);
     final disabled = _atMax && !isSelected;
 
-    return OiTappable(
-      semanticLabel: '${item.name}${isSelected ? ", selected" : ""}',
+    final tile = OiTappable(
       enabled: !disabled,
       onTap: () => _toggleItem(item),
       child: Opacity(
@@ -471,6 +470,14 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
           ),
         ),
       ),
+    );
+
+    // The label goes on a Semantics wrapper, not on the tappable: a
+    // tappable's semanticLabel replaces everything its child announces,
+    // which would hide the size badge and a caller-supplied thumbnail.
+    return Semantics(
+      label: '${item.name}${isSelected ? ", selected" : ""}',
+      child: tile,
     );
   }
 

@@ -37,6 +37,19 @@ void main() {
     return centre + Offset(math.sin(angle) * radius, -math.cos(angle) * radius);
   }
 
+  testWidgets('the readouts announce their label and their value', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await pump(tester, value: const OiTimeOfDay(hour: 9, minute: 41));
+
+    final hour = tester.getSemantics(find.text('09'));
+    expect(hour.label, 'Hour\n09');
+    expect(hour, isSemantics(isButton: true, hasTapAction: true));
+    expect(tester.getSemantics(find.text('41')).label, 'Minute\n41');
+    handle.dispose();
+  });
+
   testWidgets('starts at 9:00 on the hours face', (tester) async {
     await pump(tester);
 

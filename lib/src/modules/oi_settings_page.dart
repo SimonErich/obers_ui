@@ -436,8 +436,9 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     final colors = context.colors;
     final spacing = context.spacing;
 
+    // No semanticLabel: the row shows the title, and a semanticLabel would
+    // replace everything the row announces, hiding the subtitle.
     return OiTappable(
-      semanticLabel: item.title,
       onTap: () => widget.onNavigate?.call(item),
       child: Padding(
         padding: EdgeInsets.symmetric(

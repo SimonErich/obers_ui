@@ -482,12 +482,11 @@ class _OiDevMenuState extends State<OiDevMenu> {
         final env = widget.environments[index];
         final selected = env.key == _selectedEnvironment;
 
-        return OiTappable(
+        final row = OiTappable(
           onTap: () {
             setState(() => _selectedEnvironment = env.key);
             widget.onEnvironmentChange?.call(env.key);
           },
-          semanticLabel: '${env.label} environment',
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: spacing.md,
@@ -558,6 +557,11 @@ class _OiDevMenuState extends State<OiDevMenu> {
             ),
           ),
         );
+
+        // The label goes on a Semantics wrapper, not on the tappable: a
+        // tappable's semanticLabel replaces everything its child announces,
+        // which would hide the environment URL.
+        return Semantics(label: '${env.label} environment', child: row);
       },
     );
   }

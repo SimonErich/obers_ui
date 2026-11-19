@@ -64,6 +64,27 @@ final _logs = [
 // ---------------------------------------------------------------------------
 
 void main() {
+  testWidgets('an environment row announces its URL', (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      const SizedBox(
+        width: 500,
+        height: 600,
+        child: OiDevMenu(
+          label: 'Dev Menu',
+          environments: _envs,
+          currentEnvironment: 'dev',
+        ),
+      ),
+    );
+
+    final row = tester.getSemantics(find.text('Staging'));
+    expect(row.label, contains('Staging environment'));
+    expect(row.label, contains('https://staging.api'));
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    handle.dispose();
+  });
+
   group('OiDevMenu standalone', () {
     testWidgets('renders environment list', (tester) async {
       await tester.pumpObers(

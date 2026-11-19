@@ -53,6 +53,19 @@ Widget _menu({
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 void main() {
+  testWidgets('an item announces its label once and its badge count', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(_menu());
+
+    final row = tester.getSemantics(find.text('Tasks'));
+    expect(row.label, 'Tasks\n3');
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    expect(tester.getSemantics(find.text('Notes')).label, 'Notes');
+    handle.dispose();
+  });
+
   group('OiNavMenu', () {
     testWidgets('renders all items', (tester) async {
       await tester.pumpObers(_menu());

@@ -68,6 +68,37 @@ Widget _stepper({
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 void main() {
+  testWidgets('a tappable step announces its label once and its time', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      _stepper(
+        phases: const [
+          OiWorkflowPhase(
+            id: 'develop',
+            label: 'Develop',
+            steps: [
+              OiWorkflowStep(id: 'dev1', label: 'Frontend'),
+              OiWorkflowStep(
+                id: 'dev2',
+                label: 'Backend',
+                estimatedTime: '2 days',
+              ),
+            ],
+          ),
+        ],
+        enabledStepIds: const {'dev2'},
+        onStepTap: (_, _) {},
+      ),
+    );
+
+    final step = tester.getSemantics(find.text('Backend'));
+    expect(step.label, 'Backend\n2 days');
+    expect(step, isSemantics(isButton: true, hasTapAction: true));
+    handle.dispose();
+  });
+
   // 1. Renders phase labels.
   testWidgets('renders phase labels', (tester) async {
     await tester.pumpObers(_stepper());

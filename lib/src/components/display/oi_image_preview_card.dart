@@ -231,11 +231,12 @@ class _OiImagePreviewCardState extends State<OiImagePreviewCard> {
       );
     }
 
-    // Wrap in OiTappable if onTap is provided.
+    // Wrap in OiTappable if onTap is provided. No semanticLabel: it would
+    // replace everything the card announces (version label, status badge,
+    // edit action). The Semantics wrapper below carries the alt text.
     if (widget.onTap != null) {
       card = OiTappable(
         onTap: widget.onTap,
-        semanticLabel: widget.alt,
         clipBorderRadius: radius,
         child: card,
       );

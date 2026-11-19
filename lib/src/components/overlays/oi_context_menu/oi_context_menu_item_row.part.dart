@@ -129,24 +129,30 @@ class _MenuItemRowState extends State<_MenuItemRow>
       key: _itemKey,
       onEnter: (_) => _onMouseEnter(),
       onExit: (_) => _onMouseExit(),
-      child: OiTappable(
-        onTap: item.enabled && !_hasChildren
-            ? () {
-                item.onTap?.call();
-                widget.onClose();
-              }
-            : item.enabled && _hasChildren
-            ? _openHoverSubMenu
-            : null,
-        enabled: item.enabled,
-        semanticLabel: item.semanticLabel ?? item.label,
-        child: Container(
-          color: bg,
-          padding: EdgeInsets.symmetric(
-            horizontal: spacing.sm,
-            vertical: spacing.xs,
+      // A custom label goes on a Semantics wrapper, not on the tappable: a
+      // tappable's semanticLabel replaces everything its child announces,
+      // which would hide the shortcut. Without one the row's own text is
+      // announced.
+      child: Semantics(
+        label: item.semanticLabel,
+        child: OiTappable(
+          onTap: item.enabled && !_hasChildren
+              ? () {
+                  item.onTap?.call();
+                  widget.onClose();
+                }
+              : item.enabled && _hasChildren
+              ? _openHoverSubMenu
+              : null,
+          enabled: item.enabled,
+          child: Container(
+            color: bg,
+            padding: EdgeInsets.symmetric(
+              horizontal: spacing.sm,
+              vertical: spacing.xs,
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: children),
           ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: children),
         ),
       ),
     );

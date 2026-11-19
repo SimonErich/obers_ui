@@ -118,6 +118,21 @@ void main() {
     handle.dispose();
   });
 
+  testWidgets('a navigation item announces its title once and its subtitle', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      buildPage(onNavigate: (_) {}),
+      surfaceSize: const Size(800, 600),
+    );
+
+    final row = tester.getSemantics(find.text('Account Settings'));
+    expect(row.label, 'Account Settings\nManage your account');
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    handle.dispose();
+  });
+
   testWidgets('renders group titles', (tester) async {
     await tester.pumpObers(buildPage(), surfaceSize: const Size(800, 600));
 

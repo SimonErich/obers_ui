@@ -47,6 +47,31 @@ final _articles = [
 ];
 
 void main() {
+  testWidgets('an article row announces its title once and its category', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      SizedBox(
+        width: 800,
+        height: 600,
+        child: OiHelpCenter(
+          label: 'Help',
+          articles: _articles,
+          showFaq: false,
+          showContact: false,
+          showFeedback: false,
+        ),
+      ),
+      surfaceSize: const Size(800, 600),
+    );
+
+    final row = tester.getSemantics(find.text('Getting Started'));
+    expect(row.label, 'Getting Started\nOnboarding');
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    handle.dispose();
+  });
+
   group('OiHelpCenter', () {
     testWidgets('renders FAQ tab with questions', (tester) async {
       await tester.pumpObers(

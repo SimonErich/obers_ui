@@ -4,6 +4,7 @@ import 'dart:ui' show SemanticsRole;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart' show RenderOpacity;
 import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -125,6 +126,28 @@ void main() {
       const OiTappable(enabled: false, child: SizedBox(width: 60, height: 60)),
     );
     expect(tester.widget<Opacity>(_tappablePart<Opacity>()).opacity, 0.4);
+  });
+
+  testWidgets('only one opacity layer wraps the child', (tester) async {
+    await tester.pumpObers(
+      const OiTappable(
+        child: SizedBox(key: Key('c'), width: 60, height: 60),
+      ),
+    );
+    // The two state fills carry their own AnimatedOpacity beside the child;
+    // above the child there is only the Opacity used for the disabled fade.
+    expect(
+      find.ancestor(
+        of: find.byKey(const Key('c')),
+        matching: find.descendant(
+          of: find.byType(OiTappable),
+          matching: find.byWidgetPredicate(
+            (w) => w is Opacity || w is AnimatedOpacity,
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('enabled: child is fully opaque', (tester) async {
@@ -1011,6 +1034,11 @@ void main() {
       await tester.pumpObers(build(enabled: true));
       await tester.pumpObers(build(enabled: false));
       expect(_InitProbe.inits, 1, reason: 'disabled');
+      expect(
+        tester.renderObject<RenderOpacity>(_tappablePart<Opacity>()).opacity,
+        0.4,
+        reason: 'the fade is applied in the same frame, not animated',
+      );
       await tester.pumpObers(build(enabled: true));
       expect(_InitProbe.inits, 1, reason: 'enabled again');
     });
@@ -1359,6 +1387,71 @@ void main() {
     });
   });
 
+  group('role and state asserts', () {
+    Matcher assertionMentioning(String a, [String? b]) => throwsA(
+      isA<AssertionError>().having(
+        (e) => e.message,
+        'message',
+        allOf(contains(a), contains(b ?? a)),
+      ),
+    );
+
+    test('a tab needs selected', () {
+      expect(
+        () => OiTappable(
+          role: OiTappableRole.tab,
+          onTap: () {},
+          child: const SizedBox(),
+        ),
+        assertionMentioning('selected'),
+      );
+    });
+
+    test('an enabled tab needs onTap', () {
+      expect(
+        // Not const: the assert has to fail at run time, not at compile time.
+        () => OiTappable(
+          role: OiTappableRole.tab,
+          selected: false,
+          // Not const either, or the lint asks for a const OiTappable.
+          // ignore: prefer_const_constructors
+          child: SizedBox(),
+        ),
+        assertionMentioning('onTap'),
+      );
+    });
+
+    testWidgets('a disabled tab needs no onTap', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        const Center(
+          child: OiTappable(
+            role: OiTappableRole.tab,
+            selected: false,
+            enabled: false,
+            child: Text('Vis'),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(_node(tester).role, SemanticsRole.tab);
+      handle.dispose();
+    });
+
+    test('checked and toggled exclude each other', () {
+      expect(
+        () => OiTappable(
+          checked: true,
+          toggled: false,
+          onTap: () {},
+          child: const SizedBox(),
+        ),
+        assertionMentioning('checked', 'toggled'),
+      );
+    });
+  });
+
   group('onKeyEvent', () {
     Future<void> focusTappable(WidgetTester tester) async {
       Focus.of(tester.element(find.byType(GestureDetector))).requestFocus();
@@ -1414,6 +1507,31 @@ void main() {
       expect(taps, 0);
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       expect(taps, 1);
+    });
+
+    testWidgets('a handled key-up still releases the pressed state', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpObers(
+        OiTappable(
+          onTap: () => taps++,
+          onKeyEvent: (node, event) => event is KeyUpEvent
+              ? KeyEventResult.handled
+              : KeyEventResult.ignored,
+          child: const SizedBox(width: 60, height: 60),
+        ),
+      );
+      await focusTappable(tester);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(_scale(tester), 0.97);
+
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(_scale(tester), 1);
+      expect(taps, 0, reason: 'the hook took the key-up');
     });
 
     testWidgets('is not called while disabled', (tester) async {

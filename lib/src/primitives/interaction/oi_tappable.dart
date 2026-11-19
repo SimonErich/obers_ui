@@ -94,7 +94,22 @@ class OiTappable extends StatefulWidget {
     this.onKeyEvent,
     this.skipTraversal = false,
     super.key,
-  });
+  }) : assert(
+         role != OiTappableRole.tab || selected != null,
+         'An OiTappable with role OiTappableRole.tab needs `selected` '
+         '(true or false): a tab is always announced as selected or not.',
+       ),
+       assert(
+         role != OiTappableRole.tab || !enabled || onTap != null,
+         'An enabled OiTappable with role OiTappableRole.tab needs `onTap`: '
+         'a tab must offer a tap action. Pass enabled: false for a tab that '
+         'cannot be activated.',
+       ),
+       assert(
+         checked == null || toggled == null,
+         'OiTappable cannot have both `checked` and `toggled`: a control is '
+         'either a checkbox / radio (checked) or a switch (toggled).',
+       );
 
   /// The widget to render inside the tappable area.
   final Widget child;
@@ -178,6 +193,15 @@ class OiTappable extends StatefulWidget {
   /// An enabled tappable with the default role, no [onTap], [onDoubleTap] or
   /// [onLongPress], no [semanticLabel] and no state announces no role, so a
   /// wrapper that only tracks hover is not read out as a button.
+  ///
+  /// Requirements, checked in debug mode:
+  /// - [OiTappableRole.tab] needs [selected] and, unless the tappable is
+  ///   disabled, [onTap].
+  /// - [OiTappableRole.menuItem] needs an ancestor announced with the menu
+  ///   or menu bar role (`Semantics(role: SemanticsRole.menu)` or
+  ///   `SemanticsRole.menuBar`). Flutter reports a missing one when it
+  ///   builds the semantics tree, so only with assistive technology (or
+  ///   `tester.ensureSemantics()` in a test) switched on.
   final OiTappableRole role;
 
   /// Whether the tappable is announced as checked (`true`) or unchecked
@@ -308,12 +332,17 @@ class _OiTappableState extends State<OiTappable> {
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
     if (!widget.enabled) return KeyEventResult.ignored;
 
-    final custom = widget.onKeyEvent?.call(node, event);
-    if (custom != null && custom != KeyEventResult.ignored) return custom;
-
     final isActivationKey =
         event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.space;
+
+    final custom = widget.onKeyEvent?.call(node, event);
+    if (custom != null && custom != KeyEventResult.ignored) {
+      // The built-in handling may have taken the key-down; release the
+      // pressed state even though the hook takes the key-up.
+      if (isActivationKey && event is KeyUpEvent) _setPressed(false);
+      return custom;
+    }
 
     if (!isActivationKey) return KeyEventResult.ignored;
 
@@ -450,7 +479,9 @@ class _OiTappableState extends State<OiTappable> {
     // Scale transform for pressed states (1 paints the child untouched).
     content = Transform.scale(scale: style.scale, child: content);
 
-    // Reduced opacity when disabled (1 paints the child untouched).
+    // Reduced opacity when disabled (1 paints the child untouched). This is
+    // the only opacity layer around the child: an Opacity composites a layer
+    // even at 1, so there must not be a second one.
     content = Opacity(
       opacity: !widget.enabled && widget.dimWhenDisabled ? 0.4 : 1,
       child: content,
@@ -541,7 +572,7 @@ class _OiTappableState extends State<OiTappable> {
         widget.semanticLabel != null ||
         role != OiTappableRole.button ||
         hasState;
-    content = Semantics(
+    return Semantics(
       label: widget.semanticLabel,
       button: announce && role == OiTappableRole.button ? true : null,
       role: switch (role) {
@@ -560,13 +591,6 @@ class _OiTappableState extends State<OiTappable> {
       onLongPress: widget.enabled && widget.onLongPress != null
           ? _handleLongPress
           : null,
-      child: content,
-    );
-
-    // Animated wrapper for smooth state transitions.
-    return AnimatedOpacity(
-      opacity: 1,
-      duration: reducedMotion ? Duration.zero : animations.fast,
       child: content,
     );
   }

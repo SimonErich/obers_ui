@@ -14,6 +14,32 @@ import '../../../helpers/pump_app.dart';
 Widget _top(Widget child) => Align(alignment: Alignment.topLeft, child: child);
 
 void main() {
+  testWidgets('a dropdown item announces its label once and its shortcut', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      _top(
+        const OiMenuBar(
+          label: 'Main menu',
+          items: [
+            OiMenuItem(
+              label: 'File',
+              children: [OiMenuItem(label: 'Save', shortcut: 'Cmd+S')],
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.tap(find.text('File'));
+    await tester.pumpAndSettle();
+
+    final row = tester.getSemantics(find.text('Save'));
+    expect(row.label, 'Save\nCmd+S');
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    handle.dispose();
+  });
+
   // ── Rendering ──────────────────────────────────────────────────────────────
 
   testWidgets('renders top-level item labels', (tester) async {

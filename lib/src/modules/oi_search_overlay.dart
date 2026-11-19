@@ -519,9 +519,11 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
     final radius = context.radius;
     final isHighlighted = index == _highlightedIndex;
 
+    // No semanticLabel: the row shows the title, and a semanticLabel would
+    // replace everything the row announces, hiding the subtitle, the category
+    // and a control passed as trailing.
     return OiTappable(
       onTap: () => _onSuggestionSelected(suggestion),
-      semanticLabel: suggestion.title,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: isHighlighted
