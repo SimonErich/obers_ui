@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart' show kLongPressTimeout;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/scheduling/oi_calendar.dart';
+import 'package:obers_ui/src/composites/scheduling/oi_calendar_labels.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -301,5 +302,323 @@ void main() {
     expect(moved?.key, 'e3');
     expect(newStart, DateTime(2025, 6, 11, 14));
     expect(newEnd, DateTime(2025, 6, 11, 15));
+  });
+
+  // ── Hour cells show every event that overlaps them ────────────────────────
+
+  group('hour cells', () {
+    final events = [
+      OiCalendarEvent(
+        key: 'short',
+        title: 'Short',
+        start: DateTime(2025, 6, 16, 9),
+        end: DateTime(2025, 6, 16, 9, 30),
+      ),
+      OiCalendarEvent(
+        key: 'night',
+        title: 'Night',
+        start: DateTime(2025, 6, 16, 22),
+        end: DateTime(2025, 6, 17, 2),
+      ),
+      OiCalendarEvent(
+        key: 'normal',
+        title: 'Normal',
+        start: DateTime(2025, 6, 16, 11),
+        end: DateTime(2025, 6, 16, 12),
+      ),
+      OiCalendarEvent(
+        key: 'late',
+        title: 'Late',
+        start: DateTime(2025, 6, 16, 14, 45),
+        end: DateTime(2025, 6, 16, 15, 15),
+      ),
+    ];
+
+    // Tall enough for all 24 hour rows to be built.
+    const surface = Size(800, 1400);
+
+    Widget calendar(
+      OiCalendarMode mode,
+      DateTime date, {
+      List<OiCalendarEvent>? of,
+    }) {
+      return OiCalendar(
+        events: of ?? events,
+        label: 'Calendar',
+        mode: mode,
+        initialDate: date,
+      );
+    }
+
+    testWidgets('week view shows short, overnight and normal events', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        calendar(OiCalendarMode.week, DateTime(2025, 6, 16)),
+        surfaceSize: surface,
+      );
+
+      expect(find.text('Short'), findsOneWidget);
+      expect(find.text('Normal'), findsOneWidget);
+      // 22:00 and 23:00 on the 16th, 00:00 and 01:00 on the 17th.
+      expect(find.text('Night'), findsNWidgets(4));
+      // 14:45-15:15 touches the 14:00 and the 15:00 cell.
+      expect(find.text('Late'), findsNWidgets(2));
+    });
+
+    testWidgets('week view puts an event in the cells of its own hours', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        calendar(OiCalendarMode.week, DateTime(2025, 6, 16)),
+        surfaceSize: surface,
+      );
+
+      double centerY(Finder finder) => tester.getCenter(finder).dy;
+      double labelY(String hour) => tester.getCenter(find.text(hour)).dy;
+
+      expect(centerY(find.text('Short')), closeTo(labelY('09:00'), 1));
+      expect(centerY(find.text('Normal')), closeTo(labelY('11:00'), 1));
+      final nights = find.text('Night');
+      expect(
+        [for (var i = 0; i < 4; i++) centerY(nights.at(i))]..sort(),
+        [
+          closeTo(labelY('00:00'), 1),
+          closeTo(labelY('01:00'), 1),
+          closeTo(labelY('22:00'), 1),
+          closeTo(labelY('23:00'), 1),
+        ],
+      );
+    });
+
+    testWidgets('day view shows short, overnight and normal events', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        calendar(OiCalendarMode.day, DateTime(2025, 6, 16)),
+        surfaceSize: surface,
+      );
+
+      expect(find.text('Short'), findsOneWidget);
+      expect(find.text('Normal'), findsOneWidget);
+      expect(find.text('Night'), findsNWidgets(2));
+      expect(find.text('Late'), findsNWidgets(2));
+
+      // The following day only has the two hours after midnight.
+      await tester.tap(find.byKey(const ValueKey('calendar_forward')));
+      await tester.pump();
+      expect(find.text('Night'), findsNWidgets(2));
+      expect(find.text('Short'), findsNothing);
+    });
+
+    testWidgets('day view shows an event that spans the whole focused day', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        calendar(
+          OiCalendarMode.day,
+          DateTime(2025, 6, 16),
+          of: [
+            OiCalendarEvent(
+              key: 'conf',
+              title: 'Conference',
+              start: DateTime(2025, 6, 15, 18),
+              end: DateTime(2025, 6, 17, 10),
+            ),
+          ],
+        ),
+        surfaceSize: surface,
+      );
+
+      expect(find.text('Conference'), findsNWidgets(24));
+    });
+
+    testWidgets('an event without a duration shows in the hour it starts', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        calendar(
+          OiCalendarMode.day,
+          DateTime(2025, 6, 16),
+          of: [
+            OiCalendarEvent(
+              key: 'ping',
+              title: 'Reminder',
+              start: DateTime(2025, 6, 16, 8),
+              end: DateTime(2025, 6, 16, 8),
+            ),
+          ],
+        ),
+        surfaceSize: surface,
+      );
+
+      expect(find.text('Reminder'), findsOneWidget);
+    });
+  });
+
+  // ── Labels ────────────────────────────────────────────────────────────────
+
+  testWidgets('labels replace the mode names and the week column header', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 800,
+        height: 600,
+        child: OiCalendar(
+          events: const [],
+          label: 'Kalender',
+          initialDate: _initialDate,
+          showWeekNumbers: true,
+          labels: const OiCalendarLabels(
+            day: 'Tag',
+            week: 'Woche',
+            month: 'Monat',
+            weekNumberHeader: 'KW',
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Tag'), findsOneWidget);
+    expect(find.text('Woche'), findsOneWidget);
+    expect(find.text('Monat'), findsOneWidget);
+    expect(find.text('KW'), findsOneWidget);
+    expect(find.text('Day'), findsNothing);
+    expect(find.text('Wk'), findsNothing);
+  });
+
+  testWidgets('week numbers label each row with the week of its first day', (
+    tester,
+  ) async {
+    // June 2025 from Monday: rows start on 26 May (week 22) to 30 Jun (27).
+    await tester.pumpObers(_calendar(showWeekNumbers: true));
+    for (var week = 22; week <= 27; week++) {
+      expect(find.byKey(ValueKey('calendar_week_$week')), findsOneWidget);
+    }
+
+    // From Sunday the rows are 1-7 Jun, 8-14 Jun, ... The row of 8-14 Jun
+    // is labelled 23, the week its Sunday ends, although 9-14 Jun are in
+    // ISO week 24.
+    await tester.pumpObers(
+      _calendar(showWeekNumbers: true, firstDayOfWeek: DateTime.sunday),
+    );
+    final label = tester.getCenter(
+      find.byKey(const ValueKey('calendar_week_23')),
+    );
+    expect(label.dy, greaterThan(tester.getTopLeft(find.text('14')).dy));
+    expect(label.dy, lessThan(tester.getTopLeft(find.text('21')).dy));
+  });
+
+  // ── Widget updates ────────────────────────────────────────────────────────
+
+  testWidgets('a new mode and initialDate from the parent are applied', (
+    tester,
+  ) async {
+    await tester.pumpObers(_calendar());
+    expect(find.text('June 2025'), findsOneWidget);
+
+    await tester.pumpObers(
+      _calendar(mode: OiCalendarMode.day, initialDate: DateTime(2025, 8, 3)),
+    );
+
+    expect(find.text('3 August 2025'), findsOneWidget);
+    expect(find.text('00:00'), findsOneWidget);
+  });
+
+  testWidgets('a rebuild with the same props keeps the navigated date', (
+    tester,
+  ) async {
+    await tester.pumpObers(_calendar());
+    await tester.tap(find.byKey(const ValueKey('calendar_forward')));
+    await tester.tap(find.byKey(const ValueKey('calendar_mode_day')));
+    await tester.pump();
+    expect(find.text('1 July 2025'), findsOneWidget);
+
+    await tester.pumpObers(_calendar(label: 'Renamed'));
+
+    expect(find.text('1 July 2025'), findsOneWidget);
+  });
+
+  // ── All-day row ───────────────────────────────────────────────────────────
+
+  group('all-day row', () {
+    final events = [
+      OiCalendarEvent(
+        key: 'jan',
+        title: 'New Year',
+        start: DateTime(2025),
+        end: DateTime(2025),
+        allDay: true,
+      ),
+      OiCalendarEvent(
+        key: 'jun',
+        title: 'Company Holiday',
+        start: DateTime(2025, 6, 10),
+        end: DateTime(2025, 6, 10),
+        allDay: true,
+      ),
+      OiCalendarEvent(
+        key: 'trip',
+        title: 'Offsite',
+        start: DateTime(2025, 6, 12),
+        end: DateTime(2025, 6, 17),
+        allDay: true,
+      ),
+    ];
+
+    testWidgets('month view lists only the all-day events it shows', (
+      tester,
+    ) async {
+      await tester.pumpObers(_calendar(events: events));
+
+      expect(find.text('Company Holiday'), findsOneWidget);
+      expect(find.text('Offsite'), findsOneWidget);
+      expect(find.text('New Year'), findsNothing);
+    });
+
+    testWidgets('week view lists only the all-day events of that week', (
+      tester,
+    ) async {
+      // The week of 15 Jun 2025 runs from Mon 9 to Sun 15.
+      await tester.pumpObers(
+        _calendar(events: events, mode: OiCalendarMode.week),
+      );
+
+      expect(find.text('Company Holiday'), findsOneWidget);
+      expect(find.text('Offsite'), findsOneWidget);
+      expect(find.text('New Year'), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('calendar_forward')));
+      await tester.pump();
+      expect(find.text('Company Holiday'), findsNothing);
+      expect(find.text('Offsite'), findsOneWidget);
+    });
+
+    testWidgets('day view lists only the all-day events of that day', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        _calendar(events: events, mode: OiCalendarMode.day),
+      );
+
+      expect(find.text('Offsite'), findsOneWidget);
+      expect(find.text('Company Holiday'), findsNothing);
+      expect(find.text('New Year'), findsNothing);
+    });
+
+    testWidgets('the row is gone when the view has no all-day event', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        _calendar(
+          events: events,
+          mode: OiCalendarMode.day,
+          initialDate: DateTime(2025, 6, 20),
+        ),
+      );
+
+      expect(find.byKey(const ValueKey('calendar_all_day_row')), findsNothing);
+    });
   });
 }
