@@ -76,7 +76,7 @@ class OiStreamingSeriesAdapter<T> extends ChangeNotifier {
 
   /// Stops listening to the data source and cancels any pending throttle.
   void detach() {
-    _subscription?.cancel();
+    unawaited(_subscription?.cancel());
     _subscription = null;
     _throttleTimer?.cancel();
     _throttleTimer = null;

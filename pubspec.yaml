@@ -1,6 +1,7 @@
 name: obers_ui
 description: A comprehensive Flutter UI kit with design tokens, responsive utilities, and accessible components.
 version: 0.1.2
+repository: https://github.com/SimonErich/obers_ui
 publish_to: 'none'
 topics:
   - ui

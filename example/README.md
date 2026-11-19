@@ -1,6 +1,6 @@
 # obers_ui Showcase
 
-Interactive showcase application for the [obers_ui](../) Flutter UI library. Demonstrates **160+ widgets** across 7 mini-applications, all themed around **Alpenglueck GmbH** — a fictional Austrian e-commerce company.
+Interactive showcase application for the [obers_ui](../) Flutter UI library. Demonstrates **160+ widgets** across 10 mini-applications, all themed around **Alpenglueck GmbH** — a fictional Austrian e-commerce company.
 
 ## Quick Start
 
@@ -12,20 +12,25 @@ flutter run -d chrome
 
 | App | Description | Key Widgets |
 | --- | ----------- | ----------- |
+| **Component Library** | Catalog of the library's widgets with live previews | Primitives, components, composites, modules |
 | **Shop** | Product browsing, cart, checkout wizard | OiCheckout, OiShopProductDetail, OiCartPanel, OiProductCard |
 | **Chat** | Team messaging with auto-responses | OiChat, OiSplitPane, typing indicators, emoji reactions |
-| **Admin** | Dashboard, user table, settings forms | OiAppShell, OiDashboard, OiTable, OiForm, OiActivityFeed |
+| **Admin** | Dashboard, user table, settings forms | OiAppShell, OiDashboard, OiTable, OiAfForm, OiActivityFeed |
 | **Projects** | Kanban, Gantt, calendar, timeline | OiKanban, OiGantt, OiCalendar, OiTimeline |
 | **Files** | File explorer with CRUD operations | OiFileExplorer, OiTree, context menus |
-| **Content** | CMS with articles, editor, comments | OiListView, OiComments, OiForm, OiRichEditor |
+| **Content** | CMS with articles, editor, comments | OiListView, OiComments, OiAfForm, OiRichEditor |
 | **Auth** | Login, registration, password reset | OiAuthPage |
+| **AutoForms** | Form handling with the `obers_ui_autoforms` package | OiAfForm, OiAfTextInput, OiAfSelect |
+| **Icons** | Searchable browser for the Lucide icon set | OiIcon, OiIcons |
 
 ## Themes
 
-Two switchable themes accessible via the top bar toggle:
+Four theme presets, each with a light and a dark variant. The top bar switches the preset and toggles light/dark:
 
-- **Alpine** (light) — Forest green brand, rounded corners
-- **Vienna Night** (dark) — Baroque gold brand, medium corners
+- **Alpine** — Forest green brand, rounded corners; its dark variant is **Vienna Night** (baroque gold brand, medium corners)
+- **Blue Danube** — Teal/cyan brand
+- **Arco** — Blue brand
+- **Finesse** — Indigo/violet brand
 
 ## Project Structure
 
@@ -35,7 +40,8 @@ lib/
   app.dart               OiApp wrapper with theme state
   theme/                 Theme definitions and toggle state
   shell/                 Global navigation shell and home screen
-  apps/                  7 mini-applications
+  apps/                  10 mini-applications
+    component_library/   Widget catalog
     shop/                E-commerce (5 screens)
     chat/                Messaging (1 screen + auto-responder)
     admin/               Dashboard (5 screens)
@@ -43,6 +49,8 @@ lib/
     files/               File manager (1 screen)
     cms/                 Content management (3 screens)
     auth/                Authentication (1 screen, 3 modes)
+    autoforms/           obers_ui_autoforms showcase
+    icons/               Icon browser
   data/                  Mock data files
 
 integration_test/        E2E workflow tests
@@ -66,7 +74,7 @@ All data is local — no backend required. The mock data features:
 flutter test integration_test/ -d chrome
 ```
 
-Tests cover all 7 mini-apps, home screen navigation, and theme switching.
+Tests cover the Shop, Chat, Admin, Projects, Files, Content and Auth apps, home screen navigation, and theme switching.
 
 ## Demo Credentials
 

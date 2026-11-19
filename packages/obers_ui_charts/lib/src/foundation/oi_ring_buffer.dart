@@ -64,9 +64,7 @@ class OiRingBuffer<T> extends Iterable<T> {
       return;
     }
 
-    for (final item in list) {
-      add(item);
-    }
+    list.forEach(add);
   }
 
   /// Removes all items from the buffer.

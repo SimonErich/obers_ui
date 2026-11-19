@@ -52,7 +52,6 @@ mixin ChartStreamingHost<T extends StatefulWidget> on State<T> {
     if (mounted) {
       // setState is protected in State but safe to call here because this
       // mixin is constrained to State<T> and is only invoked while mounted.
-      // ignore: invalid_use_of_protected_member
       setState(() {});
     }
   }

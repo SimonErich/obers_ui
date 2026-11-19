@@ -24,11 +24,12 @@ migrate_working_dir/
 
 # Flutter/Dart/Pub
 /pubspec.lock
+packages/*/pubspec.lock
 **/doc/api/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-/build/
+**/build/
 /coverage/
 
 # Generated
@@ -47,7 +48,6 @@ migrate_working_dir/
 # dev tools
 .broins
 .history
-packages/obers_ui_charts/build/
 .peakz
 concept/
 .claude/

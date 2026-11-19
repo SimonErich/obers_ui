@@ -12,20 +12,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.41.2'
-          channel: stable
+      - uses: ./.github/actions/setup-flutter
       - run: flutter pub get
       - run: dart analyze --fatal-infos
       - name: Analyze packages/obers_ui_autoforms
         run: |
           cd packages/obers_ui_autoforms
-          dart pub get
+          flutter pub get
           dart analyze --fatal-infos
       - name: Analyze packages/obers_ui_charts
         run: |
           cd packages/obers_ui_charts
+          flutter pub get
+          dart analyze --fatal-infos
+      - name: Analyze example
+        run: |
+          cd example
           flutter pub get
           dart analyze --fatal-infos
       - run: dart format --output=none --set-exit-if-changed .
@@ -36,10 +38,7 @@ jobs:
     needs: analyze
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.41.2'
-          channel: stable
+      - uses: ./.github/actions/setup-flutter
       - run: flutter pub get
       # Goldens are gated by the dedicated Golden Tests workflow. Exclude them
       # here so a cosmetic pixel diff never breaks the coverage gate.
@@ -51,3 +50,13 @@ jobs:
           # 80 was never met — main itself was below it. Ratchet up as coverage
           # improves.
           min_coverage: 77
+      - name: Test packages/obers_ui_charts
+        run: |
+          cd packages/obers_ui_charts
+          flutter pub get
+          flutter test
+      - name: Test packages/obers_ui_autoforms
+        run: |
+          cd packages/obers_ui_autoforms
+          flutter pub get
+          flutter test

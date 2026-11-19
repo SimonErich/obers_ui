@@ -1,0 +1,5 @@
+# Golden tests (alchemist tags every goldenTest with `golden`) run in their own
+# workflow: `flutter test --tags golden`. Everything else runs with
+# `flutter test --exclude-tags golden`.
+tags:
+  golden:

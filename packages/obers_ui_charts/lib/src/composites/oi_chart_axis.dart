@@ -40,7 +40,8 @@ enum OiAxisScaleType {
   quantile,
 
   /// Maps continuous numeric input to discrete output based on thresholds.
-  threshold;
+  threshold
+  ;
 
   /// Converts this to the foundation [OiScaleType].
   OiScaleType toScaleType() => switch (this) {
@@ -85,7 +86,8 @@ enum OiAxisPosition {
   left,
 
   /// Right edge — typically a secondary y-axis.
-  right;
+  right
+  ;
 
   /// Converts this position to the foundation [OiChartAxisEdge].
   OiChartAxisEdge toEdge() => switch (this) {

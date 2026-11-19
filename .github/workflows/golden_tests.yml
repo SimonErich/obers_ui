@@ -12,10 +12,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.41.2'
-          channel: stable
+      - uses: ./.github/actions/setup-flutter
       - run: flutter pub get
       # Run every golden across the tree (alchemist tags them all 'golden'),
       # including goldens defined inline in component test files. CI compares

@@ -21,12 +21,12 @@ class _Ctrl extends OiAfController<_F, Map<String, dynamic>> {
   Map<String, dynamic> buildData() => json();
 }
 
-const _kFruitOpts = [
+const List<OiAfOption<String>> _kFruitOpts = [
   OiAfOption(value: 'a', label: 'Apple'),
   OiAfOption(value: 'b', label: 'Banana'),
 ];
 
-const _kColorOpts = [
+const List<OiAfOption<String>> _kColorOpts = [
   OiAfOption(value: 'r', label: 'Red'),
   OiAfOption(value: 'g', label: 'Green'),
 ];
