@@ -186,10 +186,17 @@ class _OiRichEditorState extends State<OiRichEditor> {
     _focusNode = FocusNode()..addListener(_handleFocusChange);
     widget.controller.addListener(_handleContentChange);
     _syncBlockControllers();
-    if (widget.autoFocus) {
+    // With something to type into, the first text block takes the focus
+    // itself (see [_buildBlock]); focusing only the wrapper shows no caret.
+    if (widget.autoFocus && _autoFocusBlockIndex < 0) {
       _focusNode.requestFocus();
     }
   }
+
+  /// Index of the first block with a text field, or -1 when there is none.
+  int get _autoFocusBlockIndex => widget.controller.content.blocks.indexWhere(
+    (block) => block.type != OiBlockType.divider,
+  );
 
   @override
   void didUpdateWidget(OiRichEditor oldWidget) {
@@ -321,27 +328,60 @@ class _OiRichEditorState extends State<OiRichEditor> {
       if (widget.readOnly) return KeyEventResult.ignored;
 
       final controller = _blockControllers[index];
-      final cursorPos = controller.selection.baseOffset;
+      // While an input method is composing (CJK, for one), Enter confirms the
+      // composition; it is not a line break.
+      if (controller.value.composing.isValid) return KeyEventResult.ignored;
+
+      final selection = controller.selection;
       final text = controller.text;
 
-      // Text after cursor goes to the new block.
-      final before = cursorPos >= 0 ? text.substring(0, cursorPos) : text;
-      final after = cursorPos >= 0 ? text.substring(cursorPos) : '';
+      // The selected text is replaced by the break: what is before the
+      // selection stays, what is after it goes to the new block. `start` and
+      // `end` are ordered, whichever way the selection was made.
+      final before = selection.isValid
+          ? text.substring(0, selection.start)
+          : text;
+      final after = selection.isValid ? text.substring(selection.end) : '';
 
       final blocks = List<OiContentBlock>.from(
         widget.controller.content.blocks,
       );
+      final current = blocks[index];
+      final isListItem =
+          current.type == OiBlockType.bulletList ||
+          current.type == OiBlockType.numberedList;
+
+      // Enter in an empty list item ends the list: the item becomes a
+      // paragraph instead of yet another empty item.
+      if (isListItem && text.isEmpty) {
+        blocks[index] = OiContentBlock(
+          type: OiBlockType.paragraph,
+          text: '',
+          metadata: current.metadata,
+          bold: current.bold,
+          italic: current.italic,
+          underline: current.underline,
+        );
+        widget.controller.content = OiRichContent(blocks: blocks);
+        return KeyEventResult.handled;
+      }
+
       blocks[index] = OiContentBlock(
-        type: blocks[index].type,
+        type: current.type,
         text: before,
-        metadata: blocks[index].metadata,
-        bold: blocks[index].bold,
-        italic: blocks[index].italic,
-        underline: blocks[index].underline,
+        metadata: current.metadata,
+        bold: current.bold,
+        italic: current.italic,
+        underline: current.underline,
       );
       blocks.insert(
         index + 1,
-        OiContentBlock(type: OiBlockType.paragraph, text: after),
+        // A list goes on with another item; every other block is followed by
+        // a paragraph.
+        OiContentBlock(
+          type: isListItem ? current.type : OiBlockType.paragraph,
+          text: after,
+        ),
       );
       widget.controller.content = OiRichContent(blocks: blocks);
 
@@ -482,6 +522,8 @@ class _OiRichEditorState extends State<OiRichEditor> {
         child: EditableText(
           controller: _blockControllers[index],
           focusNode: _blockFocusNodes[index],
+          // Read once, when the field is first inserted.
+          autofocus: widget.autoFocus && index == _autoFocusBlockIndex,
           style: style,
           cursorColor: cursorColor,
           backgroundCursorColor:

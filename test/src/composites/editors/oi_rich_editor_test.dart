@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/editors/oi_rich_editor.dart';
@@ -817,6 +818,239 @@ void main() {
 
       // Two paragraph EditableText widgets (divider does not create one).
       expect(find.byType(EditableText), findsAtLeast(2));
+    });
+  });
+
+  // ── Regression: Enter handling and auto focus ──────────────────────────────
+
+  group('OiRichEditor keyboard', () {
+    Future<OiRichEditorController> pumpEditor(
+      WidgetTester tester,
+      List<OiContentBlock> blocks, {
+      bool autoFocus = false,
+    }) async {
+      final controller = OiRichEditorController(
+        initialContent: OiRichContent(blocks: blocks),
+      );
+      addTearDown(controller.dispose);
+      await tester.pumpObers(
+        Center(
+          child: OiRichEditor(
+            controller: controller,
+            label: 'Editor',
+            autoFocus: autoFocus,
+          ),
+        ),
+      );
+      return controller;
+    }
+
+    EditableText block(WidgetTester tester, int index) => tester
+        .widgetList<EditableText>(find.byType(EditableText))
+        .elementAt(index);
+
+    /// Focuses block [index] and puts [value] into its field.
+    Future<void> edit(
+      WidgetTester tester,
+      int index,
+      TextEditingValue value,
+    ) async {
+      block(tester, index).focusNode.requestFocus();
+      await tester.pump();
+      block(tester, index).controller.value = value;
+      await tester.pump();
+    }
+
+    List<String> texts(OiRichEditorController controller) =>
+        controller.content.blocks.map((b) => b.text).toList();
+
+    List<OiBlockType> types(OiRichEditorController controller) =>
+        controller.content.blocks.map((b) => b.type).toList();
+
+    testWidgets('Enter splits the block at the caret', (tester) async {
+      final controller = await pumpEditor(tester, const [
+        OiContentBlock(type: OiBlockType.paragraph, text: 'Hello world'),
+      ]);
+      await edit(
+        tester,
+        0,
+        const TextEditingValue(
+          text: 'Hello world',
+          selection: TextSelection.collapsed(offset: 5),
+        ),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(texts(controller), ['Hello', ' world']);
+    });
+
+    testWidgets('Enter while composing leaves the block alone', (tester) async {
+      final controller = await pumpEditor(tester, const [
+        OiContentBlock(type: OiBlockType.paragraph, text: ''),
+      ]);
+      // An input method has "にほん" under composition; Enter confirms it.
+      await edit(
+        tester,
+        0,
+        const TextEditingValue(
+          text: 'にほん',
+          selection: TextSelection.collapsed(offset: 3),
+          composing: TextRange(start: 0, end: 3),
+        ),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(controller.content.blocks, hasLength(1));
+    });
+
+    testWidgets('Enter replaces the selection', (tester) async {
+      final controller = await pumpEditor(tester, const [
+        OiContentBlock(type: OiBlockType.paragraph, text: 'Hello world'),
+      ]);
+      await edit(
+        tester,
+        0,
+        const TextEditingValue(
+          text: 'Hello world',
+          selection: TextSelection(baseOffset: 2, extentOffset: 8),
+        ),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(texts(controller), ['He', 'rld']);
+    });
+
+    testWidgets('Enter replaces a selection made backwards', (tester) async {
+      final controller = await pumpEditor(tester, const [
+        OiContentBlock(type: OiBlockType.paragraph, text: 'Hello world'),
+      ]);
+      await edit(
+        tester,
+        0,
+        const TextEditingValue(
+          text: 'Hello world',
+          selection: TextSelection(baseOffset: 8, extentOffset: 2),
+        ),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(texts(controller), ['He', 'rld']);
+    });
+
+    for (final type in [OiBlockType.bulletList, OiBlockType.numberedList]) {
+      testWidgets('Enter in a ${type.name} item continues the list', (
+        tester,
+      ) async {
+        final controller = await pumpEditor(tester, [
+          OiContentBlock(type: type, text: 'First'),
+        ]);
+        await edit(
+          tester,
+          0,
+          const TextEditingValue(
+            text: 'First',
+            selection: TextSelection.collapsed(offset: 5),
+          ),
+        );
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+
+        expect(types(controller), [type, type]);
+        expect(texts(controller), ['First', '']);
+      });
+
+      testWidgets('Enter in an empty ${type.name} item ends the list', (
+        tester,
+      ) async {
+        final controller = await pumpEditor(tester, [
+          OiContentBlock(type: type, text: 'First'),
+          OiContentBlock(type: type, text: ''),
+        ]);
+        await edit(tester, 1, TextEditingValue.empty);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+
+        expect(types(controller), [type, OiBlockType.paragraph]);
+        expect(texts(controller), ['First', '']);
+      });
+    }
+
+    testWidgets('Enter in a heading starts a paragraph', (tester) async {
+      final controller = await pumpEditor(tester, const [
+        OiContentBlock(type: OiBlockType.heading1, text: 'Title'),
+      ]);
+      await edit(
+        tester,
+        0,
+        const TextEditingValue(
+          text: 'Title',
+          selection: TextSelection.collapsed(offset: 5),
+        ),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(types(controller), [OiBlockType.heading1, OiBlockType.paragraph]);
+    });
+
+    testWidgets('autoFocus puts the caret in the first block', (tester) async {
+      await pumpEditor(tester, const [
+        OiContentBlock(type: OiBlockType.paragraph, text: 'Hello'),
+        OiContentBlock(type: OiBlockType.paragraph, text: 'World'),
+      ], autoFocus: true);
+      await tester.pump();
+
+      expect(block(tester, 0).focusNode.hasPrimaryFocus, isTrue);
+      expect(tester.testTextInput.hasAnyClients, isTrue);
+    });
+
+    testWidgets('autoFocus skips a leading divider', (tester) async {
+      await pumpEditor(tester, const [
+        OiContentBlock(type: OiBlockType.divider, text: ''),
+        OiContentBlock(type: OiBlockType.paragraph, text: 'Hello'),
+      ], autoFocus: true);
+      await tester.pump();
+
+      expect(block(tester, 0).focusNode.hasPrimaryFocus, isTrue);
+    });
+
+    testWidgets('autoFocus reports the editor as focused', (tester) async {
+      final focusChanges = <bool>[];
+      final controller = OiRichEditorController();
+      addTearDown(controller.dispose);
+      await tester.pumpObers(
+        Center(
+          child: OiRichEditor(
+            controller: controller,
+            label: 'Editor',
+            autoFocus: true,
+            onFocusChange: focusChanges.add,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(focusChanges, [true]);
+    });
+
+    testWidgets('without autoFocus nothing is focused', (tester) async {
+      await pumpEditor(tester, const [
+        OiContentBlock(type: OiBlockType.paragraph, text: 'Hello'),
+      ]);
+      await tester.pump();
+
+      expect(block(tester, 0).focusNode.hasFocus, isFalse);
     });
   });
 }
