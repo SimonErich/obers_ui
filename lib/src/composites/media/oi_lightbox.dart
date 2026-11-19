@@ -94,6 +94,13 @@ class _OiLightboxState extends State<OiLightbox> {
   }
 
   @override
+  void didUpdateWidget(OiLightbox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // The list may have shrunk below the image being shown.
+    _currentIndex = _currentIndex.clamp(0, _maxIndex);
+  }
+
+  @override
   void dispose() {
     _focusNode.dispose();
     super.dispose();
