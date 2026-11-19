@@ -1,0 +1,22 @@
+name: Set up Flutter
+description: >-
+  Installs the Flutter version pinned in .tool-versions, so local tooling and
+  every workflow use the same SDK. Requires the repository to be checked out.
+
+runs:
+  using: composite
+  steps:
+    - name: Read Flutter version from .tool-versions
+      id: version
+      shell: bash
+      run: |
+        version="$(awk '$1 == "flutter" { sub(/-stable$/, "", $2); print $2 }' .tool-versions)"
+        if [ -z "$version" ]; then
+          echo "No flutter entry found in .tool-versions" >&2
+          exit 1
+        fi
+        echo "flutter=$version" >> "$GITHUB_OUTPUT"
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ steps.version.outputs.flutter }}
+        channel: stable
