@@ -446,7 +446,8 @@ class OiResponsive<T> {
   /// Values keyed by breakpoint, with mobile-first cascading.
   ///
   /// The map should ideally contain a key with `minWidth == 0` (typically
-  /// [OiBreakpoint.compact]) or provide a base via [defaultValue].
+  /// [OiBreakpoint.compact]) or provide a base via [defaultValue]. Without
+  /// either, breakpoints below the smallest key use that key's value.
   const OiResponsive.breakpoints(Map<OiBreakpoint, T> map, {T? defaultValue})
     : _map = map,
       _defaultValue = defaultValue;
@@ -460,7 +461,9 @@ class OiResponsive<T> {
   /// Resolves the value for the given [active] breakpoint within [scale].
   ///
   /// Walks breakpoints in descending order from [active], returns
-  /// the first mapped value found. Falls back to [_defaultValue].
+  /// the first mapped value found. Falls back to [_defaultValue]; when there
+  /// is none (and `T` is not nullable), to the nearest larger breakpoint
+  /// that has a value.
   T resolve(OiBreakpoint active, OiBreakpointScale scale) {
     if (_map == null) return _defaultValue as T;
 
@@ -472,7 +475,24 @@ class OiResponsive<T> {
       if (_map.containsKey(bp)) return _map[bp] as T;
     }
 
-    return _defaultValue as T;
+    // Nothing at or below the active breakpoint. A default (or null, for a
+    // nullable T) is the answer when there is one.
+    final fallback = _defaultValue;
+    if (fallback is T) return fallback;
+
+    // No base value: `{OiBreakpoint.medium: 2}.responsive` resolved on
+    // compact. Use the nearest larger breakpoint that has a value instead of
+    // failing on the cast.
+    for (var i = idx + 1; i < sorted.length; i++) {
+      final bp = sorted[i];
+      if (_map.containsKey(bp)) return _map[bp] as T;
+    }
+
+    throw StateError(
+      'OiResponsive<$T> has no value for breakpoint "${active.name}": none of '
+      'its keys are in the breakpoint scale and it has no defaultValue. '
+      'Add a value for the smallest breakpoint or pass defaultValue.',
+    );
   }
 
   /// Resolves the value for the current screen breakpoint.
@@ -513,7 +533,19 @@ class OiResponsive<T> {
   }
 
   @override
-  int get hashCode => Object.hash(_defaultValue, _map);
+  int get hashCode {
+    // Hash the map's contents, order-independently, to stay consistent with
+    // operator ==, which compares contents rather than identity.
+    final map = _map;
+    return Object.hash(
+      _defaultValue,
+      map == null
+          ? null
+          : Object.hashAllUnordered(
+              map.entries.map((e) => Object.hash(e.key, e.value)),
+            ),
+    );
+  }
 
   @override
   String toString() {
@@ -677,40 +709,47 @@ extension OiResponsiveExt on BuildContext {
   OiBreakpoint get breakpoint => breakpointScale.resolve(viewportWidth);
 
   // ── Standard breakpoint checks ──────────────────────────────────────────
-  // These compare by minWidth threshold so they work with custom-named
-  // breakpoints that occupy the same tier as a standard breakpoint.
+  // Each getter covers the range from its standard threshold up to the next
+  // one, compared against the active breakpoint's minWidth. So they work with
+  // custom-named breakpoints, and with scales that add breakpoints between or
+  // beyond the standard five (a 480 "tablet" is compact, a 1920 "ultraWide"
+  // is extraLarge). Exactly one of the five is true at any width.
 
-  /// Whether the active breakpoint occupies the compact tier (minWidth 0).
-  ///
-  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
-  /// [OiBreakpoint.compact]'s minWidth, regardless of its name.
-  bool get isCompact => breakpoint.minWidth == OiBreakpoint.compact.minWidth;
+  bool _tierIs(OiBreakpoint tier, [OiBreakpoint? next]) {
+    final minWidth = breakpoint.minWidth;
+    return minWidth >= tier.minWidth &&
+        (next == null || minWidth < next.minWidth);
+  }
 
-  /// Whether the active breakpoint occupies the medium tier (minWidth 600).
+  /// Whether the active breakpoint is in the compact tier: its
+  /// [OiBreakpoint.minWidth] is below [OiBreakpoint.medium]'s (0–599).
   ///
-  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
-  /// [OiBreakpoint.medium]'s minWidth, regardless of its name.
-  bool get isMedium => breakpoint.minWidth == OiBreakpoint.medium.minWidth;
+  /// Matches any breakpoint in that range, regardless of its name.
+  bool get isCompact => _tierIs(OiBreakpoint.compact, OiBreakpoint.medium);
 
-  /// Whether the active breakpoint occupies the expanded tier (minWidth 840).
+  /// Whether the active breakpoint is in the medium tier: its
+  /// [OiBreakpoint.minWidth] is in 600–839.
   ///
-  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
-  /// [OiBreakpoint.expanded]'s minWidth, regardless of its name.
-  bool get isExpanded => breakpoint.minWidth == OiBreakpoint.expanded.minWidth;
+  /// Matches any breakpoint in that range, regardless of its name.
+  bool get isMedium => _tierIs(OiBreakpoint.medium, OiBreakpoint.expanded);
 
-  /// Whether the active breakpoint occupies the large tier (minWidth 1200).
+  /// Whether the active breakpoint is in the expanded tier: its
+  /// [OiBreakpoint.minWidth] is in 840–1199.
   ///
-  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
-  /// [OiBreakpoint.large]'s minWidth, regardless of its name.
-  bool get isLarge => breakpoint.minWidth == OiBreakpoint.large.minWidth;
+  /// Matches any breakpoint in that range, regardless of its name.
+  bool get isExpanded => _tierIs(OiBreakpoint.expanded, OiBreakpoint.large);
 
-  /// Whether the active breakpoint occupies the extraLarge tier
-  /// (minWidth 1600).
+  /// Whether the active breakpoint is in the large tier: its
+  /// [OiBreakpoint.minWidth] is in 1200–1599.
   ///
-  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
-  /// [OiBreakpoint.extraLarge]'s minWidth, regardless of its name.
-  bool get isExtraLarge =>
-      breakpoint.minWidth == OiBreakpoint.extraLarge.minWidth;
+  /// Matches any breakpoint in that range, regardless of its name.
+  bool get isLarge => _tierIs(OiBreakpoint.large, OiBreakpoint.extraLarge);
+
+  /// Whether the active breakpoint is in the extraLarge tier: its
+  /// [OiBreakpoint.minWidth] is 1600 or more.
+  ///
+  /// Matches any breakpoint in that range, regardless of its name.
+  bool get isExtraLarge => _tierIs(OiBreakpoint.extraLarge);
 
   /// Whether the active breakpoint is at least as wide as
   /// [OiBreakpoint.medium] (≥600dp tier).
