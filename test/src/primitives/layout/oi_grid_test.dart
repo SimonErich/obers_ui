@@ -2427,4 +2427,176 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  // ── Column maths with gaps, narrow boxes and RTL ──────────────────────────
+
+  group('column maths', () {
+    Widget box(String key) => SizedBox(key: Key(key), height: 40);
+
+    testWidgets('auto column count leaves room for the gaps', (tester) async {
+      // 616 px, min 200, gap 16: three columns would need 3*200 + 2*16 = 632,
+      // so only two fit and every column is at least minColumnWidth wide.
+      await tester.pumpObers(
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 616,
+            child: OiGrid(
+              breakpoint: OiBreakpoint.compact,
+              minColumnWidth: const OiResponsive<double>(200),
+              gap: const OiResponsive<double>(16),
+              children: [box('a'), box('b'), box('c')],
+            ),
+          ),
+        ),
+      );
+
+      final width = tester.getSize(find.byKey(const Key('a'))).width;
+      expect(width, greaterThanOrEqualTo(200));
+      expect(width, 300);
+      expect(tester.getTopLeft(find.byKey(const Key('c'))).dy, 56);
+    });
+
+    testWidgets('auto column count uses every column that fits', (
+      tester,
+    ) async {
+      // 632 px is exactly three 200 px columns plus two 16 px gaps.
+      await tester.pumpObers(
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 632,
+            child: OiGrid(
+              breakpoint: OiBreakpoint.compact,
+              minColumnWidth: const OiResponsive<double>(200),
+              gap: const OiResponsive<double>(16),
+              children: [box('a'), box('b'), box('c')],
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.getSize(find.byKey(const Key('a'))).width, 200);
+      expect(
+        tester.getTopLeft(find.byKey(const Key('c'))),
+        const Offset(432, 0),
+      );
+    });
+
+    testWidgets('intrinsic and dry heights agree with the laid-out height', (
+      tester,
+    ) async {
+      final grid = OiGrid(
+        breakpoint: OiBreakpoint.compact,
+        minColumnWidth: const OiResponsive<double>(200),
+        gap: const OiResponsive<double>(16),
+        children: [box('a'), box('b'), box('c')],
+      );
+      await tester.pumpObers(
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(width: 616, child: grid),
+        ),
+      );
+
+      final render = tester.renderObject<RenderBox>(find.byType(OiGrid));
+      // Two columns → two rows of 40 plus one 16 px row gap.
+      expect(render.size.height, 96);
+      expect(render.getMaxIntrinsicHeight(616), 96);
+      expect(render.getMinIntrinsicHeight(616), 96);
+      expect(
+        render.getDryLayout(const BoxConstraints(maxWidth: 616)),
+        const Size(616, 96),
+      );
+    });
+
+    testWidgets('gaps wider than the box do not produce negative widths', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 200,
+            child: OiGrid(
+              breakpoint: OiBreakpoint.compact,
+              columns: const OiResponsive<int>(4),
+              gap: const OiResponsive<double>(100),
+              children: [box('a'), box('b'), box('c'), box('d')],
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(tester.getSize(find.byKey(const Key('a'))).width, 0);
+
+      final render = tester.renderObject<RenderBox>(find.byType(OiGrid));
+      expect(render.getMaxIntrinsicHeight(200), 40);
+      expect(
+        render.getDryLayout(const BoxConstraints(maxWidth: 200)),
+        const Size(200, 40),
+      );
+    });
+
+    testWidgets('columns run right-to-left under an RTL Directionality', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        Directionality(
+          textDirection: TextDirection.rtl,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 632,
+              child: OiGrid(
+                breakpoint: OiBreakpoint.compact,
+                columns: const OiResponsive<int>(3),
+                gap: const OiResponsive<double>(16),
+                children: [box('a'), box('b'), box('c'), box('d')],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // First child sits in the rightmost column.
+      expect(
+        tester.getTopLeft(find.byKey(const Key('a'))),
+        const Offset(432, 0),
+      );
+      expect(
+        tester.getTopLeft(find.byKey(const Key('b'))),
+        const Offset(216, 0),
+      );
+      expect(tester.getTopLeft(find.byKey(const Key('c'))), Offset.zero);
+      expect(
+        tester.getTopLeft(find.byKey(const Key('d'))),
+        const Offset(432, 56),
+      );
+    });
+
+    testWidgets('switching direction re-lays the grid out', (tester) async {
+      Widget build(TextDirection direction) => Directionality(
+        textDirection: direction,
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 400,
+            child: OiGrid(
+              breakpoint: OiBreakpoint.compact,
+              columns: const OiResponsive<int>(2),
+              children: [box('a'), box('b')],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpObers(build(TextDirection.ltr));
+      expect(tester.getTopLeft(find.byKey(const Key('a'))).dx, 0);
+
+      await tester.pumpObers(build(TextDirection.rtl));
+      expect(tester.getTopLeft(find.byKey(const Key('a'))).dx, 200);
+    });
+  });
 }
