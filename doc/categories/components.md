@@ -1,3 +1,3 @@
-Basic building blocks for composing UIs.
+Single-purpose widgets composed from primitives.
 
-Includes buttons, cards, text, inputs, checkboxes, dividers, spacers, and surfaces.
+Includes buttons (`OiButton`, `OiIconButton`), inputs (`OiTextInput`, `OiSelect`, `OiCheckbox`, `OiSwitch`), display (`OiCard`, `OiAvatar`, `OiBadge`, `OiEmptyState`, `OiProgress`, `OiSkeletonGroup`), overlays (`OiDialog`, `OiSheet`, `OiPopover`, `OiTooltip`), feedback and navigation widgets.

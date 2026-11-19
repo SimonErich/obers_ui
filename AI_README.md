@@ -428,7 +428,7 @@ Abstract interface for persisting widget state (column widths, sort, filters, la
 
 **Built-in Drivers:**
 - `OiLocalStorageDriver()` — SharedPreferences-based (recommended)
-- `OiInMemoryDriver()` — Memory only (testing)
+- `OiInMemorySettingsDriver()` — Memory only (testing)
 
 **Usage:**
 ```dart

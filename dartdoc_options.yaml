@@ -1,17 +1,45 @@
 dartdoc:
   name: obers_ui
   description: A comprehensive Flutter UI kit.
+  # One entry per {@category ...} used in lib/. Keep both in sync.
   categories:
-    "Theme":
-      markdown: doc/categories/theme.md
-      name: Theme
+    "Getting Started":
+      markdown: doc/categories/getting_started.md
+      name: Getting Started
+    "Foundation":
+      markdown: doc/categories/foundation.md
+      name: Foundation
+    "Primitives":
+      markdown: doc/categories/primitives.md
+      name: Primitives
     "Components":
       markdown: doc/categories/components.md
       name: Components
-    "Widgets":
-      markdown: doc/categories/widgets.md
-      name: Widgets
-    "Layouts":
-      markdown: doc/categories/layouts.md
-      name: Layouts
+    "Composites":
+      markdown: doc/categories/composites.md
+      name: Composites
+    "Modules":
+      markdown: doc/categories/modules.md
+      name: Modules
+    "Models":
+      markdown: doc/categories/models.md
+      name: Models
+    "Utils":
+      markdown: doc/categories/utils.md
+      name: Utils
+    "Navigation":
+      name: Navigation
+    "Tools":
+      name: Tools
+  categoryOrder:
+    - Getting Started
+    - Foundation
+    - Primitives
+    - Components
+    - Composites
+    - Modules
+    - Models
+    - Utils
+    - Navigation
+    - Tools
   showUndocumentedCategories: true
