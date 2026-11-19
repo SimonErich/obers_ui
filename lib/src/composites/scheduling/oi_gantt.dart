@@ -7,10 +7,17 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_gantt_settings.dart';
+import 'package:obers_ui/src/utils/calendar_utils.dart';
 
 /// A task in the Gantt chart.
 ///
 /// Represents a single work item displayed as a horizontal bar in [OiGantt].
+///
+/// The task runs from [start] up to, but not including, [end]: both are
+/// points in time and the bar spans exactly the time between them. A task
+/// from 5 Jan 00:00 to 6 Jan 00:00 is one day long; one that should fill the
+/// 5th and the 6th ends on 7 Jan 00:00. The time of day counts, so a task
+/// from 09:00 to 17:00 on one day covers a third of that day's column.
 @immutable
 class OiGanttTask {
   /// Creates an [OiGanttTask].
@@ -31,10 +38,13 @@ class OiGanttTask {
   /// The display label for this task.
   final String label;
 
-  /// The start date of the task.
+  /// The moment the task starts (inclusive), including the time of day.
   final DateTime start;
 
-  /// The end date of the task.
+  /// The moment the task ends (exclusive), including the time of day.
+  ///
+  /// For a task that lasts through a whole calendar day, pass midnight of
+  /// the following day.
   final DateTime end;
 
   /// The completion progress from 0.0 to 1.0.
@@ -104,9 +114,15 @@ class OiGantt extends StatefulWidget {
   final String label;
 
   /// The start of the visible date range. Defaults to the earliest task start.
+  ///
+  /// The timeline shows whole days and starts at midnight of this date.
   final DateTime? viewStart;
 
-  /// The end of the visible date range. Defaults to the latest task end.
+  /// The end of the visible date range (exclusive, like [OiGanttTask.end]).
+  /// Defaults to the latest task end.
+  ///
+  /// The timeline shows whole days: it ends at this moment when it is a
+  /// midnight and otherwise at the end of that day.
   final DateTime? viewEnd;
 
   /// The zoom level controlling horizontal scale.
@@ -160,7 +176,15 @@ class OiGantt extends StatefulWidget {
 
 class _OiGanttState extends State<OiGantt>
     with OiSettingsMixin<OiGantt, OiGanttSettings> {
-  late ScrollController _horizontalScroll;
+  /// Scrolls the task bars. Its offset is the one that is persisted.
+  final ScrollController _bodyScroll = ScrollController();
+
+  /// Scrolls the date header. A controller reports one offset, so the two
+  /// scroll views each get their own and are kept at the same offset.
+  final ScrollController _headerScroll = ScrollController();
+
+  /// Whether the settings of the initial load have been applied.
+  bool _initialSettingsApplied = false;
 
   /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
   OiSettingsDriver? _resolvedDriver;
@@ -195,15 +219,29 @@ class _OiGanttState extends State<OiGantt>
   void initState() {
     _resolvedDriver = widget.settingsDriver;
     super.initState();
-    _horizontalScroll = ScrollController();
-    _horizontalScroll.addListener(_onScroll);
+    _bodyScroll.addListener(_onBodyScroll);
+    _headerScroll.addListener(_onHeaderScroll);
     if (settingsLoaded && settingsDriver != null) {
       _applySettings(currentSettings);
     }
   }
 
-  void _onScroll() {
+  void _onBodyScroll() {
+    _mirrorOffset(from: _bodyScroll, to: _headerScroll);
     updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
+  }
+
+  void _onHeaderScroll() => _mirrorOffset(from: _headerScroll, to: _bodyScroll);
+
+  /// Moves [to] to the offset of [from] unless it is already there, which
+  /// also ends the echo when [to] reports the jump back.
+  void _mirrorOffset({
+    required ScrollController from,
+    required ScrollController to,
+  }) {
+    if (!from.hasClients || !to.hasClients) return;
+    final offset = from.offset;
+    if (to.offset != offset) to.jumpTo(offset);
   }
 
   @override
@@ -213,7 +251,11 @@ class _OiGanttState extends State<OiGantt>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        unawaited(reloadSettings());
+        unawaited(
+          reloadSettings().then((_) {
+            if (mounted) _applySettings(currentSettings);
+          }),
+        );
       }
     }
     if (settingsLoaded && settingsDriver != null) {
@@ -221,46 +263,81 @@ class _OiGanttState extends State<OiGantt>
     }
   }
 
+  /// Restores the saved scroll position once the timeline is laid out.
+  ///
+  /// Settings arrive before the scroll views exist or know how far they can
+  /// scroll, so the jump waits for the end of the frame.
   void _applySettings(OiGanttSettings settings) {
-    if (settings.scrollPosition > 0 && _horizontalScroll.hasClients) {
-      _horizontalScroll.jumpTo(settings.scrollPosition);
-    }
+    final target = settings.scrollPosition;
+    if (target <= 0) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_bodyScroll.hasClients) return;
+      final position = _bodyScroll.position;
+      if (!position.hasContentDimensions) return;
+      final offset = target.clamp(
+        position.minScrollExtent,
+        position.maxScrollExtent,
+      );
+      if (offset != position.pixels) _bodyScroll.jumpTo(offset);
+    });
   }
 
   OiGanttSettings _toSettings() {
     return OiGanttSettings(
-      scrollPosition: _horizontalScroll.hasClients
-          ? _horizontalScroll.offset
-          : 0.0,
+      scrollPosition: _bodyScroll.hasClients ? _bodyScroll.offset : 0.0,
     );
   }
 
   @override
   void dispose() {
-    _horizontalScroll.dispose();
+    _bodyScroll.dispose();
+    _headerScroll.dispose();
     super.dispose();
   }
 
   // ── Computed properties ───────────────────────────────────────────────────
 
-  /// The effective start of the visible date range.
-  DateTime get _viewStart {
-    if (widget.viewStart != null) return _dateOnly(widget.viewStart!);
-    if (widget.tasks.isEmpty) return _dateOnly(DateTime.now());
-    return _dateOnly(
-      widget.tasks.map((t) => t.start).reduce((a, b) => a.isBefore(b) ? a : b),
+  /// Resolves the visible date range and scale.
+  ///
+  /// Walks all tasks, so [build] calls it once and hands the result down.
+  _GanttViewport _resolveViewport() {
+    final tasks = widget.tasks;
+
+    var start = widget.viewStart;
+    if (start == null) {
+      for (final task in tasks) {
+        final taskStart = task.start;
+        if (start == null || taskStart.isBefore(start)) start = taskStart;
+      }
+    }
+    start = _dateOnly(start ?? DateTime.now());
+
+    var end = widget.viewEnd;
+    if (end == null) {
+      for (final task in tasks) {
+        final taskEnd = task.end;
+        if (end == null || taskEnd.isAfter(end)) end = taskEnd;
+      }
+    }
+    // Ends are exclusive: a midnight closes the day before it, any later
+    // time needs the rest of its day shown as well.
+    end = end == null
+        ? OiCalendarUtils.addDays(DateTime.now(), 30)
+        : _endOfLastDay(end);
+
+    return _GanttViewport(
+      start: start,
+      // Always at least one column, e.g. for a single milestone at midnight.
+      totalDays: math.max(1, OiCalendarUtils.daysBetween(start, end)),
+      columnWidth: _columnWidth,
     );
   }
 
-  /// The effective end of the visible date range.
-  DateTime get _viewEnd {
-    if (widget.viewEnd != null) return _dateOnly(widget.viewEnd!);
-    if (widget.tasks.isEmpty) {
-      return _dateOnly(DateTime.now().add(const Duration(days: 30)));
-    }
-    return _dateOnly(
-      widget.tasks.map((t) => t.end).reduce((a, b) => a.isAfter(b) ? a : b),
-    ).add(const Duration(days: 1));
+  /// The midnight at which the last day containing time before [end] is
+  /// over: [end] itself when it is a midnight, else the following midnight.
+  DateTime _endOfLastDay(DateTime end) {
+    final midnight = _dateOnly(end);
+    return end.isAfter(midnight) ? OiCalendarUtils.addDays(end, 1) : midnight;
   }
 
   /// The width of each time column in logical pixels.
@@ -277,12 +354,6 @@ class _OiGanttState extends State<OiGantt>
     }
   }
 
-  /// The total number of days in the view range.
-  int get _totalDays => _viewEnd.difference(_viewStart).inDays;
-
-  /// The total width of the timeline area.
-  double get _timelineWidth => _totalDays * _columnWidth;
-
   /// The height of each task row.
   static const _rowHeight = 36.0;
 
@@ -291,13 +362,6 @@ class _OiGanttState extends State<OiGantt>
 
   /// Strips time from a [DateTime].
   DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
-
-  /// Returns the horizontal offset of a date within the timeline.
-  double _dateToX(DateTime date) {
-    final d = _dateOnly(date);
-    final daysDiff = d.difference(_viewStart).inDays;
-    return daysDiff * _columnWidth;
-  }
 
   /// Ordered task list, optionally grouped.
   List<_GanttRow> get _rows {
@@ -327,13 +391,20 @@ class _OiGanttState extends State<OiGantt>
   @override
   Widget build(BuildContext context) {
     final rows = _rows;
+    final viewport = _resolveViewport();
+    final timelineWidth = math.max<double>(viewport.width, 100);
+
+    if (settingsLoaded && !_initialSettingsApplied) {
+      _initialSettingsApplied = true;
+      _applySettings(currentSettings);
+    }
 
     return Semantics(
       label: widget.label,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildTimelineHeader(context),
+          _buildTimelineHeader(context, viewport, timelineWidth),
           Expanded(
             child: SingleChildScrollView(
               child: Row(
@@ -352,28 +423,27 @@ class _OiGanttState extends State<OiGantt>
                   // Timeline area.
                   Expanded(
                     child: SingleChildScrollView(
-                      controller: _horizontalScroll,
+                      controller: _bodyScroll,
                       scrollDirection: Axis.horizontal,
                       child: SizedBox(
-                        width: math.max(_timelineWidth, 100),
+                        width: timelineWidth,
                         child: Stack(
                           children: [
                             // Weekend shading.
                             if (widget.showWeekends)
-                              _buildWeekendShading(context),
+                              _buildWeekendShading(context, viewport),
                             // Dependency arrows (behind bars).
                             if (widget.showDependencies)
                               IgnorePointer(
                                 child: CustomPaint(
                                   size: Size(
-                                    math.max(_timelineWidth, 100),
+                                    timelineWidth,
                                     rows.length * _rowHeight,
                                   ),
                                   painter: _DependencyPainter(
                                     tasks: widget.tasks,
                                     rows: rows,
-                                    viewStart: _viewStart,
-                                    columnWidth: _columnWidth,
+                                    viewport: viewport,
                                     rowHeight: _rowHeight,
                                     arrowColor: context.colors.textMuted,
                                   ),
@@ -390,12 +460,13 @@ class _OiGanttState extends State<OiGantt>
                                   _buildTimelineRow(
                                     context,
                                     rows[index],
-                                    index,
+                                    viewport,
                                   ),
                               ],
                             ),
                             // Today line (on top of bars).
-                            if (widget.showToday) _buildTodayLine(context),
+                            if (widget.showToday)
+                              _buildTodayLine(context, viewport),
                           ],
                         ),
                       ),
@@ -410,7 +481,11 @@ class _OiGanttState extends State<OiGantt>
     );
   }
 
-  Widget _buildTimelineHeader(BuildContext context) {
+  Widget _buildTimelineHeader(
+    BuildContext context,
+    _GanttViewport viewport,
+    double timelineWidth,
+  ) {
     final colors = context.colors;
     return Container(
       height: 28,
@@ -433,16 +508,14 @@ class _OiGanttState extends State<OiGantt>
           ),
           Expanded(
             child: SingleChildScrollView(
-              controller: _horizontalScroll,
+              controller: _headerScroll,
               scrollDirection: Axis.horizontal,
               child: SizedBox(
-                width: math.max(_timelineWidth, 100),
+                width: timelineWidth,
                 child: CustomPaint(
-                  size: Size(math.max(_timelineWidth, 100), 28),
+                  size: Size(timelineWidth, 28),
                   painter: _HeaderPainter(
-                    viewStart: _viewStart,
-                    totalDays: _totalDays,
-                    columnWidth: _columnWidth,
+                    viewport: viewport,
                     zoom: widget.zoom,
                     textColor: colors.textMuted,
                     lineColor: colors.borderSubtle,
@@ -498,7 +571,11 @@ class _OiGanttState extends State<OiGantt>
     );
   }
 
-  Widget _buildTimelineRow(BuildContext context, _GanttRow row, int index) {
+  Widget _buildTimelineRow(
+    BuildContext context,
+    _GanttRow row,
+    _GanttViewport viewport,
+  ) {
     if (row.isHeader) {
       return const SizedBox(height: _rowHeight);
     }
@@ -508,8 +585,9 @@ class _OiGanttState extends State<OiGantt>
     final barColor = task.color ?? colors.primary.base;
     // Blend bar color at 30% over the background to produce an opaque tint.
     final barTint = Color.lerp(colors.background, barColor, 0.3)!;
-    final startX = _dateToX(task.start);
-    final endX = _dateToX(task.end);
+    final startX = viewport.dateToX(task.start);
+    final endX = viewport.dateToX(task.end);
+    // A task without a duration keeps a sliver so it stays visible.
     final barWidth = math.max<double>(endX - startX, 4);
 
     return SizedBox(
@@ -575,25 +653,23 @@ class _OiGanttState extends State<OiGantt>
     );
   }
 
-  Widget _buildWeekendShading(BuildContext context) {
+  Widget _buildWeekendShading(BuildContext context, _GanttViewport viewport) {
     final colors = context.colors;
     return Positioned.fill(
       child: CustomPaint(
         painter: _WeekendPainter(
-          viewStart: _viewStart,
-          totalDays: _totalDays,
-          columnWidth: _columnWidth,
+          viewport: viewport,
           shadingColor: colors.surfaceSubtle,
         ),
       ),
     );
   }
 
-  Widget _buildTodayLine(BuildContext context) {
+  Widget _buildTodayLine(BuildContext context, _GanttViewport viewport) {
     final colors = context.colors;
     final today = _dateOnly(DateTime.now());
-    final todayX = _dateToX(today);
-    if (todayX < 0 || todayX > _timelineWidth) {
+    final todayX = viewport.dateToX(today);
+    if (todayX < 0 || todayX > viewport.width) {
       return const SizedBox.shrink();
     }
     return Positioned(
@@ -607,6 +683,48 @@ class _OiGanttState extends State<OiGantt>
       ),
     );
   }
+}
+
+// ── Viewport ──────────────────────────────────────────────────────────────────
+
+/// The visible date range of the Gantt chart and its horizontal scale.
+@immutable
+class _GanttViewport {
+  const _GanttViewport({
+    required this.start,
+    required this.totalDays,
+    required this.columnWidth,
+  });
+
+  /// Local midnight of the first visible day.
+  final DateTime start;
+
+  /// The number of day columns.
+  final int totalDays;
+
+  /// The width of one day column in logical pixels.
+  final double columnWidth;
+
+  /// The width of all day columns.
+  double get width => totalDays * columnWidth;
+
+  /// The date of the day column at [index].
+  DateTime dayAt(int index) => OiCalendarUtils.addDays(start, index);
+
+  /// The horizontal offset of [date] within the timeline, with the time of
+  /// day as a fraction of its column.
+  double dateToX(DateTime date) =>
+      OiCalendarUtils.fractionalDaysBetween(start, date) * columnWidth;
+
+  @override
+  bool operator ==(Object other) =>
+      other is _GanttViewport &&
+      other.start == start &&
+      other.totalDays == totalDays &&
+      other.columnWidth == columnWidth;
+
+  @override
+  int get hashCode => Object.hash(start, totalDays, columnWidth);
 }
 
 // ── Row model ─────────────────────────────────────────────────────────────────
@@ -633,16 +751,14 @@ class _DependencyPainter extends CustomPainter {
   const _DependencyPainter({
     required this.tasks,
     required this.rows,
-    required this.viewStart,
-    required this.columnWidth,
+    required this.viewport,
     required this.rowHeight,
     required this.arrowColor,
   });
 
   final List<OiGanttTask> tasks;
   final List<_GanttRow> rows;
-  final DateTime viewStart;
-  final double columnWidth;
+  final _GanttViewport viewport;
   final double rowHeight;
   final Color arrowColor;
 
@@ -675,9 +791,9 @@ class _DependencyPainter extends CustomPainter {
         final toTask = row.task!;
 
         // Arrow from end of fromTask to start of toTask.
-        final fromX = _dateToX(fromTask.end);
+        final fromX = viewport.dateToX(fromTask.end);
         final fromY = fromIdx * rowHeight + rowHeight / 2;
-        final toX = _dateToX(toTask.start);
+        final toX = viewport.dateToX(toTask.start);
         final toY = i * rowHeight + rowHeight / 2;
 
         // Draw the connecting line.
@@ -699,17 +815,9 @@ class _DependencyPainter extends CustomPainter {
     }
   }
 
-  double _dateToX(DateTime date) {
-    final d = DateTime(date.year, date.month, date.day);
-    final daysDiff = d.difference(viewStart).inDays;
-    return daysDiff * columnWidth;
-  }
-
   @override
   bool shouldRepaint(_DependencyPainter oldDelegate) =>
-      oldDelegate.tasks != tasks ||
-      oldDelegate.viewStart != viewStart ||
-      oldDelegate.columnWidth != columnWidth;
+      oldDelegate.tasks != tasks || oldDelegate.viewport != viewport;
 }
 
 // ── Header painter ────────────────────────────────────────────────────────────
@@ -717,17 +825,13 @@ class _DependencyPainter extends CustomPainter {
 /// Paints the timeline header labels (dates).
 class _HeaderPainter extends CustomPainter {
   const _HeaderPainter({
-    required this.viewStart,
-    required this.totalDays,
-    required this.columnWidth,
+    required this.viewport,
     required this.zoom,
     required this.textColor,
     required this.lineColor,
   });
 
-  final DateTime viewStart;
-  final int totalDays;
-  final double columnWidth;
+  final _GanttViewport viewport;
   final OiGanttZoom zoom;
   final Color textColor;
   final Color lineColor;
@@ -748,9 +852,9 @@ class _HeaderPainter extends CustomPainter {
       OiGanttZoom.quarter => 90,
     };
 
-    for (var d = 0; d < totalDays; d += step) {
-      final date = viewStart.add(Duration(days: d));
-      final x = d * columnWidth;
+    for (var d = 0; d < viewport.totalDays; d += step) {
+      final date = viewport.dayAt(d);
+      final x = d * viewport.columnWidth;
 
       // Vertical grid line.
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), linePaint);
@@ -775,34 +879,25 @@ class _HeaderPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_HeaderPainter oldDelegate) =>
-      oldDelegate.viewStart != viewStart ||
-      oldDelegate.totalDays != totalDays ||
-      oldDelegate.columnWidth != columnWidth ||
-      oldDelegate.zoom != zoom;
+      oldDelegate.viewport != viewport || oldDelegate.zoom != zoom;
 }
 
 // ── Weekend painter ───────────────────────────────────────────────────────────
 
 /// Paints shaded rectangles on weekend columns.
 class _WeekendPainter extends CustomPainter {
-  const _WeekendPainter({
-    required this.viewStart,
-    required this.totalDays,
-    required this.columnWidth,
-    required this.shadingColor,
-  });
+  const _WeekendPainter({required this.viewport, required this.shadingColor});
 
-  final DateTime viewStart;
-  final int totalDays;
-  final double columnWidth;
+  final _GanttViewport viewport;
   final Color shadingColor;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = shadingColor;
 
-    for (var d = 0; d < totalDays; d++) {
-      final date = viewStart.add(Duration(days: d));
+    final columnWidth = viewport.columnWidth;
+    for (var d = 0; d < viewport.totalDays; d++) {
+      final date = viewport.dayAt(d);
       if (date.weekday == DateTime.saturday ||
           date.weekday == DateTime.sunday) {
         canvas.drawRect(
@@ -815,7 +910,5 @@ class _WeekendPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_WeekendPainter oldDelegate) =>
-      oldDelegate.viewStart != viewStart ||
-      oldDelegate.totalDays != totalDays ||
-      oldDelegate.columnWidth != columnWidth;
+      oldDelegate.viewport != viewport;
 }
