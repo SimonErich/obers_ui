@@ -269,4 +269,166 @@ void main() {
       expect(find.byType(SlideTransition), findsNothing);
     },
   );
+
+  // ── Hidden children are inert, and maintainState is honoured ──────────────
+
+  group('hidden child', () {
+    testWidgets('fade + maintainState: does not receive taps', (tester) async {
+      var taps = 0;
+      await tester.pumpObers(
+        Center(
+          child: OiVisibility(
+            visible: false,
+            child: GestureDetector(
+              onTap: () => taps++,
+              child: const SizedBox(
+                key: Key('target'),
+                width: 100,
+                height: 100,
+                child: ColoredBox(color: Color(0xFF000000)),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('target')), warnIfMissed: false);
+      await tester.pump();
+
+      expect(taps, 0);
+    });
+
+    testWidgets('fade + maintainState: cannot take focus', (tester) async {
+      final node = FocusNode();
+      addTearDown(node.dispose);
+      await tester.pumpObers(
+        OiVisibility(
+          visible: false,
+          child: Focus(focusNode: node, child: const SizedBox(height: 10)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      node.requestFocus();
+      await tester.pump();
+
+      expect(node.hasFocus, isFalse);
+    });
+
+    testWidgets('becomes interactive again when shown', (tester) async {
+      var taps = 0;
+      Widget build({required bool visible}) => Center(
+        child: OiVisibility(
+          visible: visible,
+          child: GestureDetector(
+            onTap: () => taps++,
+            child: const SizedBox(
+              key: Key('target'),
+              width: 100,
+              height: 100,
+              child: ColoredBox(color: Color(0xFF000000)),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpObers(build(visible: false));
+      await tester.pumpAndSettle();
+      await tester.pumpObers(build(visible: true));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('target')));
+
+      expect(taps, 1);
+    });
+
+    for (final transition in [OiTransition.none, OiTransition.fade]) {
+      testWidgets('${transition.name} + maintainState keeps the child State', (
+        tester,
+      ) async {
+        var inits = 0;
+        Widget build({required bool visible}) => OiVisibility(
+          visible: visible,
+          transition: transition,
+          child: _InitCounter(onInit: () => inits++),
+        );
+
+        await tester.pumpObers(build(visible: true));
+        await tester.pumpObers(build(visible: false));
+        await tester.pumpAndSettle();
+        await tester.pumpObers(build(visible: true));
+        await tester.pumpAndSettle();
+
+        expect(inits, 1);
+      });
+    }
+
+    testWidgets('none + maintainState=false still drops the child State', (
+      tester,
+    ) async {
+      var inits = 0;
+      Widget build({required bool visible}) => OiVisibility(
+        visible: visible,
+        transition: OiTransition.none,
+        maintainState: false,
+        child: _InitCounter(onInit: () => inits++),
+      );
+
+      await tester.pumpObers(build(visible: true));
+      await tester.pumpObers(build(visible: false));
+      await tester.pumpObers(build(visible: true));
+
+      expect(inits, 2);
+    });
+
+    testWidgets('none + maintainState: hidden child takes no space or taps', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpObers(
+        Center(
+          child: OiVisibility(
+            visible: false,
+            transition: OiTransition.none,
+            child: GestureDetector(
+              onTap: () => taps++,
+              child: const SizedBox(
+                key: Key('target'),
+                width: 100,
+                height: 100,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byKey(const Key('target')), findsNothing);
+      expect(
+        find.byKey(const Key('target'), skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(tester.getSize(find.byType(OiVisibility)), Size.zero);
+      expect(taps, 0);
+    });
+  });
+}
+
+class _InitCounter extends StatefulWidget {
+  const _InitCounter({required this.onInit});
+
+  final VoidCallback onInit;
+
+  @override
+  State<_InitCounter> createState() => _InitCounterState();
+}
+
+class _InitCounterState extends State<_InitCounter> {
+  @override
+  void initState() {
+    super.initState();
+    widget.onInit();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 10, height: 10);
 }

@@ -110,7 +110,7 @@ class OiVisibility extends StatefulWidget {
 class _OiVisibilityState extends State<OiVisibility>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _animation;
+  late CurvedAnimation _animation;
 
   /// Whether the child is currently in the tree (relevant when
   /// maintainState=false).
@@ -173,6 +173,7 @@ class _OiVisibilityState extends State<OiVisibility>
 
   @override
   void dispose() {
+    _animation.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -270,7 +271,14 @@ class _OiVisibilityState extends State<OiVisibility>
       if (!widget.maintainState) {
         return widget.visible ? widget.child : const SizedBox.shrink();
       }
-      return Visibility(visible: widget.visible, child: widget.child);
+      // maintainState keeps the child's State alive while hidden; Visibility
+      // takes it offstage, which also removes it from hit testing, focus and
+      // semantics.
+      return Visibility(
+        visible: widget.visible,
+        maintainState: true,
+        child: widget.child,
+      );
     }
 
     // When maintainState=false and the child is not in tree, render nothing.
@@ -278,6 +286,16 @@ class _OiVisibilityState extends State<OiVisibility>
       return const SizedBox.shrink();
     }
 
-    return _buildTransitionedChild(transition, widget.child);
+    // A faded-out child is still laid out and hit-testable, so make it inert
+    // while hidden. The wrappers stay in place when visible so the child's
+    // State survives the toggle.
+    final hidden = !widget.visible;
+    return IgnorePointer(
+      ignoring: hidden,
+      child: ExcludeFocus(
+        excluding: hidden,
+        child: _buildTransitionedChild(transition, widget.child),
+      ),
+    );
   }
 }
