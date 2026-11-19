@@ -329,10 +329,13 @@ class OiChartLabelPainter extends OiChartLayerPainter {
     final count = math.min(labels.length, tickPositions.length);
     final visibleIndices = _computeVisibleIndices(count);
 
-    // Prepare text painters for visible labels.
+    // Prepare text painters for visible labels. The keys fetched in this
+    // pass are tracked so eviction cannot dispose a painter that is about
+    // to be painted.
+    final inUse = <_TextCacheKey>{};
     final painters = <int, TextPainter>{};
     for (final i in visibleIndices) {
-      painters[i] = _getOrCreateTextPainter(labels[i], effectiveStyle);
+      painters[i] = _getOrCreateTextPainter(labels[i], effectiveStyle, inUse);
     }
 
     // Apply overflow handling and paint.
@@ -389,19 +392,26 @@ class OiChartLabelPainter extends OiChartLayerPainter {
     return indices;
   }
 
-  TextPainter _getOrCreateTextPainter(String text, TextStyle style) {
+  TextPainter _getOrCreateTextPainter(
+    String text,
+    TextStyle style,
+    Set<_TextCacheKey> inUse,
+  ) {
     final key = _TextCacheKey(text, style, maxLabelWidth, textDirection);
+    inUse.add(key);
     final cached = _textCache[key];
     if (cached != null) return cached;
 
-    // Evict oldest entries if cache is full.
+    // Evict the oldest entries if the cache is full, sparing those the
+    // current paint has already fetched. When a single paint needs more
+    // labels than the cache holds, the cache grows for that pass.
     if (_textCache.length >= _maxCacheSize) {
       final keysToRemove = _textCache.keys
+          .where((k) => !inUse.contains(k))
           .take(_textCache.length ~/ 4)
           .toList();
       for (final k in keysToRemove) {
-        _textCache[k]?.dispose();
-        _textCache.remove(k);
+        _textCache.remove(k)?.dispose();
       }
     }
 

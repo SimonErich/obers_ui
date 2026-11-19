@@ -19,7 +19,7 @@ from the git history, using the commits that changed `version:` in
 - `OiClockDial`: a clock face that picks a time of day by tapping the hour, then the minute (drag for the exact one)
 - `OiSelect` opens its menu with the selected option in view instead of at the top
 - `obers_ui_charts`: `OiChartController.setSeriesVisible` shows or hides a series without toggling, and `OiChartLabelPainter.textDirection` sets the reading direction of axis labels
-- `obers_ui_charts`: `OiLineChart` labels its y-axis with round numbers and skips non-finite points; `OiPieChart` gives negative and non-finite segments no share
+- `obers_ui_charts`: `OiLineChart` labels its y-axis with round numbers and leaves a gap at non-finite points; `OiPieChart` gives negative and non-finite segments no share
 - `obers_ui_charts`: `OiLogarithmicScale.toPixel` returns NaN for values that are not positive, `buildTicks` honours `count` and adds sub-decade ticks; `OiLinearScale.fromData` pads a single value by 10 % of its magnitude instead of ±1
 - `OiVectorMap`, `OiTileMap`, `OiCarousel`, `OiRadialSlider` and `OiAuthMode.lock`
 - `OiCalendarWeekPicker`

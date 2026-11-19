@@ -38,28 +38,36 @@ OiNiceAxis? resolveNiceAxis({
 
   final step = scaleTicks[1].value - scaleTicks[0].value;
   if (!step.isFinite || step <= 0) return null;
-  final tolerance = step * 1e-6;
+  const tolerance = 1e-6;
 
-  // Work in whole steps so the ticks stay exact multiples of the step.
-  var first = (scaleTicks.first.value / step).round();
-  var last = (scaleTicks.last.value / step).round();
-  while (first * step > lo + tolerance) {
-    first--;
-  }
-  while (last * step < hi - tolerance) {
-    last++;
+  // Work in whole steps so the ticks stay exact multiples of the step. The
+  // first and last index are computed, not searched for, so this cannot
+  // loop on a step that lost its precision.
+  final first = (lo / step + tolerance).floorToDouble();
+  final last = (hi / step - tolerance).ceilToDouble();
+  final tickCount = last - first + 1;
+  // A nice step is never much smaller than the rough one; more ticks than
+  // this means the arithmetic ran out of precision.
+  if (!tickCount.isFinite || tickCount < 2 || tickCount > divisions * 2 + 3) {
+    return null;
   }
 
   final min = first * step;
   final max = last * step;
-  if (pinnedMin != null && (min - pinnedMin).abs() > tolerance) return null;
-  if (pinnedMax != null && (max - pinnedMax).abs() > tolerance) return null;
+  if (!min.isFinite || !max.isFinite || min >= max) return null;
+  if (pinnedMin != null && (min - pinnedMin).abs() > step * tolerance) {
+    return null;
+  }
+  if (pinnedMax != null && (max - pinnedMax).abs() > step * tolerance) {
+    return null;
+  }
 
-  return (
-    min: min,
-    max: max,
-    ticks: [for (var i = first; i <= last; i++) i * step],
-  );
+  final ticks = [for (var i = 0; i < tickCount; i++) (first + i) * step];
+  // Neighbouring ticks that collapse to the same double cannot be labelled.
+  for (var i = 1; i < ticks.length; i++) {
+    if (ticks[i] <= ticks[i - 1]) return null;
+  }
+  return (min: min, max: max, ticks: ticks);
 }
 
 /// Formats the [ticks] of a nice axis with just enough decimals to tell

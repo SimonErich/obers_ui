@@ -165,7 +165,7 @@ class OiLineChartPainter extends CustomPainter {
     );
 
     // The same layout the chart hit-tests against, including stack
-    // offsets. Non-finite points are left out.
+    // offsets. Non-finite points have no position in it.
     final layouts = layoutLineSeries(
       [for (final series in resolvedSeries) series.points],
       chartRect: chartRect,
@@ -179,48 +179,11 @@ class OiLineChartPainter extends CustomPainter {
     for (var si = 0; si < resolvedSeries.length; si++) {
       final series = resolvedSeries[si];
       final layout = layouts[si];
-      final mappedPoints = layout.points.whereType<Offset>().toList();
-      if (mappedPoints.isEmpty) continue;
+      // A missing point ends a segment, so the line and its fill leave a
+      // gap there instead of bridging to the next value.
+      final segments = splitLineSegments(layout);
+      if (segments.isEmpty) continue;
 
-      // Build path.
-      final Path path;
-      switch (mode) {
-        case OiLineChartMode.smooth:
-          path = mappedPoints.length > 2
-              ? _buildSmoothPath(mappedPoints)
-              : _buildLinearPath(mappedPoints);
-        case OiLineChartMode.stepped:
-          path = _buildSteppedPath(mappedPoints);
-        case OiLineChartMode.straight:
-          path = _buildLinearPath(mappedPoints);
-      }
-
-      // Draw fill.
-      if (series.fill) {
-        final fillPath = Path()..addPath(path, Offset.zero);
-
-        if (stacked && si > 0) {
-          // Close along the top of the series below.
-          for (final base in layout.baselines.reversed) {
-            if (base != null) fillPath.lineTo(base.dx, base.dy);
-          }
-        } else {
-          // Close to bottom axis.
-          fillPath
-            ..lineTo(mappedPoints.last.dx, chartRect.bottom)
-            ..lineTo(mappedPoints.first.dx, chartRect.bottom);
-        }
-        fillPath.close();
-
-        canvas.drawPath(
-          fillPath,
-          Paint()
-            ..color = series.color.withValues(alpha: series.fillOpacity)
-            ..style = PaintingStyle.fill,
-        );
-      }
-
-      // Draw line.
       final linePaint = Paint()
         ..color = series.color
         ..style = PaintingStyle.stroke
@@ -228,17 +191,62 @@ class OiLineChartPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;
 
-      if (series.dashed) {
-        _drawDashedPath(canvas, path, linePaint);
-      } else {
-        canvas.drawPath(path, linePaint);
+      for (final segment in segments) {
+        final mappedPoints = segment.points;
+
+        // Build path.
+        final Path path;
+        switch (mode) {
+          case OiLineChartMode.smooth:
+            path = mappedPoints.length > 2
+                ? _buildSmoothPath(mappedPoints)
+                : _buildLinearPath(mappedPoints);
+          case OiLineChartMode.stepped:
+            path = _buildSteppedPath(mappedPoints);
+          case OiLineChartMode.straight:
+            path = _buildLinearPath(mappedPoints);
+        }
+
+        // Draw fill.
+        if (series.fill) {
+          final fillPath = Path()..addPath(path, Offset.zero);
+
+          if (stacked && si > 0) {
+            // Close along the top of the series below.
+            for (final base in segment.baselines.reversed) {
+              fillPath.lineTo(base.dx, base.dy);
+            }
+          } else {
+            // Close to bottom axis.
+            fillPath
+              ..lineTo(mappedPoints.last.dx, chartRect.bottom)
+              ..lineTo(mappedPoints.first.dx, chartRect.bottom);
+          }
+          fillPath.close();
+
+          canvas.drawPath(
+            fillPath,
+            Paint()
+              ..color = series.color.withValues(alpha: series.fillOpacity)
+              ..style = PaintingStyle.fill,
+          );
+        }
+
+        // Draw line.
+        if (series.dashed) {
+          _drawDashedPath(canvas, path, linePaint);
+        } else {
+          canvas.drawPath(path, linePaint);
+        }
       }
 
       // Draw point dots.
       if (showPoints) {
         final dotPaint = Paint()..color = series.color;
-        for (final p in mappedPoints) {
-          canvas.drawCircle(p, series.strokeWidth * 1.5, dotPaint);
+        for (final segment in segments) {
+          for (final p in segment.points) {
+            canvas.drawCircle(p, series.strokeWidth * 1.5, dotPaint);
+          }
         }
       }
 

@@ -34,8 +34,9 @@ bool _isDrawable(OiLinePoint point) => point.x.isFinite && point.y.isFinite;
 
 /// Computes the data range of [series], ignoring non-finite points.
 ///
-/// In [stacked] mode the y range spans from zero to the highest cumulative
-/// value. Falls back to `0..1` on an axis without any finite value.
+/// In [stacked] mode the y range covers zero and every cumulative value, so
+/// each series lies inside it wherever it is drawn. Falls back to `0..1` on
+/// an axis without any finite value.
 OiLineChartRange computeLineChartRange(
   List<List<OiLinePoint>> series, {
   required bool stacked,
@@ -52,17 +53,17 @@ OiLineChartRange computeLineChartRange(
       minX = math.min(minX, p.x);
       maxX = math.max(maxX, p.x);
       if (stacked) {
+        // Every running total is drawn, not only the last one: a negative
+        // series on top lowers the total below what is already on screen.
         final total = (totals[p.x] ?? 0) + p.y;
         totals[p.x] = total;
+        minY = math.min(minY, math.min(0, total));
+        maxY = math.max(maxY, math.max(0, total));
       } else {
         minY = math.min(minY, p.y);
         maxY = math.max(maxY, p.y);
       }
     }
-  }
-  if (stacked && totals.isNotEmpty) {
-    minY = 0;
-    maxY = totals.values.reduce(math.max);
   }
 
   if (minX > maxX) {
@@ -124,6 +125,41 @@ List<OiLineSeriesLayout> layoutLineSeries(
     layouts.add(OiLineSeriesLayout(points: mapped, baselines: baselines));
   }
   return layouts;
+}
+
+/// One unbroken run of drawable points of a series.
+///
+/// `points` and `baselines` are parallel and never empty.
+typedef OiLineSegment = ({List<Offset> points, List<Offset> baselines});
+
+/// Splits [layout] into the runs of consecutive drawable points.
+///
+/// A point that could not be laid out ends the current run, so the line
+/// and its fill show a gap there instead of bridging the missing value.
+List<OiLineSegment> splitLineSegments(OiLineSeriesLayout layout) {
+  final segments = <OiLineSegment>[];
+  var points = <Offset>[];
+  var baselines = <Offset>[];
+
+  void close() {
+    if (points.isEmpty) return;
+    segments.add((points: points, baselines: baselines));
+    points = <Offset>[];
+    baselines = <Offset>[];
+  }
+
+  for (var i = 0; i < layout.points.length; i++) {
+    final point = layout.points[i];
+    final baseline = layout.baselines[i];
+    if (point == null || baseline == null) {
+      close();
+    } else {
+      points.add(point);
+      baselines.add(baseline);
+    }
+  }
+  close();
+  return segments;
 }
 
 /// Finds the data point drawn nearest to [position] within [hitRadius].

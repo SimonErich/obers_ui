@@ -1,8 +1,11 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui_charts/src/composites/_chart_nice_axis.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart.dart';
@@ -12,6 +15,7 @@ import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_layou
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_painter.dart';
 
 import '../../../helpers/pump_chart_app.dart';
+import '../../../helpers/run_bounded.dart';
 
 Widget _chart(
   List<OiLineSeries> series, {
@@ -145,6 +149,132 @@ void main() {
         const Offset(100, 0),
       ]);
     });
+
+    test('a missing point splits the series into segments', () {
+      const a = Offset(0, 10);
+      const b = Offset(10, 10);
+      const c = Offset(30, 10);
+      const base = Offset(0, 100);
+      const layout = OiLineSeriesLayout(
+        points: [null, a, b, null, null, c, null],
+        baselines: [null, base, base, null, null, base, null],
+      );
+
+      final segments = splitLineSegments(layout);
+
+      expect(segments.map((s) => s.points), [
+        [a, b],
+        [c],
+      ]);
+      expect(segments.map((s) => s.baselines), [
+        [base, base],
+        [base],
+      ]);
+      expect(
+        splitLineSegments(
+          const OiLineSeriesLayout(points: [null], baselines: [null]),
+        ),
+        isEmpty,
+      );
+    });
+
+    for (final mode in OiLineChartMode.values) {
+      test('${mode.name} lines leave a gap at a missing point', () {
+        // Five points along the top of a 400x100 chart; the middle one is
+        // missing, so nothing may be drawn between x = 100 and x = 300.
+        final painter = OiLineChartPainter(
+          resolvedSeries: const [
+            ResolvedLineSeries(
+              points: [
+                OiLinePoint(x: 0, y: 10),
+                OiLinePoint(x: 1, y: 10),
+                OiLinePoint(x: 2, y: double.nan),
+                OiLinePoint(x: 3, y: 10),
+                OiLinePoint(x: 4, y: 10),
+              ],
+              color: Color(0xFFFF0000),
+              strokeWidth: 2,
+              dashed: false,
+              fill: true,
+              fillOpacity: 0.5,
+              label: 'a',
+            ),
+          ],
+          chartRect: const Rect.fromLTWH(0, 0, 400, 100),
+          minX: 0,
+          maxX: 4,
+          minY: 0,
+          maxY: 10,
+          showGrid: false,
+          gridColor: const Color(0xFF000000),
+          axisLabelColor: const Color(0xFF000000),
+          highContrast: false,
+          compact: false,
+          mode: mode,
+          showPoints: false,
+          stacked: false,
+          xLabels: const [],
+          yLabels: const [],
+          xDivisions: 5,
+          yDivisions: 5,
+        );
+
+        const underFirst = Offset(50, 50);
+        const underGap = Offset(200, 50);
+        const underSecond = Offset(350, 50);
+        expect(
+          (Canvas canvas) => painter.paint(canvas, const Size(400, 100)),
+          paints
+            ..path(
+              style: PaintingStyle.fill,
+              includes: [underFirst],
+              excludes: [underGap, underSecond],
+            )
+            ..path(style: PaintingStyle.stroke)
+            ..path(
+              style: PaintingStyle.fill,
+              includes: [underSecond],
+              excludes: [underGap, underFirst],
+            )
+            ..path(style: PaintingStyle.stroke),
+        );
+      });
+    }
+  });
+
+  // ── Stacked range ───────────────────────────────────────────────────────────
+
+  group('stacked range', () {
+    test('covers every cumulative value, not only the final total', () {
+      final range = computeLineChartRange(const [
+        [OiLinePoint(x: 0, y: 10)],
+        [OiLinePoint(x: 0, y: -5)],
+      ], stacked: true);
+
+      // The first series is drawn at 10, the second on top of it at 5.
+      expect(range.minY, 0);
+      expect(range.maxY, 10);
+    });
+
+    test('an all-negative stack extends below zero', () {
+      final range = computeLineChartRange(const [
+        [OiLinePoint(x: 0, y: -5), OiLinePoint(x: 1, y: -1)],
+        [OiLinePoint(x: 0, y: -5), OiLinePoint(x: 1, y: -1)],
+      ], stacked: true);
+
+      expect(range.minY, -10);
+      expect(range.maxY, 0);
+    });
+
+    test('a positive stack still starts at zero', () {
+      final range = computeLineChartRange(const [
+        [OiLinePoint(x: 0, y: 10)],
+        [OiLinePoint(x: 0, y: 10)],
+      ], stacked: true);
+
+      expect(range.minY, 0);
+      expect(range.maxY, 20);
+    });
   });
 
   // ── Round axis labels ───────────────────────────────────────────────────────
@@ -231,6 +361,46 @@ void main() {
       expect(painter.yLabels.first, '2 kg');
       expect(painter.yLabels.last, '14 kg');
     });
+  });
+
+  // A regression here never returns from build, which no test timeout can
+  // interrupt. So the axis is first resolved on another isolate with a time
+  // limit (see runBounded), and the chart is only built once that returned.
+  group('y axis with huge values', () {
+    for (final values in const [
+      [1e19, 9e19],
+      [1e22, 3e22],
+      [1.7e308],
+      [-1.7e308, 1.7e308],
+    ]) {
+      testWidgets('$values builds with a sane number of labels', (
+        tester,
+      ) async {
+        final lo = values.reduce(math.min);
+        final hi = values.reduce(math.max);
+        final ticks = await tester.runAsync(
+          () => runBounded(
+            () => resolveNiceAxis(
+              dataMin: lo,
+              dataMax: hi,
+              divisions: 5,
+            )?.ticks.length,
+          ),
+        );
+        expect(ticks, anyOf(isNull, inInclusiveRange(2, 15)));
+
+        await tester.pumpChartApp(_chart([_series(values)]));
+
+        expect(tester.takeException(), isNull);
+        final painter = _painter(tester);
+        expect(painter.yLabels.length, inInclusiveRange(2, 15));
+        expect(painter.yDivisions, painter.yLabels.length - 1);
+        expect(painter.minY.isFinite, isTrue);
+        expect(painter.maxY.isFinite, isTrue);
+        expect(painter.minY, lessThanOrEqualTo(lo));
+        expect(painter.maxY, greaterThanOrEqualTo(hi));
+      });
+    }
   });
 
   // ── Stacked hit-testing ─────────────────────────────────────────────────────

@@ -20,7 +20,11 @@ import 'package:obers_ui_charts/src/models/oi_chart_datum.dart';
 /// - A domain is the extent of the finite data unless [xMin], [xMax],
 ///   [yMin] or [yMax] pin a bound. A zero-width domain puts its points in
 ///   the middle of the plot.
-/// - Zoom and pan of the [viewport] are applied.
+/// - The pan offset of the [viewport] shifts the points. Its zoom level does
+///   not move them: positions go through
+///   [OiChartViewport.normalizedToWidget], whose normalized space spans the
+///   plot at every zoom level. The crosshair and brush work in that same
+///   space, so the hit points line up with them.
 ///
 /// Missing points and points with a non-finite coordinate are left out.
 /// The series index of a point is the position of its series id in

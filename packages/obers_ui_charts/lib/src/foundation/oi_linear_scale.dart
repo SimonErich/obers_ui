@@ -59,8 +59,9 @@ class OiLinearScale extends OiChartScale<double> {
     }
     if (lo == hi) {
       final padding = lo == 0 ? 1.0 : lo.abs() * 0.1;
-      lo = lo - padding;
-      hi = hi + padding;
+      // Clamped so a value near the double limit cannot pad to infinity.
+      lo = math.max(lo - padding, -double.maxFinite);
+      hi = math.min(hi + padding, double.maxFinite);
     }
     if (nice) {
       final niced = _niceExtent(lo, hi);
@@ -117,15 +118,34 @@ class OiLinearScale extends OiChartScale<double> {
       final mid = (domainMin + domainMax) / 2;
       return [OiTick(value: mid, position: toPixel(mid))];
     }
-    final step = _niceStep(_domainExtent / (count - 1));
-    final start = (domainMin / step).ceil() * step;
+    // Divide before subtracting: the extent of a very wide domain
+    // overflows to infinity, its share per tick does not.
+    final divisions = count - 1;
+    final step = _niceStep(domainMax / divisions - domainMin / divisions);
+    if (!step.isFinite || step <= 0) return const [];
+
+    // Ticks are whole multiples of the step. Their indices are computed up
+    // front, so the loop is bounded even when the step is too small to
+    // move a large value (adding it would never advance).
+    final first = (domainMin / step).ceilToDouble();
+    final last = (domainMax / step + 1e-10).floorToDouble();
+    final tickCount = last - first + 1;
+    // A nice step is never much smaller than the rough one, so more ticks
+    // than this means the arithmetic ran out of precision.
+    if (!tickCount.isFinite || tickCount > count * 2 + 2) {
+      return [
+        OiTick(value: domainMin, position: toPixel(domainMin)),
+        if (domainMax != domainMin)
+          OiTick(value: domainMax, position: toPixel(domainMax)),
+      ];
+    }
+
     final ticks = <OiTick<double>>[];
-    for (var v = start; v <= domainMax + step * 1e-10; v += step) {
-      final rounded = _roundTo(v, step);
-      if (rounded >= domainMin - step * 1e-10 &&
-          rounded <= domainMax + step * 1e-10) {
-        ticks.add(OiTick(value: rounded, position: toPixel(rounded)));
-      }
+    for (var i = 0; i < tickCount; i++) {
+      final value = (first + i) * step;
+      if (!value.isFinite) continue;
+      if (ticks.isNotEmpty && ticks.last.value == value) continue;
+      ticks.add(OiTick(value: value, position: toPixel(value)));
     }
     return ticks;
   }
@@ -179,7 +199,9 @@ class OiLinearScale extends OiChartScale<double> {
   static double _niceStep(double roughStep) {
     if (!roughStep.isFinite || roughStep <= 0) return 1;
     final exp = (math.log(roughStep) / math.ln10).floor();
-    final frac = roughStep / math.pow(10, exp);
+    // A double base: integer `pow` overflows int64 from 10^19 on.
+    final magnitude = math.pow(10.0, exp).toDouble();
+    final frac = roughStep / magnitude;
     double niceFrac;
     if (frac <= 1.5) {
       niceFrac = 1;
@@ -190,16 +212,17 @@ class OiLinearScale extends OiChartScale<double> {
     } else {
       niceFrac = 10;
     }
-    return niceFrac * math.pow(10, exp);
+    final step = niceFrac * magnitude;
+    // At the edges of the double range the rounding can leave it; the
+    // rough step is still usable there.
+    return step.isFinite && step > 0 ? step : roughStep;
   }
 
   static (double, double) _niceExtent(double lo, double hi) {
-    final step = _niceStep((hi - lo) / 5);
-    return ((lo / step).floor() * step, (hi / step).ceil() * step);
-  }
-
-  static double _roundTo(double value, double step) {
-    if (step == 0) return value;
-    return (value / step).round() * step;
+    final step = _niceStep(hi / 5 - lo / 5);
+    final niceLo = (lo / step).floorToDouble() * step;
+    final niceHi = (hi / step).ceilToDouble() * step;
+    // Keep a bound as it is when rounding it would overflow.
+    return (niceLo.isFinite ? niceLo : lo, niceHi.isFinite ? niceHi : hi);
   }
 }

@@ -48,6 +48,7 @@ Future<void> _pumpChart(
   List<OiChartBehavior> behaviors, {
   OiChartAxis<dynamic>? xAxis,
   List<OiChartAxis<num>>? yAxes,
+  OiChartController? controller,
 }) async {
   await tester.pumpChartApp(
     Align(
@@ -61,6 +62,7 @@ Future<void> _pumpChart(
           xAxis: xAxis,
           yAxes: yAxes,
           behaviors: behaviors,
+          controller: controller,
           // Stands in for the series layer; it makes the plot hit-testable.
           seriesBuilder: (context, viewport, series) =>
               const ColoredBox(color: Color(0x00000000)),
@@ -155,6 +157,38 @@ void main() {
         crosshair.state?.snappedRef,
         const OiChartDataRef(seriesIndex: 0, dataIndex: 1),
       );
+    });
+
+    testWidgets('a series hidden through the controller is no longer hit', (
+      tester,
+    ) async {
+      final controller = OiDefaultChartController();
+      addTearDown(controller.dispose);
+      final crosshair = _snappingCrosshair();
+      await _pumpChart(
+        tester,
+        [
+          _series('a', _linear),
+          // Same extent as a, but no point in the middle.
+          _series('b', const [_Point(1, 10), _Point(3, 30)]),
+        ],
+        [crosshair],
+        controller: controller,
+      );
+
+      final gesture = await _hoverAt(tester, const Offset(200, 150));
+      expect(
+        crosshair.state?.snappedRef,
+        const OiChartDataRef(seriesIndex: 0, dataIndex: 1),
+      );
+
+      controller.toggleSeries('a');
+      await tester.pump();
+      await gesture.moveTo(const Offset(201, 150));
+      await tester.pump();
+
+      expect(crosshair.state, isNotNull);
+      expect(crosshair.state?.snappedRef, isNull);
     });
 
     testWidgets('explicit axis bounds move the points', (tester) async {
@@ -295,6 +329,29 @@ void main() {
       final points = project({'a': _linear}, seriesIds: ['hidden', 'a']);
 
       expect(points.map((p) => p.ref.seriesIndex).toSet(), {1});
+    });
+
+    test('follows pan, and like the viewport ignores zoom', () {
+      final panned = project(
+        {'a': _linear},
+        viewport: const OiChartViewport(
+          size: Size(400, 300),
+          panOffset: Offset(30, -10),
+        ),
+      );
+      expect(panned.first.position, const Offset(30, 290));
+      expect(panned.last.position, const Offset(430, -10));
+
+      // The viewport's normalized space spans the plot at every zoom
+      // level, which is also what the crosshair and brush work in.
+      final plain = project({'a': _linear});
+      final zoomed = project({
+        'a': _linear,
+      }, viewport: const OiChartViewport(size: Size(400, 300), zoomLevel: 2));
+      expect(
+        zoomed.map((p) => p.position),
+        plain.map((p) => p.position).toList(),
+      );
     });
 
     test('follows the plot bounds of the viewport', () {

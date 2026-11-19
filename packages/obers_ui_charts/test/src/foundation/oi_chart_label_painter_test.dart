@@ -81,6 +81,41 @@ void main() {
     });
   });
 
+  group('OiChartLabelPainter cache eviction', () {
+    void paint(List<String> labels) {
+      OiChartLabelPainter(
+        edge: OiChartAxisEdge.bottom,
+        labels: labels,
+        tickPositions: [for (var i = 0; i < labels.length; i++) i * 100.0],
+        labelStyle: _style,
+      ).paint(
+        OiChartCanvasContext(
+          canvas: TestRecordingCanvas(),
+          size: const Size(400, 200),
+          viewport: const OiChartViewport(size: Size(400, 200)),
+          plotBounds: _plotBounds,
+          devicePixelRatio: 1,
+        ),
+      );
+    }
+
+    test('does not dispose a label the current paint still needs', () {
+      // Fill the cache to its limit of 512 with '0' as the oldest entry.
+      paint([for (var i = 0; i < 512; i++) '$i']);
+
+      // 'new' triggers eviction of the oldest entries while '0' has
+      // already been fetched for this paint.
+      expect(() => paint(['0', 'new']), returnsNormally);
+    });
+
+    test('one paint with more labels than the cache holds still paints', () {
+      expect(
+        () => paint([for (var i = 0; i < 700; i++) 'label $i']),
+        returnsNormally,
+      );
+    });
+  });
+
   group('OiChartLabelPainter.shouldRepaint', () {
     test('is true when the text direction changes', () {
       expect(

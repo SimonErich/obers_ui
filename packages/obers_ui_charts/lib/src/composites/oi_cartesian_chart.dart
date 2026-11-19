@@ -27,6 +27,7 @@ import 'package:obers_ui_charts/src/models/oi_chart_datum.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_series.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_state_models.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 import 'package:obers_ui_charts/src/utils/chart_math.dart';
 
@@ -201,12 +202,14 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
     super.initState();
     attachStreamingAdapters();
     restoreSettings(widget.settings);
+    _listenToController();
   }
 
   @override
   void didUpdateWidget(covariant OiCartesianChart<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     syncStreamingAdapters();
+    _listenToController();
     if (oldWidget.behaviors != widget.behaviors ||
         oldWidget.controller != widget.controller) {
       attachBehaviors();
@@ -215,9 +218,63 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
 
   @override
   void dispose() {
+    _listenedController?.removeListener(_onControllerChanged);
+    _listenedController = null;
     detachStreamingAdapters();
     disposeBehaviorHost();
     super.dispose();
+  }
+
+  // ── Controller changes ───────────────────────────────────────────────
+
+  OiChartController? _listenedController;
+
+  /// What the last build read from the controller; see
+  /// [_onControllerChanged].
+  ({
+    OiChartLegendState legend,
+    double zoom,
+    Offset pan,
+    bool isLoading,
+    String? error,
+  })?
+  _builtFrom;
+
+  /// Follows the effective controller, also when the widget swaps it.
+  void _listenToController() {
+    final controller = effectiveController;
+    if (identical(controller, _listenedController)) return;
+    _listenedController?.removeListener(_onControllerChanged);
+    _listenedController = controller..addListener(_onControllerChanged);
+  }
+
+  ({
+    OiChartLegendState legend,
+    double zoom,
+    Offset pan,
+    bool isLoading,
+    String? error,
+  })
+  _controllerSnapshot() {
+    final controller = effectiveController;
+    return (
+      legend: controller.legendState,
+      zoom: controller.viewportState.zoomLevel,
+      pan: controller.viewportState.panOffset,
+      isLoading: controller.isLoading,
+      error: controller.error,
+    );
+  }
+
+  /// Rebuilds when the controller changed something the build reads.
+  ///
+  /// Without this a series hidden through the controller would stay on
+  /// screen and in the hit tester until the parent happened to rebuild.
+  /// Hover and selection changes also notify but are not read by the
+  /// build, so they are ignored here.
+  void _onControllerChanged() {
+    if (!mounted || _controllerSnapshot() == _builtFrom) return;
+    setState(() {});
   }
 
   // ── Series helpers ───────────────────────────────────────────────────
@@ -344,6 +401,7 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
   @override
   Widget build(BuildContext context) {
     final ctrl = effectiveController;
+    _builtFrom = _controllerSnapshot();
     final isLoading = ctrl.isLoading;
     final error = ctrl.error;
 

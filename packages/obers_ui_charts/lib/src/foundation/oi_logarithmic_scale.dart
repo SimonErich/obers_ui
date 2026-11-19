@@ -125,10 +125,11 @@ class OiLogarithmicScale extends OiChartScale<double> {
   /// Generates at most [count] ticks at human-friendly positions.
   ///
   /// Starts from the powers of [base] inside the domain. When there are
-  /// more of them than [count], every n-th power is kept. When there is
-  /// room left, sub-decade multiples (1-2-5 for base 10, then every integer
-  /// multiple) are added, which also covers a domain that lies inside a
-  /// single decade.
+  /// more of them than [count], they are thinned to [count] ticks spread
+  /// as evenly as possible, always keeping the lowest and the highest.
+  /// When there is room left, sub-decade multiples (1-2-5 for base 10, then
+  /// every integer multiple) are added, which also covers a domain that
+  /// lies inside a single decade.
   @override
   List<OiTick<double>> buildTicks({int count = 5}) {
     if (count < 1) return const [];
@@ -137,12 +138,8 @@ class OiLogarithmicScale extends OiChartScale<double> {
     final startExp = _tolerantFloor(_logMin);
     final endExp = _tolerantCeil(_logMax);
 
-    final powers = _multiples(startExp, endExp, const [1]);
-    var values = powers;
-    if (powers.length > count) {
-      final stride = (powers.length / count).ceil();
-      values = [for (var i = 0; i < powers.length; i += stride) powers[i]];
-    } else {
+    var values = _multiples(startExp, endExp, const [1]);
+    if (values.length <= count) {
       final everyMultiple = [for (var m = 1; m < base; m++) m];
       final candidates = [
         if (base == 10) _multiples(startExp, endExp, const [1, 2, 5]),
@@ -151,15 +148,23 @@ class OiLogarithmicScale extends OiChartScale<double> {
       for (final candidate in candidates) {
         if (candidate.length <= count || values.isEmpty) values = candidate;
       }
-      if (values.length > count) {
-        final stride = (values.length / count).ceil();
-        values = [for (var i = 0; i < values.length; i += stride) values[i]];
-      }
     }
+    values = _thin(values, count);
     if (values.isEmpty) {
       values = [domainMin, if (count > 1 && domainMax != domainMin) domainMax];
     }
     return [for (final v in values) OiTick(value: v, position: toPixel(v))];
+  }
+
+  /// Reduces [values] to at most [count] entries spread as evenly as their
+  /// number allows, keeping the first and (for more than one) the last.
+  static List<double> _thin(List<double> values, int count) {
+    if (values.length <= count) return values;
+    if (count == 1) return [values.first];
+    final last = values.length - 1;
+    return [
+      for (var i = 0; i < count; i++) values[(i * last / (count - 1)).round()],
+    ];
   }
 
   /// Every `multiplier * base^exp` inside the domain, in ascending order.
