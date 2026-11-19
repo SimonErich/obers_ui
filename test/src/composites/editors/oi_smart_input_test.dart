@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/editors/oi_smart_input.dart';
@@ -15,10 +16,10 @@ void main() {
     });
 
     testWidgets('onChange fires when text changes', (tester) async {
-      String? changed;
+      final changes = <String>[];
       await tester.pumpObers(
         Center(
-          child: OiSmartInput(label: 'Name', onChange: (v) => changed = v),
+          child: OiSmartInput(label: 'Name', onChange: changes.add),
         ),
       );
 
@@ -26,7 +27,7 @@ void main() {
       await tester.enterText(find.byType(EditableText).first, 'hello');
       await tester.pump();
 
-      expect(changed, 'hello');
+      expect(changes, ['hello']);
     });
 
     testWidgets('recognizers apply styles to matched text', (tester) async {
@@ -152,13 +153,13 @@ void main() {
     });
 
     testWidgets('disabled blocks input', (tester) async {
-      String? changed;
+      final changes = <String>[];
       await tester.pumpObers(
         Center(
           child: OiSmartInput(
             label: 'Name',
             enabled: false,
-            onChange: (v) => changed = v,
+            onChange: changes.add,
           ),
         ),
       );
@@ -168,7 +169,11 @@ void main() {
         find.byType(EditableText).first,
       );
       expect(editableText.readOnly, isTrue);
-      expect(changed, isNull);
+
+      // Focusing a disabled field changes nothing.
+      await tester.tap(find.byType(EditableText).first);
+      await tester.pump();
+      expect(changes, isEmpty);
     });
 
     testWidgets('error message shows', (tester) async {
@@ -296,7 +301,7 @@ void main() {
     });
 
     testWidgets('selecting suggestion inserts text', (tester) async {
-      String? lastChanged;
+      final changes = <String>[];
       final recognizers = [
         OiPatternRecognizer(
           trigger: '@',
@@ -319,7 +324,7 @@ void main() {
             label: 'Message',
             recognizers: recognizers,
             onSuggestionQuery: querySuggestions,
-            onChange: (v) => lastChanged = v,
+            onChange: changes.add,
           ),
         ),
       );
@@ -332,7 +337,157 @@ void main() {
       await tester.tap(find.text('Alice'));
       await tester.pump();
 
-      expect(lastChanged, '@alice');
+      // Once for the typed text, once for the inserted suggestion.
+      expect(changes, ['@a', '@alice']);
+    });
+
+    group('onChange', () {
+      testWidgets('does not fire when only the caret moves', (tester) async {
+        final changes = <String>[];
+        final controller = TextEditingController(text: 'hello');
+        addTearDown(controller.dispose);
+        await tester.pumpObers(
+          Center(
+            child: OiSmartInput(
+              label: 'Name',
+              controller: controller,
+              onChange: changes.add,
+            ),
+          ),
+        );
+
+        controller.selection = const TextSelection.collapsed(offset: 2);
+        await tester.pump();
+        controller.selection = const TextSelection(
+          baseOffset: 1,
+          extentOffset: 4,
+        );
+        await tester.pump();
+
+        expect(changes, isEmpty);
+      });
+
+      testWidgets('does not fire when the field takes focus', (tester) async {
+        final changes = <String>[];
+        await tester.pumpObers(
+          Center(
+            child: OiSmartInput(
+              label: 'Name',
+              value: 'hello',
+              onChange: changes.add,
+            ),
+          ),
+        );
+
+        await tester.tap(find.byType(EditableText).first);
+        await tester.pump();
+
+        expect(changes, isEmpty);
+      });
+
+      testWidgets('fires once per change of an external controller', (
+        tester,
+      ) async {
+        final changes = <String>[];
+        final controller = TextEditingController();
+        addTearDown(controller.dispose);
+        await tester.pumpObers(
+          Center(
+            child: OiSmartInput(
+              label: 'Name',
+              controller: controller,
+              onChange: changes.add,
+            ),
+          ),
+        );
+
+        controller
+          ..text = 'a'
+          ..text = 'ab'
+          ..text = 'ab';
+        await tester.pump();
+
+        expect(changes, ['a', 'ab']);
+      });
+    });
+
+    group('accepting a suggestion from the keyboard', () {
+      final recognizers = [
+        OiPatternRecognizer(
+          trigger: '@',
+          pattern: RegExp(r'@\w+'),
+          style: const TextStyle(color: Color(0xFF2563EB)),
+          showSuggestions: true,
+        ),
+      ];
+
+      Future<List<OiSuggestion>> querySuggestions(
+        String trigger,
+        String query,
+      ) async => const [
+        OiSuggestion(value: '@alice', label: 'Alice'),
+        OiSuggestion(value: '@adam', label: 'Adam'),
+      ];
+
+      Future<List<String>> pumpWithPopup(WidgetTester tester) async {
+        final changes = <String>[];
+        await tester.pumpObers(
+          Center(
+            child: OiSmartInput(
+              label: 'Message',
+              recognizers: recognizers,
+              onSuggestionQuery: querySuggestions,
+              onChange: changes.add,
+            ),
+          ),
+        );
+        await tester.enterText(find.byType(EditableText).first, '@a');
+        await tester.pump();
+        await tester.pump();
+        expect(find.text('Alice'), findsOneWidget);
+        return changes;
+      }
+
+      testWidgets('Enter inserts the highlighted suggestion', (tester) async {
+        final changes = await pumpWithPopup(tester);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+
+        expect(changes, ['@a', '@alice']);
+        expect(find.text('Alice'), findsNothing);
+      });
+
+      testWidgets('Tab inserts the highlighted suggestion', (tester) async {
+        final changes = await pumpWithPopup(tester);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+
+        expect(changes, ['@a', '@alice']);
+        expect(find.text('Alice'), findsNothing);
+      });
+
+      testWidgets('Enter follows the arrow keys', (tester) async {
+        final changes = await pumpWithPopup(tester);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+
+        expect(changes, ['@a', '@adam']);
+      });
+
+      testWidgets('Escape closes the popup without inserting', (tester) async {
+        final changes = await pumpWithPopup(tester);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pump();
+
+        expect(changes, ['@a']);
+        expect(find.text('Alice'), findsNothing);
+      });
     });
 
     testWidgets('suggestion popup hides when trigger is deleted', (
