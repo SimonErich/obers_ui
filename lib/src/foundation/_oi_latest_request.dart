@@ -14,7 +14,9 @@ class OiLatestRequest {
 
   /// Drops whatever is in flight; its answer will be ignored.
   ///
-  /// Call when the query is cleared and from `dispose`.
+  /// Call whenever the query changes, not only when the next request starts:
+  /// between the two lies the debounce, and an answer landing there would
+  /// still be the latest. Call it from `dispose` too.
   void cancel() => _latest++;
 
   /// Starts [request], superseding every earlier one.

@@ -330,6 +330,11 @@ class _OiRichEditorState extends State<OiRichEditor> {
       final controller = _blockControllers[index];
       // While an input method is composing (CJK, for one), Enter confirms the
       // composition; it is not a line break.
+      //
+      // Known risk, not reproducible in a widget test: Android keyboards keep
+      // a composing region on the word being typed for Latin text too, so a
+      // hardware Enter there may not split the block until the word is
+      // committed.
       if (controller.value.composing.isValid) return KeyEventResult.ignored;
 
       final selection = controller.selection;

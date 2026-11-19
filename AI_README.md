@@ -2232,7 +2232,7 @@ Searchable dropdown with async option loading, fuzzy match, virtual scroll.
 - `optionBuilder` (Widget Function(T)?) — Custom option rendering
 - `labels` (OiComboBoxLabels, default: English) — Dropdown texts: `searchPlaceholder`, `loading`, `create` (String Function(String query)), `loadMore`. `noResultsLabel`, `recentLabel`, `favoritesLabel` stay flat parameters
 
-Keyboard: the trigger is focusable; Enter, Space or Arrow Down opens the dropdown, the arrow keys follow the on-screen order (recent, favorites, then groups), Enter selects, Escape closes and returns focus to the trigger.
+Keyboard: the trigger is focusable; Enter, Space or Arrow Down opens the dropdown, the arrow keys follow the on-screen order (recent, favorites, then groups), Enter selects, Escape closes and returns focus to the trigger, Tab / Shift+Tab closes and moves focus to the next / previous field.
 
 **Use When:** Large option lists, async search, user/entity pickers.
 **Avoid When:** Small static lists (<20 options) — use `OiSelect`.

@@ -162,6 +162,10 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   bool _loading = false;
   Timer? _debounce;
   final OiLatestRequest _searches = OiLatestRequest();
+  final OiLatestRequest _loadMores = OiLatestRequest();
+
+  /// Whether a "load more" page is on its way.
+  bool _loadingMore = false;
 
   @override
   void initState() {
@@ -179,25 +183,60 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     // Compared by content: a parent that builds its list inline passes a new
     // instance on every rebuild. With a search callback the options come from
     // the search, so the static items do not matter.
-    if (widget.search == null && !listEquals(oldWidget.items, widget.items)) {
-      // Keep the highlight on the item it was on, wherever that item is now.
-      final before = _visibleOptions();
-      final highlighted =
-          _highlightedIndex >= 0 && _highlightedIndex < before.length
-          ? before[_highlightedIndex]
-          : null;
-      _filteredItems = _filterItems(_textController.text);
-      final index = highlighted == null
-          ? -1
-          : _visibleOptions().indexOf(highlighted);
-      _highlightedIndex = index >= 0 ? index : _initialHighlight();
+    final itemsChanged =
+        widget.search == null && !listEquals(oldWidget.items, widget.items);
+    final pinnedChanged =
+        !listEquals(oldWidget.recentItems, widget.recentItems) ||
+        !listEquals(oldWidget.favoriteItems, widget.favoriteItems);
+    if (!itemsChanged && !pinnedChanged) return;
+
+    // Keep the highlight on the tile it was on: the same item in the same
+    // section, wherever that tile is now. An item can be listed twice, pinned
+    // and in the main list, and each copy is its own tile.
+    final oldSections = [
+      oldWidget.recentItems ?? const [],
+      oldWidget.favoriteItems ?? const [],
+      _mainOptions(),
+    ];
+    var section = 0;
+    var offset = _highlightedIndex;
+    while (section < oldSections.length &&
+        offset >= oldSections[section].length) {
+      offset -= oldSections[section].length;
+      section++;
     }
+    final highlighted = offset >= 0 && section < oldSections.length;
+    final item = highlighted ? oldSections[section][offset] : null;
+
+    if (itemsChanged) {
+      // The page on its way belongs to the old list.
+      _cancelLoadMore();
+      _filteredItems = _filterItems(_textController.text);
+    }
+
+    if (!highlighted) {
+      _highlightedIndex = _initialHighlight();
+      return;
+    }
+    final newSections = [
+      widget.recentItems ?? const [],
+      widget.favoriteItems ?? const [],
+      _mainOptions(),
+    ];
+    final index = newSections[section].indexOf(item as T);
+    _highlightedIndex = index < 0
+        ? _initialHighlight()
+        : index +
+              newSections
+                  .take(section)
+                  .fold<int>(0, (sum, list) => sum + list.length);
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
     _searches.cancel();
+    _loadMores.cancel();
     _textController.dispose();
     _inputFocusNode.dispose();
     _triggerFocusNode
@@ -217,8 +256,17 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   }
 
   void _applyFilter(String query) {
+    // A page still on its way belongs to the list being replaced.
+    _cancelLoadMore();
+
     if (widget.search != null) {
       _debounce?.cancel();
+      // The search in flight answers a query that is no longer the current
+      // one. It is dropped now, not when the next search starts: otherwise
+      // its answer would be shown, and end the loading state, during the
+      // debounce.
+      _searches.cancel();
+      setState(() => _loading = true);
       _debounce = Timer(const Duration(milliseconds: 200), () {
         unawaited(_performAsyncSearch(query));
       });
@@ -253,6 +301,34 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     );
   }
 
+  /// Loads the next page and appends it to the list it was asked for.
+  ///
+  /// Taps while a page is loading are ignored, and a page that arrives after
+  /// the query or the items changed is dropped (see [_cancelLoadMore]).
+  void _loadMore() {
+    final loadMore = widget.loadMore;
+    if (loadMore == null || _loadingMore) return;
+    _loadingMore = true;
+    unawaited(
+      _loadMores.run(
+        loadMore,
+        active: () => mounted,
+        onResult: (more) => setState(() {
+          _loadingMore = false;
+          _filteredItems = [..._filteredItems, ...more];
+          _asyncResults = [..._asyncResults, ...more];
+        }),
+        // The list stays as it is and the row can be tapped again.
+        onError: (_, _) => _loadingMore = false,
+      ),
+    );
+  }
+
+  void _cancelLoadMore() {
+    _loadMores.cancel();
+    _loadingMore = false;
+  }
+
   // ── Effective items list ──────────────────────────────────────────────────
 
   List<T> get _effectiveItems {
@@ -264,12 +340,17 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   int get _pinnedCount =>
       (widget.recentItems?.length ?? 0) + (widget.favoriteItems?.length ?? 0);
 
+  /// The main list in the order the dropdown shows it, group by group.
+  List<T> _mainOptions() => [
+    for (final section in _buildGroupedSections()) ...section.items,
+  ];
+
   /// Every option in the order the dropdown shows it: recent, favorites, then
-  /// the main list group by group. The keyboard highlight walks this list.
+  /// the main list. The keyboard highlight walks this list.
   List<T> _visibleOptions() => [
     ...?widget.recentItems,
     ...?widget.favoriteItems,
-    for (final section in _buildGroupedSections()) ...section.items,
+    ..._mainOptions(),
   ];
 
   /// Where the highlight starts: the first match while a query is typed (so
@@ -400,6 +481,22 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
 
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       _closeDropdown(restoreFocus: true);
+      return KeyEventResult.handled;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      // Tab leaves the combo box: the dropdown closes and focus moves to the
+      // trigger's neighbour. The search field lives in an overlay, so the
+      // traversal has to start from the trigger, which is where the user
+      // was. Traversal goes from the scope's focused child; the request below
+      // makes that the trigger and is itself replaced by the move.
+      _closeDropdown();
+      _triggerFocusNode.requestFocus();
+      if (HardwareKeyboard.instance.isShiftPressed) {
+        _triggerFocusNode.previousFocus();
+      } else {
+        _triggerFocusNode.nextFocus();
+      }
       return KeyEventResult.handled;
     }
 
@@ -542,15 +639,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                       // Load more
                       if (widget.moreAvailable && widget.loadMore != null)
                         GestureDetector(
-                          onTap: () async {
-                            final more = await widget.loadMore!();
-                            if (mounted) {
-                              setState(() {
-                                _filteredItems = [..._filteredItems, ...more];
-                                _asyncResults = [..._asyncResults, ...more];
-                              });
-                            }
-                          },
+                          onTap: _loadMore,
                           child: Container(
                             height: effectiveItemHeight,
                             alignment: Alignment.center,

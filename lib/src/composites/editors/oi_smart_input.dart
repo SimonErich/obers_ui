@@ -533,6 +533,11 @@ class _OiSmartInputState extends State<OiSmartInput> {
         event.logicalKey == LogicalKeyboardKey.numpadEnter ||
         event.logicalKey == LogicalKeyboardKey.tab) {
       // Mid-composition the key belongs to the input method.
+      //
+      // Known risk, not reproducible in a widget test: Android keyboards keep
+      // a composing region on the word being typed for Latin text too, so a
+      // hardware Enter or Tab there may be ignored until the word is
+      // committed.
       if (_controller.value.composing.isValid) return KeyEventResult.ignored;
       _selectSuggestion(_suggestions[_selectedSuggestionIndex]);
       if (mounted) setState(() {});

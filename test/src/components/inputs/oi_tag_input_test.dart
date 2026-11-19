@@ -232,6 +232,43 @@ void main() {
         expect(find.text('dart'), findsOneWidget);
       });
 
+      testWidgets('an earlier fetch answering while the next one is debounced '
+          'is dropped', (tester) async {
+        await tester.pumpObers(
+          OiTagInput(
+            tags: const [],
+            suggestions: const ['dart', 'docker'],
+            asyncSuggestions: (query) =>
+                (requests[query] = Completer<List<String>>()).future,
+            suggestionDebounce: const Duration(milliseconds: 50),
+          ),
+        );
+        await tester.enterText(find.byType(EditableText), 'd');
+        await tester.pump(const Duration(milliseconds: 60));
+        // Typed, but its fetch has not started yet.
+        await tester.enterText(find.byType(EditableText), 'da');
+        await tester.pump(const Duration(milliseconds: 10));
+        expect(requests.keys, ['d']);
+        expect(find.text('dart'), findsOneWidget);
+        expect(find.text('docker'), findsNothing);
+
+        requests['d']!.complete(['django']);
+        await tester.pump();
+        await tester.pump();
+
+        // Still the static matches for "da", with the loading row below.
+        expect(find.text('dart'), findsOneWidget);
+        expect(find.text('django'), findsNothing);
+        expect(find.byType(OiShimmer), findsOneWidget);
+
+        await tester.pump(const Duration(milliseconds: 60));
+        requests['da']!.complete(['database']);
+        await tester.pump();
+        await tester.pump();
+        expect(find.byType(OiShimmer), findsNothing);
+        expect(find.text('database'), findsOneWidget);
+      });
+
       testWidgets('a fetch that throws an Error ends the loading state', (
         tester,
       ) async {

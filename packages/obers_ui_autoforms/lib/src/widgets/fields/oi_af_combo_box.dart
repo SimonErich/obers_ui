@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/obers_ui.dart' show OiComboBox;
+import 'package:obers_ui/obers_ui.dart' show OiComboBox, OiComboBoxLabels;
 import 'package:obers_ui_autoforms/src/foundation/oi_af_enums.dart';
 import 'package:obers_ui_autoforms/src/widgets/fields/_oi_af_field_binder.dart';
 
@@ -27,6 +27,7 @@ class OiAfComboBox<TField extends Enum, TValue> extends StatefulWidget {
     this.moreAvailable = false,
     this.optionBuilder,
     this.enabled = true,
+    this.labels = const OiComboBoxLabels(),
     super.key,
   });
 
@@ -54,6 +55,9 @@ class OiAfComboBox<TField extends Enum, TValue> extends StatefulWidget {
   })?
   optionBuilder;
   final bool enabled;
+
+  /// The texts of the dropdown; pass translations to localize it.
+  final OiComboBoxLabels labels;
 
   @override
   State<OiAfComboBox<TField, TValue>> createState() =>
@@ -105,6 +109,7 @@ class _OiAfComboBoxState<TField extends Enum, TValue>
       loadMore: widget.loadMore,
       moreAvailable: widget.moreAvailable,
       optionBuilder: widget.optionBuilder,
+      labels: widget.labels,
     );
   }
 }

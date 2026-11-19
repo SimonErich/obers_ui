@@ -210,9 +210,12 @@ class _OiSearchState extends State<OiSearch> {
 
   void _onQueryChanged(String query) {
     _debounceTimer?.cancel();
+    // The search in flight answers a query that is no longer the current one.
+    // It is dropped on every change, not when the next search starts:
+    // otherwise its answer would be shown, and end the loading state, during
+    // the debounce, or come back after the query was cleared.
+    _searches.cancel();
     if (query.isEmpty) {
-      // A search still on its way must not bring its results back.
-      _searches.cancel();
       setState(() {
         _resultsByCategory = {};
         _highlightedIndex = -1;
@@ -220,6 +223,7 @@ class _OiSearchState extends State<OiSearch> {
       });
       return;
     }
+    setState(() => _loading = true);
     _debounceTimer = Timer(widget.debounce, () => _performSearch(query));
   }
 

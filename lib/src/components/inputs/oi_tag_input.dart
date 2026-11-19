@@ -152,9 +152,14 @@ class _OiTagInputState extends State<OiTagInput> {
     if (!widget._hasSuggestions) return;
     final query = _ctrl.text;
 
+    // The fetch in flight answers a query that is no longer the current one.
+    // It is dropped on every change, not when the next fetch starts:
+    // otherwise its answer would replace the suggestions, and end the loading
+    // state, during the debounce.
+    _suggestionFetches.cancel();
+
     if (query.isEmpty) {
       _debounceTimer?.cancel();
-      _suggestionFetches.cancel();
       setState(() {
         _filteredSuggestions = const [];
         _showSuggestions = false;

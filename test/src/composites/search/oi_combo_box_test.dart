@@ -482,6 +482,108 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text('M1'), findsOneWidget);
     });
+
+    testWidgets('tapping an option selects it', (tester) async {
+      String? selected;
+      await tester.pumpObers(_comboBox(onSelect: (v) => selected = v));
+      await _open(tester);
+
+      await _tapOption(tester, 'Cherry');
+
+      expect(selected, 'Cherry');
+    });
+
+    group('while a page is loading', () {
+      late Map<String, Completer<List<String>>> searches;
+      late List<Completer<List<String>>> pages;
+
+      Widget slowPaged() => SizedBox(
+        width: 400,
+        height: 600,
+        child: OiComboBox<String>(
+          label: 'Fruit',
+          labelOf: (item) => item,
+          search: (query) =>
+              (searches[query] = Completer<List<String>>()).future,
+          moreAvailable: true,
+          loadMore: () {
+            pages.add(Completer<List<String>>());
+            return pages.last.future;
+          },
+        ),
+      );
+
+      /// Opens the dropdown with the results of the empty query shown.
+      Future<void> openWithResults(WidgetTester tester) async {
+        await tester.pumpObers(slowPaged());
+        await _open(tester);
+        await tester.pump(const Duration(milliseconds: 250));
+        searches['']!.complete(['A1', 'A2']);
+        await _flush(tester);
+        expect(find.text('A1'), findsOneWidget);
+      }
+
+      setUp(() {
+        searches = {};
+        pages = [];
+      });
+
+      testWidgets('a page of an earlier query is not added to newer results', (
+        tester,
+      ) async {
+        await openWithResults(tester);
+        await _tapOption(tester, 'Load more…');
+        expect(pages, hasLength(1));
+
+        // The query changes while the page is on its way.
+        await tester.enterText(find.byType(EditableText).first, 'b');
+        await tester.pump(const Duration(milliseconds: 250));
+        searches['b']!.complete(['B1']);
+        await _flush(tester);
+        expect(find.text('B1'), findsOneWidget);
+
+        pages.single.complete(['A3']);
+        await _flush(tester);
+
+        expect(find.text('B1'), findsOneWidget);
+        expect(find.text('A3'), findsNothing);
+      });
+
+      testWidgets('a second tap does not load the page twice', (tester) async {
+        await openWithResults(tester);
+
+        await _tapOption(tester, 'Load more…');
+        await _tapOption(tester, 'Load more…');
+        expect(pages, hasLength(1));
+
+        pages.single.complete(['A3']);
+        await _flush(tester);
+        expect(find.text('A3'), findsOneWidget);
+
+        // Once the page has arrived the next one can be asked for.
+        await _tapOption(tester, 'Load more…');
+        expect(pages, hasLength(2));
+      });
+
+      testWidgets('a failing page is caught and can be retried', (
+        tester,
+      ) async {
+        await openWithResults(tester);
+
+        await _tapOption(tester, 'Load more…');
+        pages.single.completeError(StateError('backend down'));
+        await _flush(tester);
+
+        expect(tester.takeException(), isNull);
+        expect(find.text('A1'), findsOneWidget);
+
+        await _tapOption(tester, 'Load more…');
+        expect(pages, hasLength(2));
+        pages.last.complete(['A3']);
+        await _flush(tester);
+        expect(find.text('A3'), findsOneWidget);
+      });
+    });
   });
 
   group('async search', () {
@@ -550,6 +652,42 @@ void main() {
       expect(find.text('Loading…'), findsOneWidget);
       expect(find.text('Apple'), findsNothing);
 
+      requests['ab']!.complete(['Abacus']);
+      await _flush(tester);
+      expect(find.text('Loading…'), findsNothing);
+      expect(find.text('Abacus'), findsOneWidget);
+    });
+
+    testWidgets('an earlier search answering while the next one is debounced '
+        'is dropped', (tester) async {
+      final requests = <String, Completer<List<String>>>{};
+      await tester.pumpObers(
+        _comboBox(
+          items: const [],
+          search: (query) =>
+              (requests[query] = Completer<List<String>>()).future,
+        ),
+      );
+      await _open(tester);
+      await tester.pump(const Duration(milliseconds: 250));
+      requests['']!.complete(const []);
+      await _flush(tester);
+
+      final input = find.byType(EditableText).first;
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 250));
+      // Typed, but its search has not started yet.
+      await tester.enterText(input, 'ab');
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(requests.keys, isNot(contains('ab')));
+
+      requests['a']!.complete(['Apple']);
+      await _flush(tester);
+
+      expect(find.text('Apple'), findsNothing);
+      expect(find.text('Loading…'), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 250));
       requests['ab']!.complete(['Abacus']);
       await _flush(tester);
       expect(find.text('Loading…'), findsNothing);
@@ -643,6 +781,67 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
       expect(find.text('Apple'), findsOneWidget);
+    });
+
+    group('Tab out of the open dropdown', () {
+      late FocusNode before;
+      late FocusNode after;
+
+      Widget between() => Column(
+        children: [
+          Focus(focusNode: before, child: const SizedBox(height: 20)),
+          SizedBox(
+            width: 400,
+            child: OiComboBox<String>(
+              label: 'Fruit',
+              labelOf: (item) => item,
+              items: _fruits,
+            ),
+          ),
+          Focus(focusNode: after, child: const SizedBox(height: 20)),
+        ],
+      );
+
+      /// Focuses the trigger and opens the dropdown with Space.
+      Future<void> openFromKeyboard(WidgetTester tester) async {
+        await tester.pumpObers(between());
+        before.requestFocus();
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.space);
+        await tester.pumpAndSettle();
+        expect(find.text('Apple'), findsOneWidget);
+      }
+
+      setUp(() {
+        before = FocusNode(debugLabel: 'before');
+        after = FocusNode(debugLabel: 'after');
+        addTearDown(before.dispose);
+        addTearDown(after.dispose);
+      });
+
+      testWidgets('Tab closes it and moves on', (tester) async {
+        await openFromKeyboard(tester);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Apple'), findsNothing);
+        expect(after.hasPrimaryFocus, isTrue);
+      });
+
+      testWidgets('Shift+Tab closes it and moves back', (tester) async {
+        await openFromKeyboard(tester);
+
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Apple'), findsNothing);
+        expect(before.hasPrimaryFocus, isTrue);
+      });
     });
   });
 
@@ -853,6 +1052,140 @@ void main() {
       await tester.pump();
       expect(selected, 'Cherry');
     });
+
+    group('with an item both pinned and in the main list', () {
+      var items = const ['Apple', 'Banana', 'Cherry'];
+      List<String>? recentItems = const ['Cherry'];
+      List<String>? favoriteItems;
+      late StateSetter rebuild;
+
+      Future<void> pump(WidgetTester tester) async {
+        items = const ['Apple', 'Banana', 'Cherry'];
+        recentItems = const ['Cherry'];
+        favoriteItems = null;
+        await tester.pumpObers(
+          StatefulBuilder(
+            builder: (context, setState) {
+              rebuild = setState;
+              return SizedBox(
+                width: 400,
+                height: 600,
+                child: OiComboBox<String>(
+                  label: 'Fruit',
+                  labelOf: (item) => item,
+                  items: items,
+                  recentItems: recentItems,
+                  favoriteItems: favoriteItems,
+                  optionBuilder: marked,
+                ),
+              );
+            },
+          ),
+        );
+        await _open(tester);
+      }
+
+      Future<void> arrowDown(WidgetTester tester, int times) async {
+        for (var i = 0; i < times; i++) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        }
+        await tester.pump();
+      }
+
+      testWidgets('an items change keeps the highlight on the main-list copy', (
+        tester,
+      ) async {
+        await pump(tester);
+        await arrowDown(tester, 3);
+        expect(optionTexts(tester), [
+          'Recent',
+          'Cherry',
+          'Apple',
+          'Banana',
+          'Cherry<',
+        ]);
+
+        rebuild(() => items = const ['Apricot', 'Apple', 'Banana', 'Cherry']);
+        await tester.pump();
+
+        expect(optionTexts(tester), [
+          'Recent',
+          'Cherry',
+          'Apricot',
+          'Apple',
+          'Banana',
+          'Cherry<',
+        ]);
+      });
+
+      testWidgets('an items change keeps the highlight on the pinned copy', (
+        tester,
+      ) async {
+        await pump(tester);
+        expect(optionTexts(tester).take(2), ['Recent', 'Cherry<']);
+
+        rebuild(() => items = const ['Cherry', 'Apple']);
+        await tester.pump();
+
+        expect(optionTexts(tester), ['Recent', 'Cherry<', 'Cherry', 'Apple']);
+      });
+
+      testWidgets('a recent items change keeps the highlight on its tile', (
+        tester,
+      ) async {
+        await pump(tester);
+        await arrowDown(tester, 2);
+        expect(optionTexts(tester), [
+          'Recent',
+          'Cherry',
+          'Apple',
+          'Banana<',
+          'Cherry',
+        ]);
+
+        rebuild(() => recentItems = const ['Cherry', 'Apple']);
+        await tester.pump();
+
+        expect(optionTexts(tester), [
+          'Recent',
+          'Cherry',
+          'Apple',
+          'Apple',
+          'Banana<',
+          'Cherry',
+        ]);
+      });
+
+      testWidgets('a favorite items change keeps the highlight on its tile', (
+        tester,
+      ) async {
+        await pump(tester);
+        await arrowDown(tester, 1);
+
+        rebuild(() => favoriteItems = const ['Banana']);
+        await tester.pump();
+
+        expect(optionTexts(tester), [
+          'Recent',
+          'Cherry',
+          'Favorites',
+          'Banana',
+          'Apple<',
+          'Banana',
+          'Cherry',
+        ]);
+      });
+
+      testWidgets('a removed pinned item hands the highlight to the first '
+          'option', (tester) async {
+        await pump(tester);
+
+        rebuild(() => recentItems = null);
+        await tester.pump();
+
+        expect(optionTexts(tester), ['Apple<', 'Banana', 'Cherry']);
+      });
+    });
   });
 
   group('labels', () {
@@ -927,23 +1260,10 @@ Future<void> _open(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-/// Activates the dropdown row showing [text].
-///
-/// The dropdown sits in a `CompositedTransformFollower`, which test taps do
-/// not reach, so the row's own tap handler is invoked.
+/// Taps the dropdown row showing [text] and lets its handler finish.
 Future<void> _tapOption(WidgetTester tester, String text) async {
-  tester
-      .widget<GestureDetector>(
-        find
-            .ancestor(
-              of: find.text(text),
-              matching: find.byType(GestureDetector),
-            )
-            .first,
-      )
-      .onTap!();
-  await tester.pump();
-  await tester.pump();
+  await tester.tap(find.text(text));
+  await _flush(tester);
 }
 
 @immutable

@@ -354,6 +354,35 @@ void main() {
       expect(find.text('Searching…'), findsNothing);
     });
 
+    testWidgets('an earlier search answering while the next one is debounced '
+        'is dropped', (tester) async {
+      await tester.pumpObers(
+        _search(sources: [source], debounce: const Duration(milliseconds: 300)),
+      );
+      final input = find.byType(EditableText).first;
+
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      // Typed, but its search has not started yet.
+      await tester.enterText(input, 'ab');
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(requests.keys, ['a']);
+
+      requests['a']!.complete(const [OiSearchResult(id: '1', title: 'Apple')]);
+      await _flush(tester);
+
+      expect(find.text('Apple'), findsNothing);
+      expect(find.text('Searching…'), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 300));
+      requests['ab']!.complete(const [
+        OiSearchResult(id: '2', title: 'Abacus'),
+      ]);
+      await _flush(tester);
+      expect(find.text('Searching…'), findsNothing);
+      expect(find.text('Abacus'), findsOneWidget);
+    });
+
     testWidgets('a search answering after the query was cleared is dropped', (
       tester,
     ) async {

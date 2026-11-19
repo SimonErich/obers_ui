@@ -305,6 +305,38 @@ void main() {
       expect(find.text('Abacus'), findsOneWidget);
     });
 
+    testWidgets('an earlier search answering while the next one is debounced '
+        'is dropped', (tester) async {
+      await tester.pumpObers(
+        buildOverlay(onSearch: search),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText), 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      // Typed, but its search has not started yet.
+      await tester.enterText(find.byType(EditableText), 'ab');
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(requests.keys, ['a']);
+
+      requests['a']!.complete([apple]);
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('Apple'), findsNothing);
+      expect(find.byType(OiProgress), findsOneWidget);
+
+      // The spinner stays up once the debounced search is running.
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(requests.keys, ['a', 'ab']);
+      expect(find.byType(OiProgress), findsOneWidget);
+
+      requests['ab']!.complete([abacus]);
+      await tester.pumpAndSettle();
+      expect(find.byType(OiProgress), findsNothing);
+      expect(find.text('Abacus'), findsOneWidget);
+    });
+
     testWidgets('a search answering after the query was cleared is dropped', (
       tester,
     ) async {
