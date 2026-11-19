@@ -489,8 +489,10 @@ class OiDecorationTheme {
     if (other.surfaceBorder != surfaceBorder) return false;
     if (other.cardBorder != cardBorder) return false;
     if (other.inputBorder != inputBorder) return false;
-    if (other.componentGradients != componentGradients) return false;
-    if (other.componentBorders != componentBorders) return false;
+    // By content: two themes built from equal maps must be equal, or every
+    // rebuild that creates a new map notifies the whole tree.
+    if (!mapEquals(other.componentGradients, componentGradients)) return false;
+    if (!mapEquals(other.componentBorders, componentBorders)) return false;
     return true;
   }
 
@@ -506,7 +508,14 @@ class OiDecorationTheme {
     surfaceBorder,
     cardBorder,
     inputBorder,
-    componentGradients,
-    componentBorders,
+    _hashMap(componentGradients),
+    _hashMap(componentBorders),
   ]);
+
+  /// Order-independent content hash, consistent with [mapEquals].
+  static int? _hashMap(Map<Object?, Object?>? map) => map == null
+      ? null
+      : Object.hashAllUnordered(
+          map.entries.map((e) => Object.hash(e.key, e.value)),
+        );
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// Theme data for file explorer components.
@@ -135,15 +136,46 @@ class OiFileExplorerThemeData {
         other.sidebarBackground == sidebarBackground &&
         other.contentBackground == contentBackground &&
         other.fileTileHeight == fileTileHeight &&
-        other.folderIconColor == folderIconColor;
+        other.fileTileHoverColor == fileTileHoverColor &&
+        other.fileTileSelectedColor == fileTileSelectedColor &&
+        other.fileGridCardBorderRadius == fileGridCardBorderRadius &&
+        other.fileGridCardHoverElevation == fileGridCardHoverElevation &&
+        other.dropHighlightColor == dropHighlightColor &&
+        other.dropHighlightBorderColor == dropHighlightBorderColor &&
+        other.pathBarBackground == pathBarBackground &&
+        other.toolbarBackground == toolbarBackground &&
+        other.toolbarHeight == toolbarHeight &&
+        other.selectionToolbarColor == selectionToolbarColor &&
+        mapEquals(other.iconCategoryColors, iconCategoryColors) &&
+        other.folderIconColor == folderIconColor &&
+        other.renamingFieldBackground == renamingFieldBackground;
   }
 
   @override
-  int get hashCode => Object.hash(
-    sidebarWidth,
-    sidebarBackground,
-    contentBackground,
-    fileTileHeight,
-    folderIconColor,
-  );
+  int get hashCode {
+    final iconColors = iconCategoryColors;
+    return Object.hash(
+      sidebarWidth,
+      sidebarBackground,
+      contentBackground,
+      fileTileHeight,
+      fileTileHoverColor,
+      fileTileSelectedColor,
+      fileGridCardBorderRadius,
+      fileGridCardHoverElevation,
+      dropHighlightColor,
+      dropHighlightBorderColor,
+      pathBarBackground,
+      toolbarBackground,
+      toolbarHeight,
+      selectionToolbarColor,
+      iconColors == null
+          ? null
+          : Object.hashAllUnordered(
+              iconColors.entries.map((e) => Object.hash(e.key, e.value)),
+            ),
+      folderIconColor,
+      renamingFieldBackground,
+    );
+  }
 }

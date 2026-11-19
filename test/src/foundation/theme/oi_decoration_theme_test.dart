@@ -266,4 +266,35 @@ void main() {
       expect(a.hashCode, equals(b.hashCode));
     });
   });
+
+  group('OiDecorationTheme component maps', () {
+    const primary = Color(0xFF2563EB);
+    const error = Color(0xFFDC2626);
+
+    OiDecorationTheme withMaps(Color gradientColor, double borderWidth) =>
+        OiDecorationTheme.standard(
+          primaryColor: primary,
+          errorColor: error,
+        ).copyWith(
+          // New map instances on every call, as a theme built in `build` has.
+          componentGradients: {
+            String: OiGradientStyle.linear([gradientColor, primary]),
+          },
+          componentBorders: {int: OiBorderStyle.solid(primary, borderWidth)},
+        );
+
+    test('equal maps make equal themes with equal hash codes', () {
+      final a = withMaps(error, 1);
+      final b = withMaps(error, 1);
+
+      expect(identical(a.componentGradients, b.componentGradients), isFalse);
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('a different gradient or border makes the themes differ', () {
+      expect(withMaps(error, 1), isNot(equals(withMaps(primary, 1))));
+      expect(withMaps(error, 1), isNot(equals(withMaps(error, 2))));
+    });
+  });
 }
