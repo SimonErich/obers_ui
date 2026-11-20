@@ -242,6 +242,52 @@ void main() {
         expect(keptListens, 1);
       });
 
+      testWidgets(
+        'a new source object on the same stream keeps its subscription',
+        (tester) async {
+          // Single subscription: listening again would throw.
+          var listens = 0;
+          final stream = StreamController<List<_Point>>(
+            onListen: () => listens++,
+          );
+          _closeLater(stream);
+
+          await pump(tester, [
+            liveSeries('live', _TestStreamingSource(stream.stream)),
+          ]);
+          await pump(tester, [
+            liveSeries('live', _TestStreamingSource(stream.stream)),
+          ]);
+
+          expect(tester.takeException(), isNull);
+          expect(stream.hasListener, isTrue);
+          expect(listens, 1);
+        },
+      );
+
+      testWidgets('the same stream with other settings resubscribes', (
+        tester,
+      ) async {
+        var listens = 0;
+        final stream = StreamController<List<_Point>>.broadcast(
+          onListen: () => listens++,
+        );
+        _closeLater(stream);
+
+        await pump(tester, [
+          liveSeries('live', _TestStreamingSource(stream.stream)),
+        ]);
+        await pump(tester, [
+          liveSeries(
+            'live',
+            _TestStreamingSource(stream.stream, maxRetainedPoints: 5),
+          ),
+        ]);
+
+        expect(listens, 2);
+        expect(stream.hasListener, isTrue);
+      });
+
       testWidgets('a source added after mount is subscribed', (tester) async {
         final added = StreamController<List<_Point>>();
         _closeLater(added);
@@ -278,7 +324,7 @@ void _closeLater(StreamController<List<_Point>> controller) {
 }
 
 class _TestStreamingSource extends OiStreamingDataSource<_Point> {
-  _TestStreamingSource(this._stream);
+  _TestStreamingSource(this._stream, {this.maxRetainedPoints = 100});
 
   final Stream<List<_Point>> _stream;
 
@@ -286,8 +332,7 @@ class _TestStreamingSource extends OiStreamingDataSource<_Point> {
   Stream<List<_Point>> get dataStream => _stream;
 
   @override
-  @override
-  int get maxRetainedPoints => 100;
+  final int maxRetainedPoints;
 
   @override
   Duration get updateInterval => Duration.zero;

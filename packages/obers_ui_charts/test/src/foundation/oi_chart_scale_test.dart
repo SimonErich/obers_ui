@@ -161,6 +161,31 @@ void main() {
       expect(scale.toPixel(-1), isNaN);
     });
 
+    test('with clamp, a non-positive value sits at rangeMin', () {
+      const clamped = OiLogarithmicScale(
+        domainMin: 1,
+        domainMax: 1000,
+        rangeMin: 300,
+        rangeMax: 0,
+        clamp: true,
+      );
+      expect(clamped.toPixel(0), 300);
+      expect(clamped.toPixel(-1), 300);
+      expect(clamped.toPixel(double.nan), isNaN);
+    });
+
+    test('with clamp on a reversed domain, it sits at the small end', () {
+      const reversed = OiLogarithmicScale(
+        domainMin: 1000,
+        domainMax: 1,
+        rangeMin: 0,
+        rangeMax: 300,
+        clamp: true,
+      );
+      expect(reversed.toPixel(0), 300);
+      expect(reversed.toPixel(0.5), 300);
+    });
+
     test('buildTicks generates one tick per power of base', () {
       final ticks = scale.buildTicks();
       final values = ticks.map((t) => t.value).toList();

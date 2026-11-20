@@ -92,14 +92,21 @@ class OiLinearScale extends OiChartScale<double> {
 
   double get _domainExtent => domainMax - domainMin;
 
+  // Half the extent: finite even for a domain spanning the whole double
+  // range, where the full extent overflows to infinity.
+  double get _halfExtent => domainMax / 2 - domainMin / 2;
+
   @override
   double get atom =>
-      _domainExtent == 0 ? 0 : rangeExtent.abs() / _domainExtent.abs();
+      _domainExtent == 0 ? 0 : rangeExtent.abs() / 2 / _halfExtent.abs();
 
   @override
   double toPixel(double value) {
-    if (_domainExtent == 0) return rangeMin;
-    final t = (value - domainMin) / _domainExtent;
+    final extent = _domainExtent;
+    if (extent == 0) return rangeMin;
+    final t = extent.isFinite
+        ? (value - domainMin) / extent
+        : (value / 2 - domainMin / 2) / _halfExtent;
     return clampPixel(rangeMin + t * rangeExtent);
   }
 
@@ -107,7 +114,10 @@ class OiLinearScale extends OiChartScale<double> {
   double fromPixel(double position) {
     if (rangeExtent == 0) return domainMin;
     final t = (position - rangeMin) / rangeExtent;
-    return domainMin + t * _domainExtent;
+    final extent = _domainExtent;
+    if (extent.isFinite) return domainMin + t * extent;
+    // The extent overflowed: interpolate between the bounds instead.
+    return domainMin * (1 - t) + domainMax * t;
   }
 
   @override
@@ -127,7 +137,9 @@ class OiLinearScale extends OiChartScale<double> {
     // Ticks are whole multiples of the step. Their indices are computed up
     // front, so the loop is bounded even when the step is too small to
     // move a large value (adding it would never advance).
-    final first = (domainMin / step).ceilToDouble();
+    // The same tolerance at both ends: a niced bound such as 3 * 0.1 is
+    // 0.30000000000000004 and must still get its tick.
+    final first = (domainMin / step - 1e-10).ceilToDouble();
     final last = (domainMax / step + 1e-10).floorToDouble();
     final tickCount = last - first + 1;
     // A nice step is never much smaller than the rough one, so more ticks

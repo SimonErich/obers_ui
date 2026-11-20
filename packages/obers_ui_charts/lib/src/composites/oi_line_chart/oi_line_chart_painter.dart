@@ -209,18 +209,12 @@ class OiLineChartPainter extends CustomPainter {
 
         // Draw fill.
         if (series.fill) {
+          // Close along the baselines: the top of the series below when
+          // stacked (the zero line for the first series, which may be above
+          // the bottom when the stack goes negative), the bottom otherwise.
           final fillPath = Path()..addPath(path, Offset.zero);
-
-          if (stacked && si > 0) {
-            // Close along the top of the series below.
-            for (final base in segment.baselines.reversed) {
-              fillPath.lineTo(base.dx, base.dy);
-            }
-          } else {
-            // Close to bottom axis.
-            fillPath
-              ..lineTo(mappedPoints.last.dx, chartRect.bottom)
-              ..lineTo(mappedPoints.first.dx, chartRect.bottom);
+          for (final base in segment.baselines.reversed) {
+            fillPath.lineTo(base.dx, base.dy);
           }
           fillPath.close();
 

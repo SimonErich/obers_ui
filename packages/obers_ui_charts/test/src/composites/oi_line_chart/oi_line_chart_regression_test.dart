@@ -239,6 +239,60 @@ void main() {
     }
   });
 
+  test('a negative stack fills each series from the one below', () {
+    // Two series at -1 on a -2..0 range in a 400x100 chart: zero is at
+    // y = 0, -1 at y = 50 and -2 at y = 100. The first series fills 0..-1,
+    // the second -1..-2, so they do not overlap.
+    ResolvedLineSeries series(String label) => ResolvedLineSeries(
+      points: const [OiLinePoint(x: 0, y: -1), OiLinePoint(x: 1, y: -1)],
+      color: const Color(0xFFFF0000),
+      strokeWidth: 2,
+      dashed: false,
+      fill: true,
+      fillOpacity: 0.5,
+      label: label,
+    );
+    final painter = OiLineChartPainter(
+      resolvedSeries: [series('a'), series('b')],
+      chartRect: const Rect.fromLTWH(0, 0, 400, 100),
+      minX: 0,
+      maxX: 1,
+      minY: -2,
+      maxY: 0,
+      showGrid: false,
+      gridColor: const Color(0xFF000000),
+      axisLabelColor: const Color(0xFF000000),
+      highContrast: false,
+      compact: false,
+      mode: OiLineChartMode.straight,
+      showPoints: false,
+      stacked: true,
+      xLabels: const [],
+      yLabels: const [],
+      xDivisions: 5,
+      yDivisions: 5,
+    );
+
+    const upperBand = Offset(200, 25);
+    const lowerBand = Offset(200, 75);
+    expect(
+      (Canvas canvas) => painter.paint(canvas, const Size(400, 100)),
+      paints
+        ..path(
+          style: PaintingStyle.fill,
+          includes: [upperBand],
+          excludes: [lowerBand],
+        )
+        ..path(style: PaintingStyle.stroke)
+        ..path(
+          style: PaintingStyle.fill,
+          includes: [lowerBand],
+          excludes: [upperBand],
+        )
+        ..path(style: PaintingStyle.stroke),
+    );
+  });
+
   // ── Stacked range ───────────────────────────────────────────────────────────
 
   group('stacked range', () {

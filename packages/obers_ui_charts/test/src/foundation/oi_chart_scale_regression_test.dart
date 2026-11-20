@@ -111,6 +111,25 @@ void main() {
       expectSane(await build(const [-1.7e308, 1.7e308]));
     });
 
+    test('a domain spanning nearly all doubles maps to finite pixels', () {
+      const scale = OiLinearScale(
+        domainMin: -1.7e308,
+        domainMax: 1.7e308,
+        rangeMin: 0,
+        rangeMax: 100,
+      );
+      expect(scale.toPixel(-1.7e308), 0);
+      expect(scale.toPixel(0), 50);
+      expect(scale.toPixel(1.7e308), 100);
+      expect(scale.fromPixel(0), -1.7e308);
+      expect(scale.fromPixel(50), 0);
+      expect(scale.fromPixel(100), 1.7e308);
+      expect(scale.atom, greaterThan(0));
+      for (final tick in scale.buildTicks()) {
+        expect(tick.position, inInclusiveRange(0, 100));
+      }
+    });
+
     test('a tiny range around a large value terminates', () async {
       final ticks = await runBounded(() {
         const scale = OiLinearScale(
@@ -123,6 +142,26 @@ void main() {
       });
       expect(ticks, lessThanOrEqualTo(15));
     });
+  });
+
+  group('OiLinearScale tick bounds', () {
+    // fromData nices these to 0.30000000000000004..0.8 and
+    // 0.6000000000000001..1.4: the lower bound is off by one ulp.
+    for (final (values, firstTick) in [
+      (const [0.33, 0.77], 0.3),
+      (const [0.7, 1.33], 0.6),
+    ]) {
+      test('$values keeps its lower bound tick', () {
+        final scale = OiLinearScale.fromData(
+          values: values,
+          rangeMin: 0,
+          rangeMax: 100,
+        );
+        final ticks = scale.buildTicks();
+        expect(ticks.first.value, closeTo(firstTick, 1e-12));
+        expect(ticks.first.position, closeTo(0, 1e-9));
+      });
+    }
   });
 
   group('OiLinearScale single-value padding', () {

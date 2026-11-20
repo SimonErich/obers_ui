@@ -43,7 +43,7 @@ class OiLogarithmicScale extends OiChartScale<double> {
     assert(
       positive.length == finite.length,
       'OiLogarithmicScale: ${finite.length - positive.length} negative/zero '
-      'values were clamped. Log scales require strictly positive values.',
+      'values were ignored. Log scales require strictly positive values.',
     );
     if (positive.isEmpty) {
       return OiLogarithmicScale(
@@ -107,9 +107,15 @@ class OiLogarithmicScale extends OiChartScale<double> {
   /// A logarithm is only defined for positive numbers, so a [value] that is
   /// zero, negative or NaN has no position on this scale and yields
   /// [double.nan]. Callers should skip such values rather than draw them.
+  /// With [clamp], zero and negative values sit at the end of the smaller
+  /// domain bound instead; NaN still yields [double.nan].
   @override
   double toPixel(double value) {
-    if (value.isNaN || value <= 0) return double.nan;
+    if (value.isNaN) return double.nan;
+    if (value <= 0) {
+      if (!clamp) return double.nan;
+      return domainMin <= domainMax ? rangeMin : rangeMax;
+    }
     if (_logExtent == 0) return rangeMin;
     final t = (_logOf(value) - _logMin) / _logExtent;
     return clampPixel(rangeMin + t * rangeExtent);
