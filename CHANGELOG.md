@@ -14,6 +14,8 @@ from the git history, using the commits that changed `version:` in
 ### Added
 
 - `OiTappable`: `role` (`OiTappableRole`), `checked`, `mixed`, `toggled`, `selected`, `expanded`, `inMutuallyExclusiveGroup`, `onKeyEvent` and `skipTraversal`, so toggles, tabs and disclosure headers can be built on it
+- `OiCalendar.labels` (`OiCalendarLabels`): the mode names and the week number column header can be translated
+- `OiCalendarUtils.addDays`, `daysBetween` and `fractionalDaysBetween`: day arithmetic on calendar dates that is not thrown off by daylight-saving changes
 - `OiClockDial`: a clock face that picks a time of day by tapping the hour, then the minute (drag for the exact one)
 - `OiSelect` opens its menu with the selected option in view instead of at the top
 - `OiVectorMap`, `OiTileMap`, `OiCarousel`, `OiRadialSlider` and `OiAuthMode.lock`
@@ -52,6 +54,8 @@ from the git history, using the commits that changed `version:` in
 - `obers_ui_autoforms`: `OiAfController.set` and `patch` (and so `restore` in `patchCurrent` mode) no longer mark fields touched; pass `markTouched: true` to `set` / `patch` for the old behaviour
 - `obers_ui_autoforms`: `OiAfValidators.email` requires a top-level domain and rejects leading, trailing and doubled dots; `url` requires a host for http(s), ftp(s) and ws(s); `ipAddress` validates IPv6 properly and rejects IPv4 octets with leading zeros
 - `obers_ui_autoforms`: a circular or unregistered derived-field dependency throws a `StateError` instead of failing an assertion
+- `OiGanttTask.end` is now documented and treated as exclusive everywhere: the timeline no longer adds an empty day after the last task, and bars are positioned by time of day (a 09:00 to 17:00 task is a third of a day wide instead of a sliver)
+- `OiCalendar` follows a new `mode` or `initialDate` from its parent, and its all-day row only lists events on the dates in view
 
 ### Fixed
 
@@ -79,6 +83,9 @@ from the git history, using the commits that changed `version:` in
 - `obers_ui_autoforms`: `rebase` and `restore(rebaseInitial)` re-evaluate `visibleWhen` / `enabledWhen` and derived fields; a derived value given in the map and a derived field the user overrode are kept
 - `obers_ui_autoforms`: `integer`, `digitsBetween` and `multipleOf` no longer throw on NaN, infinity or a zero factor; `multipleOf` and `decimal` tolerate binary rounding (`multipleOf(0.1)` accepts 0.3)
 - `obers_ui_charts`: `OiTileMap` wraps markers across the antimeridian and pins every visible world copy
+- `OiCalendar`: week and day views dropped events shorter than an hour, events past midnight and events spanning the focused day
+- `OiCalendar` and `OiGantt`: dates were repeated or a day off after a daylight-saving change (month grid, week numbers, navigation, bar and today-line positions)
+- `OiGantt`: scrolling the timeline threw "ScrollController attached to multiple scroll views" and the header did not follow the body; a saved scroll position was never restored
 
 ### Removed
 

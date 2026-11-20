@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/composites/scheduling/oi_calendar_labels.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_calendar_settings.dart';
+import 'package:obers_ui/src/utils/calendar_utils.dart';
 
 /// A calendar event.
 ///
@@ -99,6 +101,7 @@ class OiCalendar extends StatefulWidget {
     this.showWeekNumbers = false,
     this.showAllDayRow = true,
     this.firstDayOfWeek = DateTime.monday,
+    this.labels = const OiCalendarLabels(),
     this.settingsDriver,
     this.settingsKey,
     this.settingsNamespace = 'oi_calendar',
@@ -112,9 +115,16 @@ class OiCalendar extends StatefulWidget {
   final String label;
 
   /// The display mode: day, week, or month.
+  ///
+  /// The user can switch modes in the calendar; passing a different value
+  /// later switches it again.
   final OiCalendarMode mode;
 
   /// The initial date the calendar focuses on. Defaults to today.
+  ///
+  /// The user can navigate away from it; passing a different calendar date
+  /// later moves the focus there. Only the date counts, so a parent that
+  /// passes `DateTime.now()` on every build does not undo the navigation.
   final DateTime? initialDate;
 
   /// Called when an event is tapped.
@@ -130,7 +140,13 @@ class OiCalendar extends StatefulWidget {
   /// Called when an event is resized to a new end time.
   final void Function(OiCalendarEvent event, DateTime newEnd)? onEventResize;
 
-  /// Whether to show ISO week numbers in the month view.
+  /// Whether to show ISO 8601 week numbers in the month view.
+  ///
+  /// Each row is labelled with the ISO week of its first day. ISO weeks run
+  /// Monday to Sunday, so with [firstDayOfWeek] set to Monday the label is
+  /// the week of the whole row. With any other first day a row straddles two
+  /// ISO weeks and the label is the earlier one: for a Sunday start it is the
+  /// week that Sunday ends, not the week of the following six days.
   final bool showWeekNumbers;
 
   /// Whether to show the all-day event row.
@@ -138,6 +154,10 @@ class OiCalendar extends StatefulWidget {
 
   /// The first day of the week (1 = Monday, 7 = Sunday).
   final int firstDayOfWeek;
+
+  /// The texts of the mode switch and the week number column; pass
+  /// translations to localize them.
+  final OiCalendarLabels labels;
 
   // ── Settings persistence ──────────────────────────────────────────────────
 
@@ -169,6 +189,13 @@ class _OiCalendarState extends State<OiCalendar>
     with OiSettingsMixin<OiCalendar, OiCalendarSettings> {
   late DateTime _focusDate;
   late OiCalendarMode _mode;
+
+  /// Whether the settings of the initial load have been taken over.
+  bool _initialSettingsAdopted = false;
+
+  /// Whether the user or the parent set the mode after the running settings
+  /// load started; such a mode outranks the loaded one.
+  bool _modeSetSinceLoadStarted = false;
 
   /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
   OiSettingsDriver? _resolvedDriver;
@@ -212,18 +239,56 @@ class _OiCalendarState extends State<OiCalendar>
   }
 
   @override
+  void didUpdateWidget(OiCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.mode != oldWidget.mode) {
+      // Stored like a pick by the user, or the saved mode would come back
+      // with the next settings load.
+      _mode = widget.mode;
+      _modeSetSinceLoadStarted = true;
+      updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
+    }
+    final oldDate = oldWidget.initialDate;
+    final newDate = widget.initialDate;
+    final sameDate = oldDate == null || newDate == null
+        ? oldDate == newDate
+        : _sameDay(oldDate, newDate);
+    if (!sameDate) _focusDate = newDate ?? DateTime.now();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        unawaited(reloadSettings());
+        _modeSetSinceLoadStarted = false;
+        unawaited(
+          reloadSettings().then((_) {
+            if (mounted) setState(_adoptLoadedSettings);
+          }),
+        );
       }
     }
-    if (settingsLoaded && settingsDriver != null) {
+  }
+
+  /// Takes over the mode of settings that have just been loaded.
+  ///
+  /// Runs once per load and never on a plain dependency change (a theme
+  /// switch, say), which would undo a mode set since. A mode that the user
+  /// or the parent chose while the load was running wins and is saved
+  /// instead.
+  void _adoptLoadedSettings() {
+    if (settingsDriver == null) return;
+    if (!_modeSetSinceLoadStarted) {
       _applySettings(currentSettings);
+      return;
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
+    });
   }
 
   void _applySettings(OiCalendarSettings settings) {
@@ -256,9 +321,9 @@ class _OiCalendarState extends State<OiCalendar>
     setState(() {
       switch (_mode) {
         case OiCalendarMode.day:
-          _focusDate = _focusDate.add(const Duration(days: 1));
+          _focusDate = OiCalendarUtils.addDays(_focusDate, 1);
         case OiCalendarMode.week:
-          _focusDate = _focusDate.add(const Duration(days: 7));
+          _focusDate = OiCalendarUtils.addDays(_focusDate, 7);
         case OiCalendarMode.month:
           _focusDate = DateTime(_focusDate.year, _focusDate.month + 1);
       }
@@ -269,9 +334,9 @@ class _OiCalendarState extends State<OiCalendar>
     setState(() {
       switch (_mode) {
         case OiCalendarMode.day:
-          _focusDate = _focusDate.subtract(const Duration(days: 1));
+          _focusDate = OiCalendarUtils.addDays(_focusDate, -1);
         case OiCalendarMode.week:
-          _focusDate = _focusDate.subtract(const Duration(days: 7));
+          _focusDate = OiCalendarUtils.addDays(_focusDate, -7);
         case OiCalendarMode.month:
           _focusDate = DateTime(_focusDate.year, _focusDate.month - 1);
       }
@@ -280,10 +345,20 @@ class _OiCalendarState extends State<OiCalendar>
 
   void _setMode(OiCalendarMode mode) {
     setState(() => _mode = mode);
+    _modeSetSinceLoadStarted = true;
     updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
+
+  /// The ISO 8601 week number shown for [row] of the month grid starting at
+  /// [gridStart]: the week of the row's first day (see
+  /// [OiCalendar.showWeekNumbers]).
+  int _rowWeekNumber(DateTime gridStart, int row) {
+    return OiCalendarUtils.weekNumber(
+      OiCalendarUtils.addDays(gridStart, row * 7),
+    );
+  }
 
   /// Returns the ordered day-of-week headers starting from firstDayOfWeek.
   List<String> get _dayHeaders {
@@ -291,31 +366,23 @@ class _OiCalendarState extends State<OiCalendar>
     return [for (var i = 0; i < 7; i++) widget.weekdayLabels[(start + i) % 7]];
   }
 
-  /// Returns the ISO 8601 week number for [date].
-  int _weekNumber(DateTime date) {
-    // ISO week: week 1 is the week containing the first Thursday of the year.
-    final dayOfYear = date.difference(DateTime(date.year)).inDays + 1;
-    final weekday = date.weekday; // 1=Mon, 7=Sun
-    final woy = ((dayOfYear - weekday + 10) / 7).floor();
-    if (woy < 1) return _weekNumber(DateTime(date.year - 1, 12, 31));
-    if (woy > 52) {
-      final dec31 = DateTime(date.year, 12, 31);
-      if (dec31.weekday < 4) return 1;
-    }
-    return woy;
-  }
+  /// The number of week rows in the month grid.
+  static const _monthGridRows = 6;
 
   /// Returns the first day visible in the month grid.
   DateTime _monthGridStart() {
-    final first = DateTime(_focusDate.year, _focusDate.month);
-    final weekdayOffset = (first.weekday - widget.firstDayOfWeek + 7) % 7;
-    return first.subtract(Duration(days: weekdayOffset));
+    return OiCalendarUtils.firstDayOfWeek(
+      DateTime(_focusDate.year, _focusDate.month),
+      startOfWeek: widget.firstDayOfWeek,
+    );
   }
 
   /// Returns the start of the week containing [_focusDate].
   DateTime _weekStart() {
-    final offset = (_focusDate.weekday - widget.firstDayOfWeek + 7) % 7;
-    return DateTime(_focusDate.year, _focusDate.month, _focusDate.day - offset);
+    return OiCalendarUtils.firstDayOfWeek(
+      _focusDate,
+      startOfWeek: widget.firstDayOfWeek,
+    );
   }
 
   /// Whether [a] and [b] fall on the same calendar day.
@@ -334,7 +401,7 @@ class _OiCalendarState extends State<OiCalendar>
         return '${_focusDate.day} $m ${_focusDate.year}';
       case OiCalendarMode.week:
         final ws = _weekStart();
-        final we = ws.add(const Duration(days: 6));
+        final we = OiCalendarUtils.addDays(ws, 6);
         return '${ws.day}/${ws.month} - ${we.day}/${we.month} ${we.year}';
       case OiCalendarMode.month:
         return '${months[_focusDate.month - 1]} ${_focusDate.year}';
@@ -351,15 +418,79 @@ class _OiCalendarState extends State<OiCalendar>
     }).toList();
   }
 
-  /// All-day events in the current view range.
-  List<OiCalendarEvent> get _allDayEvents =>
-      widget.events.where((e) => e.allDay).toList();
+  /// All-day events on any of the dates the current view shows: the focused
+  /// day, its week, or the whole month grid.
+  List<OiCalendarEvent> _visibleAllDayEvents() {
+    final DateTime first;
+    final DateTime last;
+    switch (_mode) {
+      case OiCalendarMode.day:
+        first = last = _focusDate;
+      case OiCalendarMode.week:
+        first = _weekStart();
+        last = OiCalendarUtils.addDays(first, 6);
+      case OiCalendarMode.month:
+        first = _monthGridStart();
+        last = OiCalendarUtils.addDays(first, _monthGridRows * 7 - 1);
+    }
+    return widget.events.where((e) {
+      return e.allDay &&
+          OiCalendarUtils.daysBetween(e.start, last) >= 0 &&
+          OiCalendarUtils.daysBetween(first, e.end) >= 0;
+    }).toList();
+  }
+
+  /// The start of the hour cell [hour] on the day of [date], or `null` when
+  /// the clocks skip that hour on that day (a daylight-saving change).
+  ///
+  /// `DateTime` moves a skipped hour on to the next one, so without this the
+  /// row of the skipped hour would repeat the cell below it.
+  DateTime? _hourCellStart(DateTime date, int hour) {
+    final start = DateTime(date.year, date.month, date.day, hour);
+    return start.hour == hour ? start : null;
+  }
+
+  /// The timed (not all-day) events in the hour cell starting at
+  /// [cellStart]; none for a skipped hour.
+  List<OiCalendarEvent> _timedEventsIn(DateTime? cellStart) {
+    if (cellStart == null) return const [];
+    return widget.events
+        .where((e) => !e.allDay && _occupiesHour(e, cellStart))
+        .toList();
+  }
+
+  /// Whether [event] takes up any part of the hour that starts at
+  /// [cellStart]: its time range overlaps `[cellStart, cellStart + 1h)`.
+  ///
+  /// An event without a duration counts for the hour it starts in.
+  bool _occupiesHour(OiCalendarEvent event, DateTime cellStart) {
+    final cellEnd = DateTime(
+      cellStart.year,
+      cellStart.month,
+      cellStart.day,
+      cellStart.hour + 1,
+    );
+    if (!event.end.isAfter(event.start)) {
+      return !event.start.isBefore(cellStart) && event.start.isBefore(cellEnd);
+    }
+    return event.start.isBefore(cellEnd) && event.end.isAfter(cellStart);
+  }
 
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    // The first load finishes after initState; this is the first build that
+    // sees its result.
+    if (settingsLoaded && !_initialSettingsAdopted) {
+      _initialSettingsAdopted = true;
+      _adoptLoadedSettings();
+    }
+
     final sp = context.spacing;
+    final allDayEvents = widget.showAllDayRow
+        ? _visibleAllDayEvents()
+        : const <OiCalendarEvent>[];
 
     return Semantics(
       label: widget.label,
@@ -369,8 +500,7 @@ class _OiCalendarState extends State<OiCalendar>
           _buildHeader(context),
           _buildModeSelector(context),
           SizedBox(height: sp.sm),
-          if (widget.showAllDayRow && _allDayEvents.isNotEmpty)
-            _buildAllDayRow(context),
+          if (allDayEvents.isNotEmpty) _buildAllDayRow(context, allDayEvents),
           Expanded(child: _buildBody(context)),
         ],
       ),
@@ -440,7 +570,7 @@ class _OiCalendarState extends State<OiCalendar>
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    mode.name[0].toUpperCase() + mode.name.substring(1),
+                    widget.labels.modeName(mode),
                     style: TextStyle(
                       color: _mode == mode ? colors.textOnPrimary : colors.text,
                       fontSize: 12,
@@ -454,7 +584,7 @@ class _OiCalendarState extends State<OiCalendar>
     );
   }
 
-  Widget _buildAllDayRow(BuildContext context) {
+  Widget _buildAllDayRow(BuildContext context, List<OiCalendarEvent> events) {
     final colors = context.colors;
     return Container(
       key: const ValueKey('calendar_all_day_row'),
@@ -463,7 +593,7 @@ class _OiCalendarState extends State<OiCalendar>
       child: Wrap(
         spacing: 4,
         children: [
-          for (final e in _allDayEvents)
+          for (final e in events)
             GestureDetector(
               onTap: widget.onEventTap != null
                   ? () => widget.onEventTap!(e)
@@ -512,7 +642,7 @@ class _OiCalendarState extends State<OiCalendar>
                 width: 32,
                 child: Center(
                   child: Text(
-                    'Wk',
+                    widget.labels.weekNumberHeader,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -541,7 +671,7 @@ class _OiCalendarState extends State<OiCalendar>
         Expanded(
           child: Column(
             children: [
-              for (var row = 0; row < 6; row++)
+              for (var row = 0; row < _monthGridRows; row++)
                 Expanded(
                   child: Row(
                     children: [
@@ -550,9 +680,9 @@ class _OiCalendarState extends State<OiCalendar>
                           width: 32,
                           child: Center(
                             child: Text(
-                              '${_weekNumber(gridStart.add(Duration(days: row * 7)))}',
+                              '${_rowWeekNumber(gridStart, row)}',
                               key: ValueKey(
-                                'calendar_week_${_weekNumber(gridStart.add(Duration(days: row * 7)))}',
+                                'calendar_week_${_rowWeekNumber(gridStart, row)}',
                               ),
                               style: TextStyle(
                                 fontSize: 10,
@@ -565,7 +695,7 @@ class _OiCalendarState extends State<OiCalendar>
                         Expanded(
                           child: _buildDayCell(
                             context,
-                            gridStart.add(Duration(days: row * 7 + col)),
+                            OiCalendarUtils.addDays(gridStart, row * 7 + col),
                           ),
                         ),
                     ],
@@ -625,11 +755,12 @@ class _OiCalendarState extends State<OiCalendar>
   /// [target] when moves are enabled; [builder] receives whether a drag is
   /// hovering so the cell can highlight.
   Widget _eventDropTarget({
-    required DateTime target,
+    required DateTime? target,
     required bool preserveTimeOfDay,
     required Widget Function({required bool hovering}) builder,
   }) {
-    if (!_canMoveEvents) return builder(hovering: false);
+    // No target: the cell of an hour the clocks skip takes no drops.
+    if (!_canMoveEvents || target == null) return builder(hovering: false);
     return DragTarget<OiCalendarEvent>(
       onAcceptWithDetails: (details) => _moveEvent(
         details.data,
@@ -738,7 +869,7 @@ class _OiCalendarState extends State<OiCalendar>
                 child: Center(
                   child: Builder(
                     builder: (_) {
-                      final d = ws.add(Duration(days: i));
+                      final d = OiCalendarUtils.addDays(ws, i);
                       final today = _isToday(d);
                       return Text(
                         '${_dayHeaders[i]} ${d.day}',
@@ -782,7 +913,7 @@ class _OiCalendarState extends State<OiCalendar>
                       Expanded(
                         child: _buildWeekCell(
                           context,
-                          ws.add(Duration(days: dayIdx)),
+                          OiCalendarUtils.addDays(ws, dayIdx),
                           hour,
                         ),
                       ),
@@ -798,18 +929,15 @@ class _OiCalendarState extends State<OiCalendar>
 
   Widget _buildWeekCell(BuildContext context, DateTime date, int hour) {
     final colors = context.colors;
-    final cellTime = DateTime(date.year, date.month, date.day, hour);
-    final dayEvents = _eventsOn(date).where((e) {
-      if (e.allDay) return false;
-      return e.start.hour <= hour && e.end.hour > hour;
-    }).toList();
+    final cellTime = _hourCellStart(date, hour);
+    final dayEvents = _timedEventsIn(cellTime);
 
     return _eventDropTarget(
       target: cellTime,
       preserveTimeOfDay: false,
       builder: ({required hovering}) => GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: widget.onDateTap != null
+        onTap: widget.onDateTap != null && cellTime != null
             ? () => widget.onDateTap!(cellTime)
             : null,
         child: Container(
@@ -866,26 +994,15 @@ class _OiCalendarState extends State<OiCalendar>
     return ListView.builder(
       itemCount: 24,
       itemBuilder: (context, hour) {
-        final cellTime = DateTime(
-          _focusDate.year,
-          _focusDate.month,
-          _focusDate.day,
-          hour,
-        );
-        final hourEvents = widget.events.where((e) {
-          if (e.allDay) return false;
-          if (!_sameDay(e.start, _focusDate) && !_sameDay(e.end, _focusDate)) {
-            return false;
-          }
-          return e.start.hour <= hour && e.end.hour > hour;
-        }).toList();
+        final cellTime = _hourCellStart(_focusDate, hour);
+        final hourEvents = _timedEventsIn(cellTime);
 
         return _eventDropTarget(
           target: cellTime,
           preserveTimeOfDay: false,
           builder: ({required hovering}) => GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: widget.onDateTap != null
+            onTap: widget.onDateTap != null && cellTime != null
                 ? () => widget.onDateTap!(cellTime)
                 : null,
             child: Container(

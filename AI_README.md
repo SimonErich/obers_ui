@@ -4707,6 +4707,13 @@ Dual-calendar date range selector with quick-select presets. Two side-by-side ca
 
 Day/week/month event calendar with drag-to-create and drag-to-move.
 
+**Key Parameters:**
+- `events` (List\<OiCalendarEvent\>, required) — Timed events show in every hour cell their time range overlaps; `allDay` events show in the row above the view, for the dates the view covers
+- `mode` (OiCalendarMode, default: month), `initialDate` (DateTime?) — Starting view and date; a new value from the parent is applied
+- `showWeekNumbers` (bool, default: false) — ISO 8601 week of each month row's first day (with a Sunday `firstDayOfWeek` that is the week the Sunday ends)
+- `labels` (OiCalendarLabels) — Mode names (`day`, `week`, `month`) and the week column header (`weekNumberHeader`), English by default
+- `weekdayLabels`, `monthLabels` (List\<String\>) — Day and month names
+
 **Use When:** Event scheduling, appointment booking, content calendar.
 **Avoid When:** Project timelines — use `OiGantt`. Time tracking — use `OiTimeline`.
 
@@ -4717,6 +4724,11 @@ Day/week/month event calendar with drag-to-create and drag-to-move.
 **Tier:** Composite
 
 Gantt chart with horizontal task bars, dependencies, zoom levels.
+
+**Key Parameters:**
+- `tasks` (List\<OiGanttTask\>, required) — `start` is inclusive and `end` exclusive, both with their time of day: 5 Jan 00:00 to 6 Jan 00:00 is one day wide, 09:00 to 17:00 a third of a day. For a task that fills the 5th and the 6th, end on 7 Jan 00:00
+- `viewStart`, `viewEnd` (DateTime?) — Visible range in whole days (default: earliest start to latest end)
+- `zoom` (OiGanttZoom, default: week) — Width of a day column
 
 **Use When:** Project planning, task timelines, resource allocation.
 
@@ -5719,7 +5731,7 @@ Color manipulation (lighten, darken, HSL conversion).
 ### Calendar Utils (`calendar_utils.dart`)
 **Tags:** `date`, `calendar`, `month`, `week`
 
-Date/calendar calculation helpers.
+Date/calendar calculation helpers. For day arithmetic use `OiCalendarUtils.addDays`, `daysBetween` and `fractionalDaysBetween`: they count calendar dates, where `Duration(days:)` and `difference().inDays` are off by a day around daylight-saving changes.
 
 ### File Utils (`file_utils.dart`)
 **Tags:** `file`, `size`, `extension`, `mime`
