@@ -285,9 +285,10 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
       ),
     );
 
+    // No semanticLabel: the row shows the label, and a semanticLabel would
+    // replace everything the row announces, hiding the badge count.
     row = OiTappable(
       enabled: !item.disabled,
-      semanticLabel: item.label,
       onTap: () => widget.onSelect(item.id),
       child: row,
     );

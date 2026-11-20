@@ -333,10 +333,12 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
     );
 
     if (header.onTap != null) {
-      return OiTappable(
-        onTap: header.onTap,
-        semanticLabel: 'User profile: ${header.name}',
-        child: content,
+      // The label goes on a Semantics wrapper, not on the tappable: a
+      // tappable's semanticLabel replaces everything its child announces,
+      // which would hide the subtitle and a custom avatar widget.
+      return Semantics(
+        label: 'User profile: ${header.name}',
+        child: OiTappable(onTap: header.onTap, child: content),
       );
     }
 
@@ -498,11 +500,10 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
       return Opacity(opacity: 0.5, child: row);
     }
 
-    return OiTappable(
-      onTap: () => _handleItemTap(item),
-      semanticLabel: item.label,
-      child: row,
-    );
+    // No semanticLabel: the row shows the label, and a semanticLabel would
+    // replace everything the row announces, hiding the badge and a control
+    // passed as trailing.
+    return OiTappable(onTap: () => _handleItemTap(item), child: row);
   }
 
   Widget _buildToggle(BuildContext context, OiDrawerToggle toggle) {

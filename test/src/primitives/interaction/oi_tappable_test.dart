@@ -1,7 +1,11 @@
 // Tests do not require documentation comments.
 
+import 'dart:ui' show SemanticsRole;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart' show RenderOpacity;
+import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -117,12 +121,40 @@ void main() {
     expect(tapped, isFalse);
   });
 
-  testWidgets('disabled=true: Opacity widget present with 0.4', (tester) async {
+  testWidgets('disabled=true: child is faded to 0.4', (tester) async {
     await tester.pumpObers(
       const OiTappable(enabled: false, child: SizedBox(width: 60, height: 60)),
     );
-    final opacityWidgets = tester.widgetList<Opacity>(find.byType(Opacity));
-    expect(opacityWidgets.any((o) => o.opacity == 0.4), isTrue);
+    expect(tester.widget<Opacity>(_tappablePart<Opacity>()).opacity, 0.4);
+  });
+
+  testWidgets('only one opacity layer wraps the child', (tester) async {
+    await tester.pumpObers(
+      const OiTappable(
+        child: SizedBox(key: Key('c'), width: 60, height: 60),
+      ),
+    );
+    // The two state fills carry their own AnimatedOpacity beside the child;
+    // above the child there is only the Opacity used for the disabled fade.
+    expect(
+      find.ancestor(
+        of: find.byKey(const Key('c')),
+        matching: find.descendant(
+          of: find.byType(OiTappable),
+          matching: find.byWidgetPredicate(
+            (w) => w is Opacity || w is AnimatedOpacity,
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('enabled: child is fully opaque', (tester) async {
+    await tester.pumpObers(
+      const OiTappable(child: SizedBox(width: 60, height: 60)),
+    );
+    expect(tester.widget<Opacity>(_tappablePart<Opacity>()).opacity, 1);
   });
 
   // ── 6. focusable=false: Focus cannot request focus ─────────────────────────
@@ -362,7 +394,7 @@ void main() {
   // ── 13. Focus ring: DecoratedBox with foreground border when focused ────────
 
   testWidgets(
-    'focus ring: DecoratedBox with foreground border rendered when widget is focused',
+    'focus ring: foreground border rendered when widget is focused',
     (tester) async {
       // Force keyboard highlight mode so the focus ring is always rendered
       // during keyboard-navigation tests regardless of the platform default.
@@ -387,10 +419,7 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      final foregroundBoxes = tester
-          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
-          .where((b) => b.position == DecorationPosition.foreground);
-      expect(foregroundBoxes, isNotEmpty);
+      expect(_focusRings(tester), isNotEmpty);
     },
   );
 
@@ -416,10 +445,7 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      final foregroundBoxes = tester
-          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
-          .where((b) => b.position == DecorationPosition.foreground);
-      expect(foregroundBoxes, isEmpty);
+      expect(_focusRings(tester), isEmpty);
     },
   );
 
@@ -446,10 +472,7 @@ void main() {
       await tester.pump();
 
       // Confirm focus ring is absent in touch mode.
-      final touchForegroundBoxes = tester
-          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
-          .where((b) => b.position == DecorationPosition.foreground);
-      expect(touchForegroundBoxes, isEmpty);
+      expect(_focusRings(tester), isEmpty);
 
       // Switch to keyboard modality.
       FocusManager.instance.highlightStrategy =
@@ -457,10 +480,7 @@ void main() {
       await tester.pump();
 
       // Focus ring must now be present.
-      final keyboardForegroundBoxes = tester
-          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
-          .where((b) => b.position == DecorationPosition.foreground);
-      expect(keyboardForegroundBoxes, isNotEmpty);
+      expect(_focusRings(tester), isNotEmpty);
     },
   );
 
@@ -486,10 +506,7 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      final foregroundBoxes = tester
-          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
-          .where((b) => b.position == DecorationPosition.foreground);
-      expect(foregroundBoxes, isEmpty);
+      expect(_focusRings(tester), isEmpty);
     },
   );
 
@@ -508,9 +525,7 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      Iterable<DecoratedBox> rings() => tester
-          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
-          .where((b) => b.position == DecorationPosition.foreground);
+      Iterable<DecoratedBox> rings() => _focusRings(tester);
       expect(rings(), isEmpty, reason: 'no key pressed yet');
 
       await tester.sendKeyEvent(LogicalKeyboardKey.shift);
@@ -651,10 +666,8 @@ void main() {
     );
     await tester.pump();
 
-    // The dragging style from OiEffectsTheme.standard has scale > 1.0 (1.03).
-    // Verify a Transform widget is present with the dragging scale.
-    final transforms = tester.widgetList<Transform>(find.byType(Transform));
-    expect(transforms, isNotEmpty);
+    // The dragging style from OiEffectsTheme.standard has scale 1.03.
+    expect(_scale(tester), 1.03);
   });
 
   testWidgets('isDragging=false: no dragging scale applied by default', (
@@ -666,26 +679,31 @@ void main() {
     await tester.pump();
 
     // Default state (no dragging, no hover, no focus, no press) applies
-    // OiInteractiveStyle.none which has scale=1.0, so no Transform.
-    final transforms = tester.widgetList<Transform>(find.byType(Transform));
-    expect(transforms, isEmpty);
+    // OiInteractiveStyle.none which has scale=1.0: the Transform stays in the
+    // tree as an identity.
+    expect(_scale(tester), 1);
   });
 
   testWidgets('isDragging takes priority over pressed state', (tester) async {
     // When both isDragging and pressed are active, dragging wins.
     await tester.pumpObers(
-      const OiTappable(dragging: true, child: SizedBox(width: 60, height: 60)),
+      OiTappable(
+        dragging: true,
+        onTap: () {},
+        child: const SizedBox(width: 60, height: 60),
+      ),
     );
     await tester.pump();
 
-    // Simulate a press — but isDragging should still take priority.
-    await tester.tap(find.byType(OiTappable), warnIfMissed: false);
+    // Hold a press — but isDragging should still take priority.
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(OiTappable)),
+    );
     await tester.pump();
 
     // The dragging style has scale 1.03 (> 1), active has 0.97 (< 1).
-    // Verify scale > 1 by checking Transform is present.
-    final transforms = tester.widgetList<Transform>(find.byType(Transform));
-    expect(transforms, isNotEmpty);
+    expect(_scale(tester), 1.03);
+    await gesture.up();
   });
 
   // ── 21. Keyboard activation: other keys do NOT trigger onTap ───────────────
@@ -806,7 +824,12 @@ void main() {
       await hoverOver(tester, find.byType(OiTappable));
 
       final stack = stateStack(tester);
-      expect(stack.children[1], isA<SizedBox>());
+      expect(
+        stack.children[1],
+        isA<ExcludeSemantics>()
+            .having((e) => e.excluding, 'excluding', isFalse)
+            .having((e) => e.child, 'child', isA<SizedBox>()),
+      );
       expect(find.text('Label'), findsOneWidget);
       expect(hasVisibleColoredBox(tester, const Color(0xFF123456)), isTrue);
     },
@@ -922,12 +945,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(
-      tester
-          .widgetList<Opacity>(find.byType(Opacity))
-          .any((o) => o.opacity == 0.4),
-      isFalse,
-    );
+    expect(tester.widget<Opacity>(_tappablePart<Opacity>()).opacity, 1);
   });
 
   testWidgets(
@@ -959,6 +977,695 @@ void main() {
       expect(find.text('Label'), findsOneWidget);
     },
   );
+
+  // ── 23. Child state survives every interactive state ──────────────────────
+
+  group('child state is kept', () {
+    Widget probe() =>
+        const SizedBox(width: 60, height: 60, child: _InitProbe());
+
+    setUp(() => _InitProbe.inits = 0);
+
+    testWidgets('on press and release', (tester) async {
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(onTap: () {}, child: probe()),
+        ),
+      );
+      expect(_InitProbe.inits, 1);
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(OiTappable)),
+      );
+      await tester.pump();
+      expect(_InitProbe.inits, 1, reason: 'tap down');
+      expect(
+        _scale(tester),
+        0.97,
+        reason: 'the pressed scale is applied',
+      );
+
+      await gesture.up();
+      await tester.pump();
+      expect(_InitProbe.inits, 1, reason: 'tap up');
+    });
+
+    testWidgets('on keyboard focus', (tester) async {
+      OiFocusVisibility.reset();
+      addTearDown(OiFocusVisibility.reset);
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(onTap: () {}, child: probe()),
+        ),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      await tester.pump();
+
+      expect(_focusRings(tester), isNotEmpty, reason: 'the ring is shown');
+      expect(_InitProbe.inits, 1);
+    });
+
+    testWidgets('when enabled flips', (tester) async {
+      Widget build({required bool enabled}) => Center(
+        child: OiTappable(enabled: enabled, onTap: () {}, child: probe()),
+      );
+      await tester.pumpObers(build(enabled: true));
+      await tester.pumpObers(build(enabled: false));
+      expect(_InitProbe.inits, 1, reason: 'disabled');
+      expect(
+        tester.renderObject<RenderOpacity>(_tappablePart<Opacity>()).opacity,
+        0.4,
+        reason: 'the fade is applied in the same frame, not animated',
+      );
+      await tester.pumpObers(build(enabled: true));
+      expect(_InitProbe.inits, 1, reason: 'enabled again');
+    });
+
+    testWidgets('when dragging flips', (tester) async {
+      Widget build({required bool dragging}) => Center(
+        child: OiTappable(dragging: dragging, onTap: () {}, child: probe()),
+      );
+      await tester.pumpObers(build(dragging: false));
+      await tester.pumpObers(build(dragging: true));
+      expect(_InitProbe.inits, 1, reason: 'dragging');
+      await tester.pumpObers(build(dragging: false));
+      expect(_InitProbe.inits, 1, reason: 'dropped');
+    });
+
+    testWidgets(
+      'on hover with a theme that draws a halo',
+      (tester) async {
+        const halo = OiHaloStyle(
+          color: Color(0x80FF0000),
+          spread: 2,
+          blur: 4,
+        );
+        await tester.pumpWidget(
+          hoverStyledApp(
+            Center(
+              child: OiTappable(onTap: () {}, child: probe()),
+            ),
+            hover: const OiInteractiveStyle(
+              backgroundOverlay: Color(0x00000000),
+              halo: halo,
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(_InitProbe.inits, 1);
+
+        final gesture = await hoverOver(tester, find.byType(OiTappable));
+        expect(_InitProbe.inits, 1, reason: 'hovered');
+        expect(_haloShadows(tester), [halo.toBoxShadow()]);
+
+        await gesture.moveTo(const Offset(1, 1));
+        await tester.pumpAndSettle();
+        expect(_InitProbe.inits, 1, reason: 'left');
+        expect(_haloShadows(tester), isNull);
+      },
+      variant: TargetPlatformVariant.only(TargetPlatform.linux),
+    );
+  });
+
+  // ── 24. Semantics ─────────────────────────────────────────────────────────
+
+  group('semantics', () {
+    testWidgets('an unlabelled tappable is an enabled button', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(onTap: () {}, child: const Text('Vis')),
+        ),
+      );
+
+      expect(
+        _node(tester),
+        isSemantics(
+          label: 'Vis',
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          hasTapAction: true,
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('a disabled tappable is disabled and offers no tap', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(
+            enabled: false,
+            onTap: () {},
+            onLongPress: () {},
+            child: const Text('Vis'),
+          ),
+        ),
+      );
+
+      expect(
+        _node(tester),
+        isSemantics(
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: false,
+          hasTapAction: false,
+          hasLongPressAction: false,
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('a disabled tappable still swallows the tap', (tester) async {
+      var outer = 0;
+      await tester.pumpObers(
+        Center(
+          child: GestureDetector(
+            onTap: () => outer++,
+            child: OiTappable(
+              enabled: false,
+              onTap: () {},
+              child: const SizedBox(width: 60, height: 60),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(OiTappable));
+      expect(outer, 0);
+    });
+
+    testWidgets('semanticLabel replaces the child text', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(
+            semanticLabel: 'Other',
+            onTap: () {},
+            child: const Text('Vis'),
+          ),
+        ),
+      );
+
+      final node = _node(tester);
+      expect(node.label, 'Other');
+      expect(node, isSemantics(isButton: true, hasTapAction: true));
+      expect(find.bySemanticsLabel(RegExp('Vis')), findsNothing);
+      handle.dispose();
+    });
+
+    testWidgets('a label equal to the child text is announced once', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(
+            semanticLabel: 'Save',
+            onTap: () {},
+            child: const Text('Save'),
+          ),
+        ),
+      );
+
+      expect(_node(tester).label, 'Save');
+      handle.dispose();
+    });
+
+    testWidgets('the semantic tap and long press run the callbacks', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      final calls = <String>[];
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(
+            semanticLabel: 'Go',
+            onTap: () => calls.add('tap'),
+            onLongPress: () => calls.add('long'),
+            child: const Text('Vis'),
+          ),
+        ),
+      );
+
+      final node = _node(tester);
+      expect(
+        node,
+        isSemantics(hasLongPressAction: true, isFocusable: true),
+      );
+      tester.semantics.tap(find.semantics.byLabel('Go'));
+      tester.semantics.longPress(find.semantics.byLabel('Go'));
+      expect(calls, ['tap', 'long']);
+      handle.dispose();
+    });
+
+    testWidgets('a tappable without callbacks has no role', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        const Center(child: OiTappable(child: Text('Vis'))),
+      );
+
+      expect(
+        tester.getSemantics(find.text('Vis')),
+        isSemantics(
+          label: 'Vis',
+          isButton: false,
+          hasEnabledState: false,
+          hasTapAction: false,
+        ),
+      );
+      handle.dispose();
+    });
+  });
+
+  // ── 25. Semantic state, role, key hook, traversal ─────────────────────────
+
+  group('semantic state and role', () {
+    testWidgets('state flags are passed through', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(
+            role: OiTappableRole.checkbox,
+            checked: true,
+            selected: true,
+            expanded: false,
+            onTap: () {},
+            child: const Text('Vis'),
+          ),
+        ),
+      );
+
+      expect(
+        _node(tester),
+        isSemantics(
+          isButton: false,
+          hasCheckedState: true,
+          isChecked: true,
+          hasSelectedState: true,
+          isSelected: true,
+          hasExpandedState: true,
+          isExpanded: false,
+          hasEnabledState: true,
+          isEnabled: true,
+          hasTapAction: true,
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('mixed and toggled are passed through', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        Column(
+          children: [
+            OiTappable(
+              key: const Key('mixed'),
+              role: OiTappableRole.checkbox,
+              mixed: true,
+              onTap: () {},
+              child: const Text('a'),
+            ),
+            OiTappable(
+              key: const Key('switch'),
+              role: OiTappableRole.toggle,
+              toggled: true,
+              onTap: () {},
+              child: const Text('b'),
+            ),
+          ],
+        ),
+      );
+
+      expect(
+        _node(tester, of: find.byKey(const Key('mixed'))),
+        isSemantics(isCheckStateMixed: true, isButton: false),
+      );
+      expect(
+        _node(tester, of: find.byKey(const Key('switch'))),
+        isSemantics(
+          hasToggledState: true,
+          isToggled: true,
+          isButton: false,
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('a radio is in a mutually exclusive group by default', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(
+            role: OiTappableRole.radio,
+            checked: false,
+            onTap: () {},
+            child: const Text('Vis'),
+          ),
+        ),
+      );
+
+      expect(
+        _node(tester),
+        isSemantics(
+          hasCheckedState: true,
+          isChecked: false,
+          isInMutuallyExclusiveGroup: true,
+          isButton: false,
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('the tab role is exposed', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(
+            role: OiTappableRole.tab,
+            selected: true,
+            onTap: () {},
+            child: const Text('Vis'),
+          ),
+        ),
+      );
+
+      final node = _node(tester);
+      expect(node.role, SemanticsRole.tab);
+      expect(node, isSemantics(isSelected: true, isButton: false));
+      handle.dispose();
+    });
+
+    testWidgets('role none keeps the enabled state without a role', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        Center(
+          child: OiTappable(
+            role: OiTappableRole.none,
+            onTap: () {},
+            child: const Text('Vis'),
+          ),
+        ),
+      );
+
+      final node = _node(tester);
+      expect(node.role, SemanticsRole.none);
+      expect(
+        node,
+        isSemantics(isButton: false, isEnabled: true, hasTapAction: true),
+      );
+      handle.dispose();
+    });
+  });
+
+  group('role and state asserts', () {
+    Matcher assertionMentioning(String a, [String? b]) => throwsA(
+      isA<AssertionError>().having(
+        (e) => e.message,
+        'message',
+        allOf(contains(a), contains(b ?? a)),
+      ),
+    );
+
+    test('a tab needs selected', () {
+      expect(
+        () => OiTappable(
+          role: OiTappableRole.tab,
+          onTap: () {},
+          child: const SizedBox(),
+        ),
+        assertionMentioning('selected'),
+      );
+    });
+
+    test('an enabled tab needs onTap', () {
+      expect(
+        // Not const: the assert has to fail at run time, not at compile time.
+        () => OiTappable(
+          role: OiTappableRole.tab,
+          selected: false,
+          // Not const either, or the lint asks for a const OiTappable.
+          // ignore: prefer_const_constructors
+          child: SizedBox(),
+        ),
+        assertionMentioning('onTap'),
+      );
+    });
+
+    testWidgets('a disabled tab needs no onTap', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        const Center(
+          child: OiTappable(
+            role: OiTappableRole.tab,
+            selected: false,
+            enabled: false,
+            child: Text('Vis'),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(_node(tester).role, SemanticsRole.tab);
+      handle.dispose();
+    });
+
+    test('checked and toggled exclude each other', () {
+      expect(
+        () => OiTappable(
+          checked: true,
+          toggled: false,
+          onTap: () {},
+          child: const SizedBox(),
+        ),
+        assertionMentioning('checked', 'toggled'),
+      );
+    });
+  });
+
+  group('onKeyEvent', () {
+    Future<void> focusTappable(WidgetTester tester) async {
+      Focus.of(tester.element(find.byType(GestureDetector))).requestFocus();
+      await tester.pump();
+    }
+
+    testWidgets('sees keys the tappable does not handle', (tester) async {
+      final keys = <LogicalKeyboardKey>[];
+      var taps = 0;
+      await tester.pumpObers(
+        OiTappable(
+          onTap: () => taps++,
+          onKeyEvent: (node, event) {
+            if (event is KeyDownEvent) keys.add(event.logicalKey);
+            return KeyEventResult.ignored;
+          },
+          child: const SizedBox(width: 60, height: 60),
+        ),
+      );
+      await focusTappable(tester);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.home);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+
+      expect(keys, [
+        LogicalKeyboardKey.arrowDown,
+        LogicalKeyboardKey.home,
+        LogicalKeyboardKey.escape,
+        LogicalKeyboardKey.enter,
+      ]);
+      expect(taps, 1, reason: 'an ignored Enter still activates');
+    });
+
+    testWidgets('runs before Enter and Space and can take them', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpObers(
+        OiTappable(
+          onTap: () => taps++,
+          onKeyEvent: (node, event) =>
+              event.logicalKey == LogicalKeyboardKey.space
+              ? KeyEventResult.handled
+              : KeyEventResult.ignored,
+          child: const SizedBox(width: 60, height: 60),
+        ),
+      );
+      await focusTappable(tester);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(taps, 0);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(taps, 1);
+    });
+
+    testWidgets('a handled key-up still releases the pressed state', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpObers(
+        OiTappable(
+          onTap: () => taps++,
+          onKeyEvent: (node, event) => event is KeyUpEvent
+              ? KeyEventResult.handled
+              : KeyEventResult.ignored,
+          child: const SizedBox(width: 60, height: 60),
+        ),
+      );
+      await focusTappable(tester);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(_scale(tester), 0.97);
+
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(_scale(tester), 1);
+      expect(taps, 0, reason: 'the hook took the key-up');
+    });
+
+    testWidgets('is not called while disabled', (tester) async {
+      var calls = 0;
+      await tester.pumpObers(
+        OiTappable(
+          enabled: false,
+          onTap: () {},
+          onKeyEvent: (node, event) {
+            calls++;
+            return KeyEventResult.handled;
+          },
+          child: const Focus(
+            autofocus: true,
+            child: SizedBox(width: 60, height: 60),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      expect(calls, 0);
+    });
+  });
+
+  group('skipTraversal', () {
+    Widget pair({required bool skipFirst}) => Column(
+      children: [
+        OiTappable(
+          key: const Key('first'),
+          skipTraversal: skipFirst,
+          onTap: () {},
+          child: const SizedBox(width: 60, height: 60),
+        ),
+        OiTappable(
+          key: const Key('second'),
+          onTap: () {},
+          child: const SizedBox(width: 60, height: 60),
+        ),
+      ],
+    );
+
+    FocusNode nodeOf(WidgetTester tester, Key key) => Focus.of(
+      tester.element(
+        find.descendant(
+          of: find.byKey(key),
+          matching: find.byType(GestureDetector),
+        ),
+      ),
+    );
+
+    testWidgets('Tab passes over a skipped tappable', (tester) async {
+      await tester.pumpObers(pair(skipFirst: true));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      expect(nodeOf(tester, const Key('first')).hasPrimaryFocus, isFalse);
+      expect(nodeOf(tester, const Key('second')).hasPrimaryFocus, isTrue);
+    });
+
+    testWidgets('a skipped tappable can still be focused in code', (
+      tester,
+    ) async {
+      await tester.pumpObers(pair(skipFirst: true));
+
+      nodeOf(tester, const Key('first')).requestFocus();
+      await tester.pump();
+
+      expect(nodeOf(tester, const Key('first')).hasPrimaryFocus, isTrue);
+    });
+
+    testWidgets('Tab reaches it by default', (tester) async {
+      await tester.pumpObers(pair(skipFirst: false));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      expect(nodeOf(tester, const Key('first')).hasPrimaryFocus, isTrue);
+    });
+  });
+}
+
+/// The widgets of type [T] that an [OiTappable] wraps its child in.
+Finder _tappablePart<T extends Widget>() =>
+    find.descendant(of: find.byType(OiTappable), matching: find.byType(T));
+
+/// The semantics node of the [OiTappable] found by [of] (the only one by
+/// default).
+SemanticsNode _node(WidgetTester tester, {Finder? of}) => tester.getSemantics(
+  find.descendant(
+    of: of ?? find.byType(OiTappable),
+    matching: find.byType(GestureDetector),
+  ),
+);
+
+/// The scale the [OiTappable] currently paints its child at.
+double _scale(WidgetTester tester) =>
+    tester.widget<Transform>(_tappablePart<Transform>()).transform.entry(0, 0);
+
+/// The focus rings currently painted (foreground boxes with a border).
+Iterable<DecoratedBox> _focusRings(WidgetTester tester) => tester
+    .widgetList<DecoratedBox>(_tappablePart<DecoratedBox>())
+    .where(
+      (b) =>
+          b.position == DecorationPosition.foreground &&
+          (b.decoration as BoxDecoration).border != null,
+    );
+
+/// The shadows of the halo box, or `null` while no halo is painted.
+List<BoxShadow>? _haloShadows(WidgetTester tester) => tester
+    .widgetList<DecoratedBox>(_tappablePart<DecoratedBox>())
+    .where((b) => b.position == DecorationPosition.background)
+    .map((b) => (b.decoration as BoxDecoration).boxShadow)
+    .single;
+
+class _InitProbe extends StatefulWidget {
+  const _InitProbe();
+
+  static int inits = 0;
+
+  @override
+  State<_InitProbe> createState() => _InitProbeState();
+}
+
+class _InitProbeState extends State<_InitProbe> {
+  @override
+  void initState() {
+    super.initState();
+    _InitProbe.inits++;
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.expand();
 }
 
 class _HoverProbe extends StatefulWidget {

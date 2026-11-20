@@ -2,6 +2,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/composites/data/oi_grouped_list.dart';
 import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
@@ -73,6 +74,32 @@ void main() {
   });
 
   // ── Collapsible ─────────────────────────────────────────────────────────
+
+  testWidgets('a control in a collapsible header stays reachable', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      OiGroupedList<_Contact>(
+        items: _contacts,
+        itemBuilder: (_, c, _) => Text(c.name),
+        groupBy: (c) => c.letter,
+        collapsible: true,
+        headerBuilder: (_, key, _, {required collapsed}) => Row(
+          children: [
+            Text('Group $key'),
+            OiButton.primary(label: 'Add to $key', onTap: () {}),
+          ],
+        ),
+        label: 'Contacts',
+      ),
+      surfaceSize: const Size(800, 1200),
+    );
+
+    expect(find.bySemanticsLabel('Add to A'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('Collapse A')), findsOneWidget);
+    handle.dispose();
+  });
 
   testWidgets('collapsible groups toggle on header tap', (tester) async {
     await tester.pumpObers(

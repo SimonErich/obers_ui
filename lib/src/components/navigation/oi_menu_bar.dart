@@ -419,16 +419,22 @@ class _DropdownItemWidget extends StatelessWidget {
         ..add(OiLabel.tiny(item.shortcut!, color: colors.textMuted));
     }
 
-    return OiTappable(
-      onTap: item.enabled ? onTap : null,
-      enabled: item.enabled,
-      semanticLabel: item.semanticLabel ?? item.label,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: spacing.sm,
-          vertical: spacing.xs,
+    // A custom label goes on a Semantics wrapper, not on the tappable: a
+    // tappable's semanticLabel replaces everything its child announces,
+    // which would hide the shortcut. Without one the row's own text is
+    // announced.
+    return Semantics(
+      label: item.semanticLabel,
+      child: OiTappable(
+        onTap: item.enabled ? onTap : null,
+        enabled: item.enabled,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.sm,
+            vertical: spacing.xs,
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: children),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: children),
       ),
     );
   }

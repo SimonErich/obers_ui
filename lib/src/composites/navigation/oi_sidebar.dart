@@ -591,9 +591,11 @@ class _OiSidebarState extends State<OiSidebar>
       ),
     );
 
+    // No semanticLabel: it would replace everything the row announces and
+    // hide the badge count. The row shows the label, and in compact mode the
+    // tooltip below announces it.
     Widget result = OiTappable(
       enabled: !item.disabled,
-      semanticLabel: item.label,
       onTap: () {
         if (hasKids && !compact) {
           _toggleParent(item.id);

@@ -886,13 +886,16 @@ void main() {
       expect(find.text('Alice Smith'), findsOneWidget);
     });
 
-    testWidgets('onTap provides semantic label', (tester) async {
+    testWidgets('onTap announces the label and the value', (tester) async {
+      final handle = tester.ensureSemantics();
       await tester.pumpObers(
         OiFieldDisplay(value: 'Click me', label: 'Action Field', onTap: () {}),
       );
 
-      final tappable = tester.widget<OiTappable>(find.byType(OiTappable));
-      expect(tappable.semanticLabel, 'Action Field');
+      final node = tester.getSemantics(find.text('Click me'));
+      expect(node.label, 'Action Field\nClick me');
+      expect(node, isSemantics(isButton: true, hasTapAction: true));
+      handle.dispose();
     });
 
     testWidgets('Semantics widget wraps output with correct label', (

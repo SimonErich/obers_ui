@@ -412,8 +412,7 @@ class _OiChangelogViewState extends State<OiChangelogView> {
       grouped.putIfAbsent(change.type, () => []).add(change);
     }
 
-    return OiTappable(
-      semanticLabel: widget.labels.version(version.version),
+    final card = OiTappable(
       onTap: widget.onVersionTap != null
           ? () => widget.onVersionTap!(version)
           : null,
@@ -470,6 +469,14 @@ class _OiChangelogViewState extends State<OiChangelogView> {
           ],
         ),
       ),
+    );
+
+    // The label goes on a Semantics wrapper, not on the tappable: a
+    // tappable's semanticLabel replaces everything its child announces,
+    // which would hide the changes of the version.
+    return Semantics(
+      label: widget.labels.version(version.version),
+      child: card,
     );
   }
 

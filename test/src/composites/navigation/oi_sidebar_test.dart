@@ -82,6 +82,29 @@ Widget _sidebar({
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 void main() {
+  testWidgets('an item announces its label once and its badge count', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(_sidebar());
+
+    final row = tester.getSemantics(find.text('Inbox'));
+    expect(row.label, 'Inbox\n5');
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    expect(tester.getSemantics(find.text('Home')).label, 'Home');
+    handle.dispose();
+  });
+
+  testWidgets('a compact item is announced by its label, once', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(_sidebar(mode: OiSidebarMode.compact));
+
+    expect(find.bySemanticsLabel('Home'), findsOneWidget);
+    handle.dispose();
+  });
+
   group('OiSidebar', () {
     testWidgets('renders items with icon and label', (tester) async {
       await tester.pumpObers(_sidebar());

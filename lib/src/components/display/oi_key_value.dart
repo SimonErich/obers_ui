@@ -176,10 +176,12 @@ class OiKeyValue extends StatelessWidget {
     }
 
     if (onTap != null) {
-      content = OiTappable(
-        onTap: onTap,
-        semanticLabel: semanticLabel ?? '$label: $displayValue',
-        child: content,
+      // The label goes on a Semantics wrapper, not on the tappable: a
+      // tappable's semanticLabel replaces everything its child announces,
+      // which would hide a control passed as trailing.
+      content = Semantics(
+        label: semanticLabel ?? '$label: $displayValue',
+        child: OiTappable(onTap: onTap, child: content),
       );
     } else if (semanticLabel != null) {
       content = Semantics(label: semanticLabel, child: content);

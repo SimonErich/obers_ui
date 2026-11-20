@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
@@ -35,6 +36,40 @@ void main() {
       ),
     );
   }
+
+  testWidgets('a result announces its details and keeps its trailing action', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      buildOverlay(
+        onSearch: (query, category) async => [
+          OiSearchSuggestion(
+            key: '1',
+            title: 'Result One',
+            subtitle: 'In projects',
+            category: 'Docs',
+            trailing: OiButton.primary(label: 'Open', onTap: () {}),
+          ),
+        ],
+      ),
+      surfaceSize: const Size(800, 600),
+    );
+    await tester.enterText(find.byType(EditableText), 'test');
+    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pumpAndSettle();
+
+    final row = tester.getSemantics(find.text('Result One'));
+    expect(row.label, contains('In projects'));
+    expect(row.label, contains('Docs'));
+    expect('Result One'.allMatches(row.label), hasLength(1));
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    expect(
+      tester.getSemantics(find.text('Open')),
+      isSemantics(label: 'Open', isButton: true, hasTapAction: true),
+    );
+    handle.dispose();
+  });
 
   testWidgets('renders search input with placeholder', (tester) async {
     await tester.pumpObers(buildOverlay(), surfaceSize: const Size(800, 600));

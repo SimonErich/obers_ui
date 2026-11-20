@@ -475,11 +475,16 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
         widget.onTap != null || widget._kind == _OiCardKind.interactive;
     Widget result;
     if (needsTappable) {
-      result = OiTappable(
-        onTap: widget.onTap,
-        semanticLabel: widget.label,
-        clipBorderRadius: ct?.borderRadius ?? BorderRadius.circular(8),
-        child: surface,
+      // The label goes on a Semantics wrapper, not on the tappable: a
+      // tappable's semanticLabel replaces everything its child announces,
+      // which would hide the card content and its controls.
+      result = Semantics(
+        label: widget.label,
+        child: OiTappable(
+          onTap: widget.onTap,
+          clipBorderRadius: ct?.borderRadius ?? BorderRadius.circular(8),
+          child: surface,
+        ),
       );
     } else {
       result = surface;

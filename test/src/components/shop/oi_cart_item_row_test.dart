@@ -54,6 +54,29 @@ const _itemNoVariant = OiCartItem(
 
 void main() {
   group('OiCartItemRow', () {
+    testWidgets('quantity control stays reachable in a tappable row', (
+      tester,
+    ) async {
+      _ignoreImageErrors();
+      addTearDown(_restoreOnError);
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        OiCartItemRow(
+          item: _item,
+          label: 'Cart item',
+          onTap: () {},
+          onQuantityChange: (_) {},
+        ),
+        surfaceSize: const Size(600, 200),
+      );
+      tester.takeException();
+      expect(
+        find.bySemanticsLabel(RegExp('Test Product quantity')),
+        findsWidgets,
+      );
+      handle.dispose();
+    });
+
     testWidgets('renders product name and variant label', (tester) async {
       _ignoreImageErrors();
       addTearDown(_restoreOnError);

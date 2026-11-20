@@ -108,16 +108,21 @@ class _OiClockDialState extends State<OiClockDial> {
     final readout = context.textTheme.code.copyWith(fontSize: 32, height: 1);
     final hours = _face == _Face.hours;
 
+    // The label goes on a Semantics wrapper, not on the tappable: a
+    // tappable's semanticLabel replaces what its child announces, which
+    // would hide the value ("Hour" instead of "Hour, 09").
     Widget part(String text, {required bool active, required _Face face}) =>
-        OiTappable(
-          onTap: () => setState(() => _face = face),
-          semanticLabel: face == _Face.hours
+        Semantics(
+          label: face == _Face.hours
               ? widget.labels.hours
               : widget.labels.minutes,
-          child: Text(
-            text,
-            style: readout.copyWith(
-              color: active ? colors.text : colors.textMuted,
+          child: OiTappable(
+            onTap: () => setState(() => _face = face),
+            child: Text(
+              text,
+              style: readout.copyWith(
+                color: active ? colors.text : colors.textMuted,
+              ),
             ),
           ),
         );

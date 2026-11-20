@@ -52,7 +52,9 @@ extension _OiFieldDisplayLayout on OiFieldDisplay {
     }
 
     if (onTap != null) {
-      result = OiTappable(onTap: onTap, semanticLabel: label, child: result);
+      // No semanticLabel here: it would replace the value. The Semantics
+      // wrapper in build() carries the label.
+      result = OiTappable(onTap: onTap, child: result);
     }
 
     if (leading != null) {

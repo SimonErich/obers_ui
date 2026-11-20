@@ -437,10 +437,15 @@ class OiDataGrid<T> extends StatelessWidget {
     );
 
     if (onRowTap != null) {
-      rowWidget = OiTappable(
-        semanticLabel: 'Row ${index + 1}',
-        onTap: () => onRowTap!(row, index),
-        child: rowWidget,
+      // The label goes on a Semantics wrapper, not on the tappable: a
+      // tappable's semanticLabel replaces everything its child announces,
+      // which would hide the cells.
+      rowWidget = Semantics(
+        label: 'Row ${index + 1}',
+        child: OiTappable(
+          onTap: () => onRowTap!(row, index),
+          child: rowWidget,
+        ),
       );
     }
 

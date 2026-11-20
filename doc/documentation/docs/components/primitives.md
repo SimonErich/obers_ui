@@ -139,7 +139,6 @@ The interaction primitive. All buttons, inputs, and interactive widgets use it:
 OiTappable(
   onTap: () => print('Tapped'),
   clipBorderRadius: context.radius.sm,
-  semanticLabel: 'Tap me',
   child: Padding(
     padding: EdgeInsets.all(context.spacing.sm),
     child: const Text('Tap me'),
@@ -147,7 +146,9 @@ OiTappable(
 )
 ```
 
-Automatically handles: hover overlay, focus ring (shown only while the keyboard is used, see `OiFocusVisibility`), active/press feedback, disabled state (0.4 opacity), and touch-target enforcement via `OiA11y.minTouchTarget` (48dp on touch platforms, 0 on pointer).
+Automatically handles: hover overlay, focus ring (shown only while the keyboard is used, see `OiFocusVisibility`), active/press feedback, disabled state (0.4 opacity), and touch-target enforcement via `OiA11y.minTouchTarget` (48dp on touch platforms, 0 on pointer). The child keeps its `State` through all of these.
+
+It is announced as a button with its enabled state. `semanticLabel` replaces what the child announces (use it for icon-only content); `role` and the state parameters (`checked`, `mixed`, `toggled`, `selected`, `expanded`, `inMutuallyExclusiveGroup`) turn it into a checkbox, radio, switch, tab or disclosure header; `onKeyEvent` adds keys before the built-in Enter/Space; `skipTraversal` takes it out of the Tab order for roving-tab-index groups.
 
 ## Animation
 

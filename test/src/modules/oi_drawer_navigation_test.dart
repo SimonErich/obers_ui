@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_avatar.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
+import 'package:obers_ui/src/components/inputs/oi_switch.dart';
 import 'package:obers_ui/src/components/inputs/oi_switch_tile.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/modules/oi_drawer_navigation.dart';
@@ -66,6 +67,63 @@ void main() {
   }
 
   // ── Tests ───────────────────────────────────────────────────────────────
+
+  testWidgets('an item announces its badge and keeps its trailing control', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      buildDrawer(
+        sections: [
+          OiDrawerSection(
+            items: [
+              OiDrawerItem(
+                key: 'inbox',
+                label: 'Inbox',
+                badge: '3',
+                trailing: OiSwitch(
+                  value: false,
+                  semanticLabel: 'Mute',
+                  onChanged: (_) {},
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      surfaceSize: const Size(800, 600),
+    );
+
+    final row = tester.getSemantics(find.text('Inbox'));
+    expect(row.label, 'Inbox\n3');
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    expect(find.bySemanticsLabel('Mute'), findsOneWidget);
+    handle.dispose();
+  });
+
+  testWidgets('a tappable header announces its subtitle and avatar widget', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      buildDrawer(
+        header: OiDrawerHeader(
+          name: 'Jane Doe',
+          subtitle: 'Administrator',
+          avatarWidget: const Text('JD portrait'),
+          onTap: () {},
+        ),
+      ),
+      surfaceSize: const Size(800, 600),
+    );
+
+    final header = tester.getSemantics(find.text('Administrator'));
+    expect(header.label, contains('User profile: Jane Doe'));
+    expect(header.label, contains('Administrator'));
+    expect(header.label, contains('JD portrait'));
+    expect(header, isSemantics(isButton: true, hasTapAction: true));
+    handle.dispose();
+  });
 
   testWidgets('renders header with name and subtitle', (tester) async {
     await tester.pumpObers(

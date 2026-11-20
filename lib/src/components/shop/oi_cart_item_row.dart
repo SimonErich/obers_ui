@@ -246,7 +246,10 @@ class OiCartItemRow extends StatelessWidget {
     );
 
     if (onTap != null) {
-      content = OiTappable(onTap: onTap, semanticLabel: label, child: content);
+      // No semanticLabel here: it would replace everything the row announces
+      // and hide the quantity and remove controls. The Semantics wrapper in
+      // build() carries the label.
+      content = OiTappable(onTap: onTap, child: content);
     }
 
     return content;

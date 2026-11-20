@@ -11,6 +11,30 @@ import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('an item announces its label once and its shortcut', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      const OiContextMenu(
+        label: 'Test menu',
+        items: [
+          OiMenuItem(label: 'Save', shortcut: 'Cmd+S'),
+          OiMenuItem(label: 'Print', semanticLabel: 'Print page'),
+        ],
+        child: Text('target'),
+      ),
+    );
+    await tester.longPress(find.text('target'));
+    await tester.pumpAndSettle();
+
+    final row = tester.getSemantics(find.text('Save'));
+    expect(row.label, 'Save\nCmd+S');
+    expect(row, isSemantics(isButton: true, hasTapAction: true));
+    expect(tester.getSemantics(find.text('Print')).label, 'Print page\nPrint');
+    handle.dispose();
+  });
+
   // ── Trigger tests ────────────────────────────────────────────────────────
 
   group('OiContextMenu triggers', () {

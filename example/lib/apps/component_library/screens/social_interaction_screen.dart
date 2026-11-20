@@ -16,6 +16,7 @@ class SocialInteractionScreen extends StatefulWidget {
 
 class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
   int _tapCount = 0;
+  bool _tappableChecked = false;
   final List<String> _reorderItems = ['Item A', 'Item B', 'Item C'];
   String? _pastedText;
   bool _spotlightActive = false;
@@ -750,7 +751,6 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
               ComponentExample(
                 title: 'Interactive Area',
                 child: OiTappable(
-                  semanticLabel: 'Tap me',
                   onTap: () => setState(() => _tapCount++),
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -760,6 +760,28 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                     ),
                     child: OiLabel.body(
                       'Tappable area (tapped $_tapCount times)',
+                    ),
+                  ),
+                ),
+              ),
+              ComponentExample(
+                title: 'Role and State',
+                child: OiTappable(
+                  role: OiTappableRole.checkbox,
+                  checked: _tappableChecked,
+                  onTap: () =>
+                      setState(() => _tappableChecked = !_tappableChecked),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _tappableChecked
+                          ? colors.primary.muted
+                          : colors.surfaceSubtle,
+                      borderRadius: context.radius.sm,
+                    ),
+                    child: OiLabel.body(
+                      'Announced as a checkbox '
+                      '(${_tappableChecked ? 'checked' : 'not checked'})',
                     ),
                   ),
                 ),

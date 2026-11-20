@@ -244,5 +244,27 @@ void main() {
       );
       expect(find.text('Test Widget'), findsOneWidget);
     });
+
+    testWidgets('compact variant: Add stays reachable in a tappable card', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        OiProductCard(
+          product: _product,
+          label: 'Test Widget card',
+          variant: OiProductCardVariant.compact,
+          onTap: () {},
+          onAddToCart: () {},
+        ),
+        surfaceSize: const Size(400, 200),
+      );
+      expect(
+        tester.getSemantics(find.text('Add')),
+        isSemantics(label: 'Add', isButton: true, hasTapAction: true),
+      );
+      expect(find.bySemanticsLabel(RegExp('Test Widget card')), findsWidgets);
+      handle.dispose();
+    });
   });
 }

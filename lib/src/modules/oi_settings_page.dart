@@ -342,8 +342,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     final colors = context.colors;
     final spacing = context.spacing;
 
-    return OiTappable(
-      semanticLabel: widget.groupLabel(group.title, expanded: expanded),
+    final header = OiTappable(
       clipBorderRadius: context.radius.sm,
       onTap: () {
         setState(() {
@@ -400,6 +399,14 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
         ),
       ),
     );
+
+    // The label goes on a Semantics wrapper, not on the tappable: a
+    // tappable's semanticLabel replaces everything its child announces,
+    // which would hide the group description and the reset button.
+    return Semantics(
+      label: widget.groupLabel(group.title, expanded: expanded),
+      child: header,
+    );
   }
 
   Widget _buildToggleItem(
@@ -429,8 +436,9 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     final colors = context.colors;
     final spacing = context.spacing;
 
+    // No semanticLabel: the row shows the title, and a semanticLabel would
+    // replace everything the row announces, hiding the subtitle.
     return OiTappable(
-      semanticLabel: item.title,
       onTap: () => widget.onNavigate?.call(item),
       child: Padding(
         padding: EdgeInsets.symmetric(

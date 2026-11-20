@@ -353,8 +353,9 @@ class OiWorkflowStepper extends StatelessWidget {
       );
 
       if (isTappable) {
+        // No semanticLabel: the pill shows the label, and a semanticLabel
+        // would replace what the pill announces, hiding the estimated time.
         pill = OiTappable(
-          semanticLabel: step.label,
           clipBorderRadius: radius.full,
           onTap: () => onStepTap!(currentPhaseId, step.id),
           child: pill,
@@ -527,8 +528,8 @@ class OiWorkflowStepper extends StatelessWidget {
           );
 
           if (isTappable) {
+            // No semanticLabel, as for the horizontal pill above.
             stepPill = OiTappable(
-              semanticLabel: step.label,
               clipBorderRadius: radius.full,
               onTap: () => onStepTap!(phase.id, step.id),
               child: stepPill,
