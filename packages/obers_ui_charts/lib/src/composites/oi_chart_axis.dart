@@ -349,6 +349,7 @@ class OiChartAxis<TDomain> {
   /// `format` callback.
   String formatValue(double value) {
     if (format != null) return format!(value);
+    if (!value.isFinite) return value.toString();
     if (value == value.roundToDouble()) return value.toInt().toString();
     return value.toStringAsFixed(1);
   }

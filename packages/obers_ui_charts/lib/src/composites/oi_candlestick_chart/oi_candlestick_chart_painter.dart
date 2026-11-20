@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_candlestick_chart/oi_candlestick_chart.dart'
@@ -254,11 +255,62 @@ class OiCandlestickChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiCandlestickChartPainter oldDelegate) =>
-      oldDelegate.resolvedSeries != resolvedSeries ||
+      !_sameSeries(oldDelegate.resolvedSeries, resolvedSeries) ||
+      oldDelegate.chartRect != chartRect ||
+      oldDelegate.minX != minX ||
+      oldDelegate.maxX != maxX ||
+      oldDelegate.minY != minY ||
+      oldDelegate.maxY != maxY ||
+      !listEquals(oldDelegate.xLabels, xLabels) ||
+      !listEquals(oldDelegate.yLabels, yLabels) ||
+      oldDelegate.xDivisions != xDivisions ||
+      oldDelegate.yDivisions != yDivisions ||
       oldDelegate.showGrid != showGrid ||
       oldDelegate.gridColor != gridColor ||
+      oldDelegate.axisLabelColor != axisLabelColor ||
       oldDelegate.highContrast != highContrast ||
-      oldDelegate.compact != compact ||
       oldDelegate.hoveredSeriesIndex != hoveredSeriesIndex ||
       oldDelegate.hoveredCandleIndex != hoveredCandleIndex;
+
+  /// Whether [a] and [b] paint the same thing.
+  ///
+  /// The series list is rebuilt on every build, so it is compared by value.
+  /// Labels are left out: the painter does not draw them.
+  static bool _sameSeries(
+    List<ResolvedCandlestickSeries> a,
+    List<ResolvedCandlestickSeries> b,
+  ) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      final x = a[i];
+      final y = b[i];
+      if (x.bullColor != y.bullColor ||
+          x.bearColor != y.bearColor ||
+          !_sameCandles(x.candles, y.candles)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static bool _sameCandles(
+    List<ResolvedCandlestick> a,
+    List<ResolvedCandlestick> b,
+  ) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      final x = a[i];
+      final y = b[i];
+      if (x.x != y.x ||
+          x.open != y.open ||
+          x.high != y.high ||
+          x.low != y.low ||
+          x.close != y.close) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

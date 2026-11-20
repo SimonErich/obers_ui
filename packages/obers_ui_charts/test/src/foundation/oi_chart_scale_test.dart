@@ -106,15 +106,15 @@ void main() {
       expect(s.domainMax, 1);
     });
 
-    test('fromData with single value expands domain by ±1', () {
+    test('fromData with single value expands domain by 10 %', () {
       final s = OiLinearScale.fromData(
         values: const [5.0],
         rangeMin: 0,
         rangeMax: 100,
         nice: false,
       );
-      expect(s.domainMin, 4);
-      expect(s.domainMax, 6);
+      expect(s.domainMin, 4.5);
+      expect(s.domainMax, 5.5);
     });
 
     test('inverted range (rangeMax < rangeMin) maps correctly', () {
@@ -156,9 +156,34 @@ void main() {
       expect(scale.fromPixel(300), closeTo(1000, 0.001));
     });
 
-    test('toPixel with non-positive value returns rangeMin', () {
-      expect(scale.toPixel(0), scale.rangeMin);
-      expect(scale.toPixel(-1), scale.rangeMin);
+    test('toPixel with non-positive value returns NaN', () {
+      expect(scale.toPixel(0), isNaN);
+      expect(scale.toPixel(-1), isNaN);
+    });
+
+    test('with clamp, a non-positive value sits at rangeMin', () {
+      const clamped = OiLogarithmicScale(
+        domainMin: 1,
+        domainMax: 1000,
+        rangeMin: 300,
+        rangeMax: 0,
+        clamp: true,
+      );
+      expect(clamped.toPixel(0), 300);
+      expect(clamped.toPixel(-1), 300);
+      expect(clamped.toPixel(double.nan), isNaN);
+    });
+
+    test('with clamp on a reversed domain, it sits at the small end', () {
+      const reversed = OiLogarithmicScale(
+        domainMin: 1000,
+        domainMax: 1,
+        rangeMin: 0,
+        rangeMax: 300,
+        clamp: true,
+      );
+      expect(reversed.toPixel(0), 300);
+      expect(reversed.toPixel(0.5), 300);
     });
 
     test('buildTicks generates one tick per power of base', () {

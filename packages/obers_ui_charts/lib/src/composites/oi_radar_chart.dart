@@ -274,10 +274,12 @@ class _OiRadarChartPainter extends CustomPainter {
         ),
         textDirection: TextDirection.ltr,
       )..layout();
-      tp.paint(
-        canvas,
-        Offset(labelOffset.dx - tp.width / 2, labelOffset.dy - tp.height / 2),
-      );
+      tp
+        ..paint(
+          canvas,
+          Offset(labelOffset.dx - tp.width / 2, labelOffset.dy - tp.height / 2),
+        )
+        ..dispose();
     }
 
     // Draw series polygons.
@@ -317,7 +319,9 @@ class _OiRadarChartPainter extends CustomPainter {
             ),
             textDirection: TextDirection.ltr,
           )..layout();
-          tp.paint(canvas, Offset(point.dx + 4, point.dy - tp.height - 2));
+          tp
+            ..paint(canvas, Offset(point.dx + 4, point.dy - tp.height - 2))
+            ..dispose();
         }
       }
       path.close();

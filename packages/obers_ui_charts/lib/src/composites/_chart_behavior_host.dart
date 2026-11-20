@@ -107,8 +107,12 @@ mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
     if (settings == null) return;
     final ctrl = effectiveController;
 
-    // Restore hidden series → legend state.
-    settings.hiddenSeriesIds.forEach(ctrl.toggleSeries);
+    // Restore hidden series → legend state. Setting rather than toggling
+    // keeps a series hidden that a caller-supplied controller already
+    // hides.
+    for (final id in settings.hiddenSeriesIds) {
+      ctrl.setSeriesVisible(id, visible: false);
+    }
 
     // Restore viewport.
     if (settings.viewport != null) {
@@ -177,7 +181,10 @@ mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
 
   /// Wraps [child] in a [Listener] that forwards pointer events to behaviors.
   Widget wrapWithPointerListener(Widget child) {
-    if (_attachedBehaviors.isEmpty) return child;
+    // Decide on the configured behaviors, not the attached ones: behaviors
+    // attach after the first frame without a rebuild, and the listener
+    // must already be in the tree by then.
+    if (behaviors.isEmpty) return child;
     return Listener(
       onPointerDown: dispatchPointerEvent,
       onPointerMove: dispatchPointerEvent,

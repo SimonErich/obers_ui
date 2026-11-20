@@ -250,6 +250,7 @@ class OiChartLabelPainter extends OiChartLayerPainter {
     this.activeBreakpoint,
     this.breakpointScale,
     this.themeAxis,
+    this.textDirection = TextDirection.ltr,
   });
 
   /// Which edge of the plot area labels sit beside.
@@ -295,9 +296,18 @@ class OiChartLabelPainter extends OiChartLayerPainter {
   /// Optional theme tokens for fallback styling.
   final OiChartAxisTheme? themeAxis;
 
+  /// The reading direction used to lay out the labels.
+  ///
+  /// Pass `Directionality.of(context)` so right-to-left labels are shaped
+  /// correctly. Defaults to [TextDirection.ltr].
+  final TextDirection textDirection;
+
   // ── Text layout cache ─────────────────────────────────────────────────
 
-  /// Cache of laid-out [TextPainter]s keyed by (label string, effective style).
+  /// Cache of laid-out [TextPainter]s keyed by everything that affects the
+  /// layout: label string, effective style, [maxLabelWidth] and
+  /// [textDirection]. The cache is shared by all instances, so two axes that
+  /// differ in any of these must not share an entry.
   ///
   /// This avoids re-creating and re-laying-out text painters for identical
   /// labels across repaint frames.
@@ -319,10 +329,13 @@ class OiChartLabelPainter extends OiChartLayerPainter {
     final count = math.min(labels.length, tickPositions.length);
     final visibleIndices = _computeVisibleIndices(count);
 
-    // Prepare text painters for visible labels.
+    // Prepare text painters for visible labels. The keys fetched in this
+    // pass are tracked so eviction cannot dispose a painter that is about
+    // to be painted.
+    final inUse = <_TextCacheKey>{};
     final painters = <int, TextPainter>{};
     for (final i in visibleIndices) {
-      painters[i] = _getOrCreateTextPainter(labels[i], effectiveStyle);
+      painters[i] = _getOrCreateTextPainter(labels[i], effectiveStyle, inUse);
     }
 
     // Apply overflow handling and paint.
@@ -379,25 +392,32 @@ class OiChartLabelPainter extends OiChartLayerPainter {
     return indices;
   }
 
-  TextPainter _getOrCreateTextPainter(String text, TextStyle style) {
-    final key = _TextCacheKey(text, style);
+  TextPainter _getOrCreateTextPainter(
+    String text,
+    TextStyle style,
+    Set<_TextCacheKey> inUse,
+  ) {
+    final key = _TextCacheKey(text, style, maxLabelWidth, textDirection);
+    inUse.add(key);
     final cached = _textCache[key];
     if (cached != null) return cached;
 
-    // Evict oldest entries if cache is full.
+    // Evict the oldest entries if the cache is full, sparing those the
+    // current paint has already fetched. When a single paint needs more
+    // labels than the cache holds, the cache grows for that pass.
     if (_textCache.length >= _maxCacheSize) {
       final keysToRemove = _textCache.keys
+          .where((k) => !inUse.contains(k))
           .take(_textCache.length ~/ 4)
           .toList();
       for (final k in keysToRemove) {
-        _textCache[k]?.dispose();
-        _textCache.remove(k);
+        _textCache.remove(k)?.dispose();
       }
     }
 
     final tp = TextPainter(
       text: TextSpan(text: text, style: style),
-      textDirection: TextDirection.ltr,
+      textDirection: textDirection,
       maxLines: 1,
       ellipsis: '…',
     )..layout(maxWidth: maxLabelWidth);
@@ -526,7 +546,8 @@ class OiChartLabelPainter extends OiChartLayerPainter {
         oldPainter.labelGap != labelGap ||
         oldPainter.maxVisibleTicks != maxVisibleTicks ||
         oldPainter.activeBreakpoint != activeBreakpoint ||
-        oldPainter.themeAxis != themeAxis;
+        oldPainter.themeAxis != themeAxis ||
+        oldPainter.textDirection != textDirection;
   }
 }
 
@@ -536,16 +557,22 @@ class OiChartLabelPainter extends OiChartLayerPainter {
 
 @immutable
 class _TextCacheKey {
-  const _TextCacheKey(this.text, this.style);
+  const _TextCacheKey(this.text, this.style, this.maxWidth, this.textDirection);
 
   final String text;
   final TextStyle style;
+  final double maxWidth;
+  final TextDirection textDirection;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _TextCacheKey && other.text == text && other.style == style;
+      other is _TextCacheKey &&
+          other.text == text &&
+          other.style == style &&
+          other.maxWidth == maxWidth &&
+          other.textDirection == textDirection;
 
   @override
-  int get hashCode => Object.hash(text, style);
+  int get hashCode => Object.hash(text, style, maxWidth, textDirection);
 }

@@ -1,11 +1,13 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart.dart'
     show OiLineChart;
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_data.dart'
     show OiLineChartMode, OiLinePoint;
+import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_layout.dart';
 
 /// Resolved line series with concrete colors ready for painting.
 class ResolvedLineSeries {
@@ -128,22 +130,6 @@ class OiLineChartPainter extends CustomPainter {
   /// Hovered point index.
   final int? hoveredPointIndex;
 
-  double get _rangeX {
-    final r = maxX - minX;
-    return r == 0 ? 1.0 : r;
-  }
-
-  double get _rangeY {
-    final r = maxY - minY;
-    return r == 0 ? 1.0 : r;
-  }
-
-  Offset _mapPoint(double x, double y) {
-    final px = chartRect.left + chartRect.width * (x - minX) / _rangeX;
-    final py = chartRect.bottom - chartRect.height * (y - minY) / _rangeY;
-    return Offset(px, py);
-  }
-
   @override
   void paint(Canvas canvas, Size size) {
     // Grid.
@@ -178,70 +164,26 @@ class OiLineChartPainter extends CustomPainter {
       labelColor: axisLabelColor,
     );
 
-    // Track cumulative Y offsets for stacked mode.
-    // Map from x-value to cumulative y-value.
-    final stackOffsets = <double, double>{};
+    // The same layout the chart hit-tests against, including stack
+    // offsets. Non-finite points have no position in it.
+    final layouts = layoutLineSeries(
+      [for (final series in resolvedSeries) series.points],
+      chartRect: chartRect,
+      minX: minX,
+      maxX: maxX,
+      minY: minY,
+      maxY: maxY,
+      stacked: stacked,
+    );
 
     for (var si = 0; si < resolvedSeries.length; si++) {
       final series = resolvedSeries[si];
-      if (series.points.isEmpty) continue;
+      final layout = layouts[si];
+      // A missing point ends a segment, so the line and its fill leave a
+      // gap there instead of bridging to the next value.
+      final segments = splitLineSegments(layout);
+      if (segments.isEmpty) continue;
 
-      // Compute mapped points, applying stack offsets if needed.
-      final mappedPoints = <Offset>[];
-      for (final point in series.points) {
-        var effectiveY = point.y;
-        if (stacked) {
-          final base = stackOffsets[point.x] ?? 0;
-          effectiveY += base;
-          stackOffsets[point.x] = effectiveY;
-        }
-        mappedPoints.add(_mapPoint(point.x, effectiveY));
-      }
-
-      // Build path.
-      final Path path;
-      switch (mode) {
-        case OiLineChartMode.smooth:
-          path = mappedPoints.length > 2
-              ? _buildSmoothPath(mappedPoints)
-              : _buildLinearPath(mappedPoints);
-        case OiLineChartMode.stepped:
-          path = _buildSteppedPath(mappedPoints);
-        case OiLineChartMode.straight:
-          path = _buildLinearPath(mappedPoints);
-      }
-
-      // Draw fill.
-      if (series.fill) {
-        final fillPath = Path()..addPath(path, Offset.zero);
-
-        if (stacked && si > 0) {
-          // Close to the previous series baseline.
-          final prevSeries = resolvedSeries[si - 1];
-          for (var i = prevSeries.points.length - 1; i >= 0; i--) {
-            final p = prevSeries.points[i];
-            final base =
-                (stackOffsets[p.x] ?? p.y) -
-                series.points[math.min(i, series.points.length - 1)].y;
-            fillPath.lineTo(_mapPoint(p.x, base).dx, _mapPoint(p.x, base).dy);
-          }
-        } else {
-          // Close to bottom axis.
-          fillPath
-            ..lineTo(mappedPoints.last.dx, chartRect.bottom)
-            ..lineTo(mappedPoints.first.dx, chartRect.bottom);
-        }
-        fillPath.close();
-
-        canvas.drawPath(
-          fillPath,
-          Paint()
-            ..color = series.color.withValues(alpha: series.fillOpacity)
-            ..style = PaintingStyle.fill,
-        );
-      }
-
-      // Draw line.
       final linePaint = Paint()
         ..color = series.color
         ..style = PaintingStyle.stroke
@@ -249,25 +191,64 @@ class OiLineChartPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;
 
-      if (series.dashed) {
-        _drawDashedPath(canvas, path, linePaint);
-      } else {
-        canvas.drawPath(path, linePaint);
+      for (final segment in segments) {
+        final mappedPoints = segment.points;
+
+        // Build path.
+        final Path path;
+        switch (mode) {
+          case OiLineChartMode.smooth:
+            path = mappedPoints.length > 2
+                ? _buildSmoothPath(mappedPoints)
+                : _buildLinearPath(mappedPoints);
+          case OiLineChartMode.stepped:
+            path = _buildSteppedPath(mappedPoints);
+          case OiLineChartMode.straight:
+            path = _buildLinearPath(mappedPoints);
+        }
+
+        // Draw fill.
+        if (series.fill) {
+          // Close along the baselines: the top of the series below when
+          // stacked (the zero line for the first series, which may be above
+          // the bottom when the stack goes negative), the bottom otherwise.
+          final fillPath = Path()..addPath(path, Offset.zero);
+          for (final base in segment.baselines.reversed) {
+            fillPath.lineTo(base.dx, base.dy);
+          }
+          fillPath.close();
+
+          canvas.drawPath(
+            fillPath,
+            Paint()
+              ..color = series.color.withValues(alpha: series.fillOpacity)
+              ..style = PaintingStyle.fill,
+          );
+        }
+
+        // Draw line.
+        if (series.dashed) {
+          _drawDashedPath(canvas, path, linePaint);
+        } else {
+          canvas.drawPath(path, linePaint);
+        }
       }
 
       // Draw point dots.
       if (showPoints) {
         final dotPaint = Paint()..color = series.color;
-        for (final p in mappedPoints) {
-          canvas.drawCircle(p, series.strokeWidth * 1.5, dotPaint);
+        for (final segment in segments) {
+          for (final p in segment.points) {
+            canvas.drawCircle(p, series.strokeWidth * 1.5, dotPaint);
+          }
         }
       }
 
       // Draw hover highlight.
       if (hoveredSeriesIndex == si && hoveredPointIndex != null) {
         final pi = hoveredPointIndex!;
-        if (pi < mappedPoints.length) {
-          final hp = mappedPoints[pi];
+        final hp = pi < layout.points.length ? layout.points[pi] : null;
+        if (hp != null) {
           canvas
             ..drawCircle(
               hp,
@@ -344,14 +325,57 @@ class OiLineChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiLineChartPainter oldDelegate) =>
-      oldDelegate.resolvedSeries != resolvedSeries ||
+      !_sameSeries(oldDelegate.resolvedSeries, resolvedSeries) ||
+      oldDelegate.chartRect != chartRect ||
+      oldDelegate.minX != minX ||
+      oldDelegate.maxX != maxX ||
+      oldDelegate.minY != minY ||
+      oldDelegate.maxY != maxY ||
       oldDelegate.showGrid != showGrid ||
       oldDelegate.gridColor != gridColor ||
+      oldDelegate.axisLabelColor != axisLabelColor ||
       oldDelegate.highContrast != highContrast ||
-      oldDelegate.compact != compact ||
       oldDelegate.mode != mode ||
       oldDelegate.showPoints != showPoints ||
       oldDelegate.stacked != stacked ||
+      !listEquals(oldDelegate.xLabels, xLabels) ||
+      !listEquals(oldDelegate.yLabels, yLabels) ||
+      oldDelegate.xDivisions != xDivisions ||
+      oldDelegate.yDivisions != yDivisions ||
       oldDelegate.hoveredSeriesIndex != hoveredSeriesIndex ||
       oldDelegate.hoveredPointIndex != hoveredPointIndex;
+
+  /// Whether [a] and [b] paint the same thing.
+  ///
+  /// The series list is rebuilt on every build, so it is compared by value.
+  /// Labels are left out: the painter does not draw them.
+  static bool _sameSeries(
+    List<ResolvedLineSeries> a,
+    List<ResolvedLineSeries> b,
+  ) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      final x = a[i];
+      final y = b[i];
+      if (x.color != y.color ||
+          x.strokeWidth != y.strokeWidth ||
+          x.dashed != y.dashed ||
+          x.fill != y.fill ||
+          x.fillOpacity != y.fillOpacity ||
+          !_samePoints(x.points, y.points)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static bool _samePoints(List<OiLinePoint> a, List<OiLinePoint> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].x != b[i].x || a[i].y != b[i].y) return false;
+    }
+    return true;
+  }
 }

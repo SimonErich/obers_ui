@@ -394,10 +394,12 @@ class _OiPolarAreaPainter<T> extends CustomPainter {
           textDirection: TextDirection.ltr,
         )..layout();
 
-        tp.paint(
-          canvas,
-          Offset(labelPos.dx - tp.width / 2, labelPos.dy - tp.height / 2),
-        );
+        tp
+          ..paint(
+            canvas,
+            Offset(labelPos.dx - tp.width / 2, labelPos.dy - tp.height / 2),
+          )
+          ..dispose();
       }
     }
   }

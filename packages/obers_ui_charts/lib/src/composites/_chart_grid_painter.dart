@@ -107,7 +107,9 @@ abstract final class OiChartGrid {
         ),
         textDirection: TextDirection.ltr,
       )..layout();
-      tp.paint(canvas, Offset(x - tp.width / 2, chartRect.bottom + 4));
+      tp
+        ..paint(canvas, Offset(x - tp.width / 2, chartRect.bottom + 4))
+        ..dispose();
     }
   }
 
@@ -130,10 +132,12 @@ abstract final class OiChartGrid {
         ),
         textDirection: TextDirection.ltr,
       )..layout();
-      tp.paint(
-        canvas,
-        Offset(chartRect.left - tp.width - 4, y - tp.height / 2),
-      );
+      tp
+        ..paint(
+          canvas,
+          Offset(chartRect.left - tp.width - 4, y - tp.height / 2),
+        )
+        ..dispose();
     }
   }
 }

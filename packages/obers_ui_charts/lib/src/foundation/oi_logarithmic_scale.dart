@@ -28,6 +28,9 @@ class OiLogarithmicScale extends OiChartScale<double> {
        assert(base > 1, 'base must be greater than 1');
 
   /// Creates an [OiLogarithmicScale] from a list of positive [values].
+  ///
+  /// NaN and infinite entries are ignored. The domain is widened to the
+  /// surrounding powers of [base].
   factory OiLogarithmicScale.fromData({
     required List<double> values,
     required double rangeMin,
@@ -35,21 +38,12 @@ class OiLogarithmicScale extends OiChartScale<double> {
     bool clamp = false,
     double base = 10,
   }) {
-    if (values.isEmpty) {
-      return OiLogarithmicScale(
-        domainMin: 1,
-        domainMax: 10,
-        rangeMin: rangeMin,
-        rangeMax: rangeMax,
-        clamp: clamp,
-        base: base,
-      );
-    }
-    final positive = values.where((v) => v > 0);
+    final finite = values.where((v) => v.isFinite).toList();
+    final positive = finite.where((v) => v > 0);
     assert(
-      positive.length == values.length,
-      'OiLogarithmicScale: ${values.length - positive.length} negative/zero '
-      'values were clamped. Log scales require strictly positive values.',
+      positive.length == finite.length,
+      'OiLogarithmicScale: ${finite.length - positive.length} negative/zero '
+      'values were ignored. Log scales require strictly positive values.',
     );
     if (positive.isEmpty) {
       return OiLogarithmicScale(
@@ -73,8 +67,8 @@ class OiLogarithmicScale extends OiChartScale<double> {
     }
     // Round to nearest power of base.
     final logBase = math.log(base);
-    lo = math.pow(base, (math.log(lo) / logBase).floor()).toDouble();
-    hi = math.pow(base, (math.log(hi) / logBase).ceil()).toDouble();
+    lo = math.pow(base, _tolerantFloor(math.log(lo) / logBase)).toDouble();
+    hi = math.pow(base, _tolerantCeil(math.log(hi) / logBase)).toDouble();
     return OiLogarithmicScale(
       domainMin: lo,
       domainMax: hi,
@@ -108,9 +102,21 @@ class OiLogarithmicScale extends OiChartScale<double> {
   @override
   double get atom => _logExtent == 0 ? 0 : rangeExtent.abs() / _logExtent.abs();
 
+  /// Converts a domain [value] to a pixel position.
+  ///
+  /// A logarithm is only defined for positive numbers, so a [value] that is
+  /// zero, negative or NaN has no position on this scale and yields
+  /// [double.nan]. Callers should skip such values rather than draw them.
+  /// With [clamp], zero and negative values sit at the end of the smaller
+  /// domain bound instead; NaN still yields [double.nan].
   @override
   double toPixel(double value) {
-    if (value <= 0 || _logExtent == 0) return rangeMin;
+    if (value.isNaN) return double.nan;
+    if (value <= 0) {
+      if (!clamp) return double.nan;
+      return domainMin <= domainMax ? rangeMin : rangeMax;
+    }
+    if (_logExtent == 0) return rangeMin;
     final t = (_logOf(value) - _logMin) / _logExtent;
     return clampPixel(rangeMin + t * rangeExtent);
   }
@@ -122,22 +128,81 @@ class OiLogarithmicScale extends OiChartScale<double> {
     return math.pow(base, _logMin + t * _logExtent).toDouble();
   }
 
+  /// Generates at most [count] ticks at human-friendly positions.
+  ///
+  /// Starts from the powers of [base] inside the domain. When there are
+  /// more of them than [count], they are thinned to [count] ticks spread
+  /// as evenly as possible, always keeping the lowest and the highest.
+  /// When there is room left, sub-decade multiples (1-2-5 for base 10, then
+  /// every integer multiple) are added, which also covers a domain that
+  /// lies inside a single decade.
   @override
   List<OiTick<double>> buildTicks({int count = 5}) {
-    final ticks = <OiTick<double>>[];
-    final startExp = (math.log(domainMin) / _logBase).floor();
-    final endExp = (math.log(domainMax) / _logBase).ceil();
+    if (count < 1) return const [];
+    if (!domainMin.isFinite || !domainMax.isFinite) return const [];
 
-    for (var exp = startExp; exp <= endExp; exp++) {
-      final value = math.pow(base, exp).toDouble();
-      if (value >= domainMin && value <= domainMax) {
-        ticks.add(OiTick(value: value, position: toPixel(value)));
+    final startExp = _tolerantFloor(_logMin);
+    final endExp = _tolerantCeil(_logMax);
+
+    var values = _multiples(startExp, endExp, const [1]);
+    if (values.length <= count) {
+      final everyMultiple = [for (var m = 1; m < base; m++) m];
+      final candidates = [
+        if (base == 10) _multiples(startExp, endExp, const [1, 2, 5]),
+        _multiples(startExp, endExp, everyMultiple),
+      ];
+      for (final candidate in candidates) {
+        if (candidate.length <= count || values.isEmpty) values = candidate;
       }
     }
-    if (ticks.isEmpty) {
-      ticks.add(OiTick(value: domainMin, position: toPixel(domainMin)));
+    values = _thin(values, count);
+    if (values.isEmpty) {
+      values = [domainMin, if (count > 1 && domainMax != domainMin) domainMax];
     }
-    return ticks;
+    return [for (final v in values) OiTick(value: v, position: toPixel(v))];
+  }
+
+  /// Reduces [values] to at most [count] entries spread as evenly as their
+  /// number allows, keeping the first and (for more than one) the last.
+  static List<double> _thin(List<double> values, int count) {
+    if (values.length <= count) return values;
+    if (count == 1) return [values.first];
+    final last = values.length - 1;
+    return [
+      for (var i = 0; i < count; i++) values[(i * last / (count - 1)).round()],
+    ];
+  }
+
+  /// Every `multiplier * base^exp` inside the domain, in ascending order.
+  List<double> _multiples(int startExp, int endExp, List<int> multipliers) {
+    // Tolerate rounding in `pow`, so a bound that is itself a multiple is
+    // kept.
+    final lo = domainMin * (1 - 1e-9);
+    final hi = domainMax * (1 + 1e-9);
+    final result = <double>[];
+    for (var exp = startExp; exp <= endExp; exp++) {
+      final power = math.pow(base, exp).toDouble();
+      for (final m in multipliers) {
+        final value = m * power;
+        if (value >= lo && value <= hi) result.add(value);
+      }
+    }
+    return result;
+  }
+
+  /// Floors [value], treating a result within rounding error of an integer
+  /// as that integer (`log(1000) / ln10` is `2.9999999999999996`).
+  static int _tolerantFloor(double value) {
+    final nearest = value.roundToDouble();
+    if ((value - nearest).abs() < 1e-9) return nearest.toInt();
+    return value.floor();
+  }
+
+  /// Ceils [value] with the same tolerance as [_tolerantFloor].
+  static int _tolerantCeil(double value) {
+    final nearest = value.roundToDouble();
+    if ((value - nearest).abs() < 1e-9) return nearest.toInt();
+    return value.ceil();
   }
 
   @override

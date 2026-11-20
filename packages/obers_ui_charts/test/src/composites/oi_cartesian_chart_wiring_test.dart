@@ -54,6 +54,35 @@ void main() {
       controller.dispose();
     });
 
+    testWidgets(
+      'persistence: a series the controller already hides stays hidden',
+      (tester) async {
+        final controller = OiDefaultChartController()..toggleSeries('s2');
+        addTearDown(controller.dispose);
+        expect(controller.legendState.isVisible('s2'), isFalse);
+
+        await tester.pumpChartApp(
+          SizedBox(
+            width: 400,
+            height: 300,
+            child: OiCartesianChart<_Point>(
+              label: 'Test',
+              series: [
+                _makeSeries(),
+                _makeSeries(id: 's2'),
+              ],
+              controller: controller,
+              settings: const OiChartSettings(hiddenSeriesIds: {'s2'}),
+            ),
+          ),
+          surfaceSize: const Size(400, 300),
+        );
+
+        expect(controller.legendState.isVisible('s2'), isFalse);
+        expect(controller.legendState.isVisible('s1'), isTrue);
+      },
+    );
+
     testWidgets('persistence: restores viewport from settings', (tester) async {
       final controller = OiDefaultChartController();
       const settings = OiChartSettings(
@@ -137,11 +166,165 @@ void main() {
 
       await streamController.close();
     });
+
+    group('streaming: sources swapped after mount', () {
+      OiCartesianSeries<_Point> liveSeries(
+        String id,
+        OiStreamingDataSource<_Point>? source,
+      ) {
+        return OiCartesianSeries<_Point>(
+          id: id,
+          label: id,
+          data: source == null ? const [_Point(1, 1)] : null,
+          streamingSource: source,
+          xMapper: (p) => p.x,
+          yMapper: (p) => p.y,
+        );
+      }
+
+      Future<void> pump(
+        WidgetTester tester,
+        List<OiCartesianSeries<_Point>> series,
+      ) {
+        return tester.pumpChartApp(
+          SizedBox(
+            width: 400,
+            height: 300,
+            child: OiCartesianChart<_Point>(label: 'Streaming', series: series),
+          ),
+          surfaceSize: const Size(400, 300),
+        );
+      }
+
+      testWidgets('a replaced source is subscribed and the old one released', (
+        tester,
+      ) async {
+        final first = StreamController<List<_Point>>();
+        final second = StreamController<List<_Point>>();
+        _closeLater(first);
+        _closeLater(second);
+
+        await pump(tester, [
+          liveSeries('live', _TestStreamingSource(first.stream)),
+        ]);
+        expect(first.hasListener, isTrue);
+
+        await pump(tester, [
+          liveSeries('live', _TestStreamingSource(second.stream)),
+        ]);
+        expect(second.hasListener, isTrue);
+        expect(first.hasListener, isFalse);
+      });
+
+      testWidgets('an unchanged source keeps its subscription', (tester) async {
+        var keptListens = 0;
+        final kept = StreamController<List<_Point>>(
+          onListen: () => keptListens++,
+        );
+        final first = StreamController<List<_Point>>();
+        final second = StreamController<List<_Point>>();
+        _closeLater(kept);
+        _closeLater(first);
+        _closeLater(second);
+        final keptSource = _TestStreamingSource(kept.stream);
+
+        await pump(tester, [
+          liveSeries('kept', keptSource),
+          liveSeries('swapped', _TestStreamingSource(first.stream)),
+        ]);
+        await pump(tester, [
+          liveSeries('kept', keptSource),
+          liveSeries('swapped', _TestStreamingSource(second.stream)),
+        ]);
+
+        expect(second.hasListener, isTrue);
+        expect(kept.hasListener, isTrue);
+        expect(keptListens, 1);
+      });
+
+      testWidgets(
+        'a new source object on the same stream keeps its subscription',
+        (tester) async {
+          // Single subscription: listening again would throw.
+          var listens = 0;
+          final stream = StreamController<List<_Point>>(
+            onListen: () => listens++,
+          );
+          _closeLater(stream);
+
+          await pump(tester, [
+            liveSeries('live', _TestStreamingSource(stream.stream)),
+          ]);
+          await pump(tester, [
+            liveSeries('live', _TestStreamingSource(stream.stream)),
+          ]);
+
+          expect(tester.takeException(), isNull);
+          expect(stream.hasListener, isTrue);
+          expect(listens, 1);
+        },
+      );
+
+      testWidgets('the same stream with other settings resubscribes', (
+        tester,
+      ) async {
+        var listens = 0;
+        final stream = StreamController<List<_Point>>.broadcast(
+          onListen: () => listens++,
+        );
+        _closeLater(stream);
+
+        await pump(tester, [
+          liveSeries('live', _TestStreamingSource(stream.stream)),
+        ]);
+        await pump(tester, [
+          liveSeries(
+            'live',
+            _TestStreamingSource(stream.stream, maxRetainedPoints: 5),
+          ),
+        ]);
+
+        expect(listens, 2);
+        expect(stream.hasListener, isTrue);
+      });
+
+      testWidgets('a source added after mount is subscribed', (tester) async {
+        final added = StreamController<List<_Point>>();
+        _closeLater(added);
+
+        await pump(tester, [liveSeries('live', null)]);
+        await pump(tester, [
+          liveSeries('live', _TestStreamingSource(added.stream)),
+        ]);
+
+        expect(added.hasListener, isTrue);
+      });
+
+      testWidgets('a removed source is released', (tester) async {
+        final removed = StreamController<List<_Point>>();
+        _closeLater(removed);
+
+        await pump(tester, [
+          liveSeries('live', _TestStreamingSource(removed.stream)),
+        ]);
+        await pump(tester, [liveSeries('live', null)]);
+
+        expect(removed.hasListener, isFalse);
+      });
+    });
   });
 }
 
+/// Closes [controller] when the test ends.
+///
+/// The close future of a controller that was never listened to (or whose
+/// listener is gone) never completes, so it must not be awaited.
+void _closeLater(StreamController<List<_Point>> controller) {
+  addTearDown(() => unawaited(controller.close()));
+}
+
 class _TestStreamingSource extends OiStreamingDataSource<_Point> {
-  _TestStreamingSource(this._stream);
+  _TestStreamingSource(this._stream, {this.maxRetainedPoints = 100});
 
   final Stream<List<_Point>> _stream;
 
@@ -149,8 +332,7 @@ class _TestStreamingSource extends OiStreamingDataSource<_Point> {
   Stream<List<_Point>> get dataStream => _stream;
 
   @override
-  @override
-  int get maxRetainedPoints => 100;
+  final int maxRetainedPoints;
 
   @override
   Duration get updateInterval => Duration.zero;

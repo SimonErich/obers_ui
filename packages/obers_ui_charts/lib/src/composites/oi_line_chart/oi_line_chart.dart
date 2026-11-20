@@ -3,10 +3,12 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
+import 'package:obers_ui_charts/src/composites/_chart_nice_axis.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_accessibility.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_data.dart';
+import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_layout.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_legend.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_theme.dart';
@@ -289,87 +291,19 @@ class _OiLineChartState extends State<OiLineChart> {
         : OiChartInteractionMode.pointer;
   }
 
-  ({double minX, double maxX, double minY, double maxY}) _computeRange() {
-    var minX = double.infinity;
-    var maxX = double.negativeInfinity;
-    var minY = double.infinity;
-    var maxY = double.negativeInfinity;
-
-    if (widget.stacked) {
-      // For stacked, compute cumulative max.
-      final xValues = <double>{};
-      for (final s in widget.series) {
-        for (final p in s.points) {
-          xValues.add(p.x);
-          minX = math.min(minX, p.x);
-          maxX = math.max(maxX, p.x);
-        }
-      }
-      for (final x in xValues) {
-        var cumY = 0.0;
-        for (final s in widget.series) {
-          for (final p in s.points) {
-            if (p.x == x) cumY += p.y;
-          }
-        }
-        minY = math.min(minY, 0);
-        maxY = math.max(maxY, cumY);
-      }
-    } else {
-      for (final s in widget.series) {
-        for (final p in s.points) {
-          minX = math.min(minX, p.x);
-          maxX = math.max(maxX, p.x);
-          minY = math.min(minY, p.y);
-          maxY = math.max(maxY, p.y);
-        }
-      }
-    }
-
+  /// The data range with any explicit axis bounds applied.
+  ///
+  /// Non-finite data points are ignored.
+  OiLineChartRange _computeRange() {
+    final data = computeLineChartRange([
+      for (final s in widget.series) s.points,
+    ], stacked: widget.stacked);
     return (
-      minX: widget.xAxis?.min ?? minX,
-      maxX: widget.xAxis?.max ?? maxX,
-      minY: widget.yAxis?.min ?? minY,
-      maxY: widget.yAxis?.max ?? maxY,
+      minX: widget.xAxis?.min ?? data.minX,
+      maxX: widget.xAxis?.max ?? data.maxX,
+      minY: widget.yAxis?.min ?? data.minY,
+      maxY: widget.yAxis?.max ?? data.maxY,
     );
-  }
-
-  ({int seriesIndex, int pointIndex})? _findNearestPoint(
-    Offset position,
-    Rect chartRect,
-    double minX,
-    double maxX,
-    double minY,
-    double maxY,
-  ) {
-    const hitRadius = 20.0;
-    final rangeX = maxX - minX == 0 ? 1.0 : maxX - minX;
-    final rangeY = maxY - minY == 0 ? 1.0 : maxY - minY;
-
-    var bestDist = double.infinity;
-    int? bestSi;
-    int? bestPi;
-
-    for (var si = 0; si < widget.series.length; si++) {
-      final series = widget.series[si];
-      for (var pi = 0; pi < series.points.length; pi++) {
-        final point = series.points[pi];
-        final px = chartRect.left + chartRect.width * (point.x - minX) / rangeX;
-        final py =
-            chartRect.bottom - chartRect.height * (point.y - minY) / rangeY;
-        final dist = (Offset(px, py) - position).distance;
-        if (dist < hitRadius && dist < bestDist) {
-          bestDist = dist;
-          bestSi = si;
-          bestPi = pi;
-        }
-      }
-    }
-
-    if (bestSi != null) {
-      return (seriesIndex: bestSi, pointIndex: bestPi!);
-    }
-    return null;
   }
 
   @override
@@ -409,7 +343,7 @@ class _OiLineChartState extends State<OiLineChart> {
 
           final isCompact = widget.compact ?? (w < _compactThreshold);
           final mode = _resolveInteractionMode(context);
-          final range = _computeRange();
+          final dataRange = _computeRange();
           final chartSize = Size(
             w,
             math.min(h, isCompact ? w * 0.6 : w * 0.75),
@@ -444,6 +378,29 @@ class _OiLineChartState extends State<OiLineChart> {
           // Generate axis labels.
           final xDiv = widget.xAxis?.divisions ?? (isCompact ? 3 : 5);
           final yDiv = widget.yAxis?.divisions ?? (isCompact ? 3 : 5);
+
+          // The y-axis gets round tick values unless the caller supplied
+          // labels or a range that no round axis fits.
+          final yAxis = widget.yAxis ?? const OiChartAxis<num>();
+          final niceY = yAxis.labels == null
+              ? resolveNiceAxis(
+                  dataMin: dataRange.minY,
+                  dataMax: dataRange.maxY,
+                  divisions: yDiv,
+                  pinnedMin: yAxis.min,
+                  pinnedMax: yAxis.max,
+                )
+              : null;
+          final range = niceY == null
+              ? dataRange
+              : (
+                  minX: dataRange.minX,
+                  maxX: dataRange.maxX,
+                  minY: niceY.min,
+                  maxY: niceY.max,
+                );
+          final yDivisions = niceY == null ? yDiv : niceY.ticks.length - 1;
+
           final rX = range.maxX - range.minX;
           final rY = range.maxY - range.minY;
           final xLabels =
@@ -454,14 +411,37 @@ class _OiLineChartState extends State<OiLineChart> {
                   range.minX + (rX == 0 ? 0 : rX * i / xDiv),
                 ),
               );
-          final yLabels =
-              widget.yAxis?.labels ??
-              List.generate(
-                yDiv + 1,
-                (i) => (widget.yAxis ?? const OiChartAxis()).formatValue(
-                  range.minY + (rY == 0 ? 0 : rY * i / yDiv),
-                ),
-              );
+          final List<String> yLabels;
+          if (yAxis.labels != null) {
+            yLabels = yAxis.labels!;
+          } else if (niceY != null) {
+            yLabels = yAxis.format != null
+                ? [for (final tick in niceY.ticks) yAxis.format!(tick)]
+                : formatNiceTicks(niceY.ticks);
+          } else {
+            yLabels = List.generate(
+              yDiv + 1,
+              (i) =>
+                  yAxis.formatValue(range.minY + (rY == 0 ? 0 : rY * i / yDiv)),
+            );
+          }
+
+          // Painter and hit-testing share one layout, so a point is hit
+          // where it is drawn (stack offsets included).
+          ({int seriesIndex, int pointIndex})? findPoint(Offset position) {
+            return findNearestLinePoint(
+              position,
+              layoutLineSeries(
+                [for (final s in widget.series) s.points],
+                chartRect: chartRect,
+                minX: range.minX,
+                maxX: range.maxX,
+                minY: range.minY,
+                maxY: range.maxY,
+                stacked: widget.stacked,
+              ),
+            );
+          }
 
           final chartWidget = SizedBox(
             key: const Key('oi_line_chart_canvas'),
@@ -489,7 +469,7 @@ class _OiLineChartState extends State<OiLineChart> {
                 xLabels: xLabels,
                 yLabels: yLabels,
                 xDivisions: xDiv,
-                yDivisions: yDiv,
+                yDivisions: yDivisions,
                 hoveredSeriesIndex: hoverSi,
                 hoveredPointIndex: hoverPi,
               ),
@@ -503,14 +483,7 @@ class _OiLineChartState extends State<OiLineChart> {
               key: const Key('oi_line_chart_touch'),
               behavior: HitTestBehavior.opaque,
               onTapDown: (d) {
-                final hit = _findNearestPoint(
-                  d.localPosition,
-                  chartRect,
-                  range.minX,
-                  range.maxX,
-                  range.minY,
-                  range.maxY,
-                );
+                final hit = findPoint(d.localPosition);
                 if (hit != null) {
                   setState(() {
                     _selectedSeriesIndex = hit.seriesIndex;
@@ -525,14 +498,7 @@ class _OiLineChartState extends State<OiLineChart> {
             interactiveChart = MouseRegion(
               key: const Key('oi_line_chart_pointer'),
               onHover: (e) {
-                final hit = _findNearestPoint(
-                  e.localPosition,
-                  chartRect,
-                  range.minX,
-                  range.maxX,
-                  range.minY,
-                  range.maxY,
-                );
+                final hit = findPoint(e.localPosition);
                 final si = hit?.seriesIndex;
                 final pi = hit?.pointIndex;
                 if (si != _hoveredSeriesIndex || pi != _hoveredPointIndex) {

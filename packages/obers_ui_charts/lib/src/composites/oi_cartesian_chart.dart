@@ -7,6 +7,7 @@ import 'package:obers_ui_charts/obers_ui_charts.dart'
 import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_error_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_loading_state.dart';
+import 'package:obers_ui_charts/src/composites/_cartesian_hit_tester.dart';
 import 'package:obers_ui_charts/src/composites/_chart_behavior_host.dart';
 import 'package:obers_ui_charts/src/composites/_chart_streaming_host.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
@@ -26,6 +27,7 @@ import 'package:obers_ui_charts/src/models/oi_chart_datum.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_series.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_state_models.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 import 'package:obers_ui_charts/src/utils/chart_math.dart';
 
@@ -91,6 +93,14 @@ class OiCartesianChart<T> extends StatefulWidget {
   ///
   /// Receives the current [OiChartViewport] and the resolved series list.
   /// If null, the chart renders only its frame (axes, grid, surface).
+  ///
+  /// Behaviors that resolve a pointer position to a data point (such as a
+  /// crosshair that snaps to the nearest point) assume the usual cartesian
+  /// layout: x and y are mapped linearly from the data extent, or from the
+  /// bounds set on [xAxis] and the first of [yAxes], onto
+  /// [OiChartViewport.plotBounds], and category x values sit at the centre
+  /// of equal bands. A builder that draws its points elsewhere will not
+  /// line up with them.
   final Widget Function(
     BuildContext context,
     OiChartViewport viewport,
@@ -157,8 +167,6 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
   OiChartViewport _viewport = const OiChartViewport(size: Size.zero);
 
   /// Cached normalized data from the last build, keyed by series id.
-  // Cached for future use by seriesBuilder once the API is exposed.
-  // ignore: unused_field
   Map<String, List<OiChartDatum>> _lastNormalizedData = const {};
 
   // ── ChartBehaviorHost overrides ──────────────────────────────────────
@@ -175,7 +183,7 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
   @override
   OiChartHitTester get hitTester => _hitTester;
 
-  final OiChartHitTester _hitTester = NoOpHitTester();
+  final OiCartesianChartHitTester _hitTester = OiCartesianChartHitTester();
 
   // ── ChartStreamingHost overrides ───────────────────────────────────
 
@@ -194,11 +202,14 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
     super.initState();
     attachStreamingAdapters();
     restoreSettings(widget.settings);
+    _listenToController();
   }
 
   @override
   void didUpdateWidget(covariant OiCartesianChart<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    syncStreamingAdapters();
+    _listenToController();
     if (oldWidget.behaviors != widget.behaviors ||
         oldWidget.controller != widget.controller) {
       attachBehaviors();
@@ -207,9 +218,63 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
 
   @override
   void dispose() {
+    _listenedController?.removeListener(_onControllerChanged);
+    _listenedController = null;
     detachStreamingAdapters();
     disposeBehaviorHost();
     super.dispose();
+  }
+
+  // ── Controller changes ───────────────────────────────────────────────
+
+  OiChartController? _listenedController;
+
+  /// What the last build read from the controller; see
+  /// [_onControllerChanged].
+  ({
+    OiChartLegendState legend,
+    double zoom,
+    Offset pan,
+    bool isLoading,
+    String? error,
+  })?
+  _builtFrom;
+
+  /// Follows the effective controller, also when the widget swaps it.
+  void _listenToController() {
+    final controller = effectiveController;
+    if (identical(controller, _listenedController)) return;
+    _listenedController?.removeListener(_onControllerChanged);
+    _listenedController = controller..addListener(_onControllerChanged);
+  }
+
+  ({
+    OiChartLegendState legend,
+    double zoom,
+    Offset pan,
+    bool isLoading,
+    String? error,
+  })
+  _controllerSnapshot() {
+    final controller = effectiveController;
+    return (
+      legend: controller.legendState,
+      zoom: controller.viewportState.zoomLevel,
+      pan: controller.viewportState.panOffset,
+      isLoading: controller.isLoading,
+      error: controller.error,
+    );
+  }
+
+  /// Rebuilds when the controller changed something the build reads.
+  ///
+  /// Without this a series hidden through the controller would stay on
+  /// screen and in the hit tester until the parent happened to rebuild.
+  /// Hover and selection changes also notify but are not read by the
+  /// build, so they are ignored here.
+  void _onControllerChanged() {
+    if (!mounted || _controllerSnapshot() == _builtFrom) return;
+    setState(() {});
   }
 
   // ── Series helpers ───────────────────────────────────────────────────
@@ -336,6 +401,7 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
   @override
   Widget build(BuildContext context) {
     final ctrl = effectiveController;
+    _builtFrom = _controllerSnapshot();
     final isLoading = ctrl.isLoading;
     final error = ctrl.error;
 
@@ -396,6 +462,19 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
 
           // Normalize series data through the foundation pipeline.
           _lastNormalizedData = _applyDecimation(_normalizeVisibleSeries());
+
+          // Keep the hit tester in step with what is on screen. Behaviors
+          // hold on to it, so it is updated in place.
+          final yAxis = widget.yAxes?.firstOrNull;
+          _hitTester.update(
+            data: _lastNormalizedData,
+            seriesIds: [for (final s in widget.series) s.id],
+            viewport: _viewport,
+            xMin: widget.xAxis?.min,
+            xMax: widget.xAxis?.max,
+            yMin: yAxis?.min,
+            yMax: yAxis?.max,
+          );
 
           // Attach behaviors and sync now that we have a valid context.
           if (behaviors.isNotEmpty && behaviors.any((b) => !b.isAttached)) {

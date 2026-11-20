@@ -1,5 +1,7 @@
 // Tests do not require documentation comments.
 
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
@@ -177,5 +179,130 @@ void main() {
       _pieChart(interactionMode: OiChartInteractionMode.pointer),
     );
     expect(find.byKey(const Key('oi_pie_chart_pointer')), findsOneWidget);
+  });
+
+  // ── Invalid segment values ──────────────────────────────────────────────────
+
+  group('invalid segment values', () {
+    // Donut mode draws each segment with drawArc, which the paints matcher
+    // can observe.
+    Widget donut(List<OiPieSegment> segments) => _pieChart(
+      segments: segments,
+      donut: true,
+      showLabels: false,
+      showPercentages: false,
+    );
+
+    final painter = find.byKey(const Key('oi_pie_chart_painter'));
+
+    testWidgets('a negative segment takes no share of the circle', (
+      tester,
+    ) async {
+      await tester.pumpChartApp(
+        donut(const [
+          OiPieSegment(label: 'a', value: 10),
+          OiPieSegment(label: 'b', value: -5),
+        ]),
+      );
+
+      expect(painter, paints..arc(sweepAngle: 2 * math.pi));
+      expect(
+        painter,
+        isNot(
+          paints
+            ..arc()
+            ..arc(),
+        ),
+      );
+    });
+
+    testWidgets('a NaN segment takes no share of the circle', (tester) async {
+      await tester.pumpChartApp(
+        donut(const [
+          OiPieSegment(label: 'a', value: 10),
+          OiPieSegment(label: 'b', value: double.nan),
+          OiPieSegment(label: 'c', value: 10),
+        ]),
+      );
+
+      expect(
+        painter,
+        paints
+          ..arc(sweepAngle: math.pi)
+          ..arc(sweepAngle: math.pi),
+      );
+      expect(
+        painter,
+        isNot(
+          paints
+            ..arc()
+            ..arc()
+            ..arc(),
+        ),
+      );
+    });
+
+    testWidgets('an infinite segment takes no share of the circle', (
+      tester,
+    ) async {
+      await tester.pumpChartApp(
+        donut(const [
+          OiPieSegment(label: 'a', value: 10),
+          OiPieSegment(label: 'b', value: double.infinity),
+        ]),
+      );
+
+      expect(painter, paints..arc(sweepAngle: 2 * math.pi));
+      expect(tester.takeException(), isNull);
+    });
+
+    /// Taps at [angle] radians clockwise from the top of the pie.
+    Future<void> tapAtAngle(WidgetTester tester, double angle) async {
+      final center = tester.getCenter(
+        find.byKey(const Key('oi_pie_chart_touch')),
+      );
+      await tester.tapAt(
+        center + Offset(math.sin(angle), -math.cos(angle)) * 100,
+      );
+    }
+
+    testWidgets('hit-testing skips a negative segment', (tester) async {
+      final taps = <int>[];
+      await tester.pumpChartApp(
+        _pieChart(
+          segments: const [
+            OiPieSegment(label: 'a', value: 10),
+            OiPieSegment(label: 'b', value: -5),
+            OiPieSegment(label: 'c', value: 10),
+          ],
+          interactionMode: OiChartInteractionMode.touch,
+          onSegmentTap: taps.add,
+        ),
+      );
+
+      // a covers the right half, c the left half.
+      await tapAtAngle(tester, 0.5 * math.pi);
+      await tapAtAngle(tester, 1.2 * math.pi);
+      expect(taps, [0, 2]);
+    });
+
+    testWidgets('hit-testing skips a NaN segment', (tester) async {
+      final taps = <int>[];
+      await tester.pumpChartApp(
+        _pieChart(
+          segments: const [
+            OiPieSegment(label: 'a', value: 10),
+            OiPieSegment(label: 'b', value: double.nan),
+            OiPieSegment(label: 'c', value: 10),
+          ],
+          interactionMode: OiChartInteractionMode.touch,
+          onSegmentTap: taps.add,
+        ),
+      );
+
+      await tapAtAngle(tester, 0.5 * math.pi);
+      await tapAtAngle(tester, 1.5 * math.pi);
+      expect(taps, [0, 2]);
+    });
   });
 }

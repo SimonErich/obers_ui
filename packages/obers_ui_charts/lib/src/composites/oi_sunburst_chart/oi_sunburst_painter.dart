@@ -151,10 +151,12 @@ class OiSunburstPainter extends CustomPainter {
         maxLines: 1,
       )..layout(maxWidth: ringWidth * 2);
 
-      tp.paint(
-        canvas,
-        Offset(labelPos.dx - tp.width / 2, labelPos.dy - tp.height / 2),
-      );
+      tp
+        ..paint(
+          canvas,
+          Offset(labelPos.dx - tp.width / 2, labelPos.dy - tp.height / 2),
+        )
+        ..dispose();
     }
   }
 
