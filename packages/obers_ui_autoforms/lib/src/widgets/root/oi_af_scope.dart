@@ -13,6 +13,7 @@ class OiAfScope extends InheritedWidget {
     required this.rawController,
     required this.messageResolver,
     required super.child,
+    this.enabled = true,
     super.key,
   });
 
@@ -22,6 +23,13 @@ class OiAfScope extends InheritedWidget {
 
   /// Resolver for default validation messages when validators omit `message`.
   final OiAfMessageResolver messageResolver;
+
+  /// Whether the form was enabled when this scope was built.
+  ///
+  /// Read the live state from the controller. This copy only exists so that
+  /// widgets depending on the scope rebuild when the form's `enabled` prop
+  /// changes, also when they sit in a `const` subtree.
+  final bool enabled;
 
   /// Retrieve the nearest [OiAfController] from the widget tree.
   static OiAfController<TField, Object?> of<TField extends Enum, TData>(
@@ -59,6 +67,7 @@ class OiAfScope extends InheritedWidget {
   @override
   bool updateShouldNotify(OiAfScope oldWidget) {
     return rawController != oldWidget.rawController ||
-        messageResolver != oldWidget.messageResolver;
+        messageResolver != oldWidget.messageResolver ||
+        enabled != oldWidget.enabled;
   }
 }

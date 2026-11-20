@@ -232,10 +232,10 @@ void main() {
       expect(ctrl.get<String>(_F.email), isNull);
     });
 
-    test('cycle detection: assert fires for circular dependencies', () {
+    test('cycle detection: throws for circular dependencies', () {
       // The controller constructor calls defineFields then _buildDependencyGraph
-      // which detects cycles and fires an assertion.
-      expect(_CycleCtrl.new, throwsA(isA<AssertionError>()));
+      // which detects cycles and throws, in release builds too.
+      expect(_CycleCtrl.new, throwsStateError);
     });
   });
 }

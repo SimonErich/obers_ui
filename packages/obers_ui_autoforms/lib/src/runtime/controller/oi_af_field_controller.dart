@@ -24,6 +24,14 @@ enum OiAfFieldValidationPhase {
   activelyEditing,
 }
 
+/// The arguments of a validation run, kept so an interrupted run can start
+/// over with the same ones.
+typedef _OiAfValidationRun<TField extends Enum> = ({
+  OiAfValidateMode effectiveMode,
+  OiAfReader<TField> form,
+  OiAfValidationTrigger trigger,
+});
+
 /// Per-field runtime controller.
 ///
 /// Stores values as [Object?] internally. Widget binders access typed values
@@ -61,7 +69,23 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
   final List<String> _backendErrors = [];
   final List<String> _runtimeErrors = [];
 
+  /// Bumped whenever a validation starts or an in-flight one becomes stale
+  /// (new value, hidden, disabled, reset, disposed). A run only applies its
+  /// result while its own version is still the current one.
   int _validationVersion = 0;
+
+  /// The arguments of the run in flight, or null when none is.
+  _OiAfValidationRun<TField>? _activeRun;
+
+  /// Completes when the run in flight finishes or is cancelled, so superseded
+  /// runs can wait for the outcome instead of reporting one of their own.
+  Completer<void>? _validationSettled;
+
+  /// Whether the last completed run judged the value and state the field has
+  /// now. Everything that makes a run in flight stale clears it as well.
+  bool _validationCurrent = false;
+
+  bool _disposed = false;
 
   String? _displayLabel;
   FocusNode? registeredFocusNode;
@@ -120,6 +144,18 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
   /// Whether an async validation is in progress.
   bool get isValidating => _isValidating;
 
+  /// Whether the field has a validation verdict for its current value.
+  ///
+  /// False before the first validation, while one is running, and after
+  /// anything that made the last verdict stale: a new value, the field being
+  /// hidden or disabled, a reset or a rebase. A submit only goes ahead once
+  /// this holds for every visible and enabled field.
+  bool get isValidationCurrent => _validationCurrent && !_isValidating;
+
+  /// Whether the validators left errors on the field (backend and runtime
+  /// errors not counted).
+  bool get hasValidationErrors => _validationErrors.isNotEmpty;
+
   /// Whether this field has any errors.
   bool get hasErrors => !isValid;
 
@@ -159,9 +195,13 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
     bool fromUser = true,
     bool notify = true,
   }) {
-    if (_valuesEqual(value, _value) && !(markTouched && !_isTouched)) {
+    final valueChanged = !_valuesEqual(value, _value);
+    if (!valueChanged && !(markTouched && !_isTouched)) {
       return;
     }
+
+    // A validation still running was started for the old value.
+    final interrupted = valueChanged ? _cancelValidation() : null;
 
     _value = value;
 
@@ -190,6 +230,10 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
     if (notify) notifyListeners();
 
     onValueChanged?.call(_definition.field, fromUser: fromUser);
+
+    // Whoever awaits the interrupted run (a submit, for one) needs a verdict
+    // on the new value, also when the change itself did not trigger one.
+    _restartValidation(interrupted);
   }
 
   /// Notifies this field's listeners without mutating any state.
@@ -221,6 +265,7 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
     if (_isEnabled == enabled) return;
     _isEnabled = enabled;
     if (!enabled && _definition.skipValidationWhenDisabled) {
+      _cancelValidation();
       _validationErrors.clear();
     }
     if (notify) notifyListeners();
@@ -229,7 +274,11 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
   void setVisible({required bool visible, bool notify = true}) {
     if (_isVisible == visible) return;
     _isVisible = visible;
+    _OiAfValidationRun<TField>? interrupted;
     if (!visible) {
+      if (_definition.excludeWhenHidden || _definition.clearValueWhenHidden) {
+        interrupted = _cancelValidation();
+      }
       if (_definition.excludeWhenHidden) {
         _validationErrors.clear();
         _backendErrors.clear();
@@ -243,6 +292,9 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
       }
     }
     if (notify) notifyListeners();
+    // Only starts a run when the field is still validated while hidden and
+    // its value was just cleared; otherwise validate() returns right away.
+    _restartValidation(interrupted);
   }
 
   // ── Errors ─────────────────────────────────────────────────────────────
@@ -324,13 +376,21 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
   }
 
   /// Run validation using the definition's validators.
+  ///
+  /// Resolves to whether the field passed. A run that is overtaken, by a
+  /// newer [validate] call or by the value changing underneath it, never
+  /// applies its own result: it waits for the validation that replaced it and
+  /// resolves to that outcome. A run cancelled without a replacement resolves
+  /// to `true` when the field is skipped anyway (hidden or disabled), and to
+  /// `false` otherwise (reset, rebased, disposed, or hidden and shown again):
+  /// nothing has judged the value the field holds now, see
+  /// [isValidationCurrent].
   Future<bool> validate({
     required OiAfValidateMode effectiveMode,
     required OiAfReader<TField> form,
     OiAfValidationTrigger trigger = OiAfValidationTrigger.manual,
   }) async {
-    if (!_isVisible && _definition.excludeWhenHidden) return true;
-    if (!_isEnabled && _definition.skipValidationWhenDisabled) return true;
+    if (_skipsValidation) return true;
     if (!shouldValidateForTrigger(trigger, effectiveMode)) {
       return isValid;
     }
@@ -338,6 +398,9 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
     _validationVersion++;
     final version = _validationVersion;
     _isValidating = true;
+    _validationCurrent = false;
+    _activeRun = (effectiveMode: effectiveMode, form: form, trigger: trigger);
+    _validationSettled ??= Completer<void>();
     notifyListeners();
 
     final errors = <String>[];
@@ -358,11 +421,7 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
       final validators = (_definition as dynamic).validators as List;
       for (var i = 0; i < validators.length; i++) {
         final validator = validators[i] as Function;
-        if (version != _validationVersion) {
-          _isValidating = false;
-          notifyListeners();
-          return false;
-        }
+        if (version != _validationVersion) return _settledResult();
 
         // Check for bail sentinel
         if (identical(validator, OiAfValidators.bail)) {
@@ -384,11 +443,7 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
             messages: validationMessagesGetter?.call(),
           );
           final result = await (validator as dynamic)(ctx) as String?;
-          if (version != _validationVersion) {
-            _isValidating = false;
-            notifyListeners();
-            return false;
-          }
+          if (version != _validationVersion) return _settledResult();
           if (result != null) errors.add(result);
         } on Object catch (e, st) {
           errors.add(_resolveValidationFailed());
@@ -397,16 +452,65 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
       }
     }
 
-    if (version == _validationVersion) {
-      _validationErrors
-        ..clear()
-        ..addAll(errors);
-      _isValidating = false;
-      observerGetter?.call()?.onFieldValidated(_definition.field, errors);
-      notifyListeners();
-    }
+    if (version != _validationVersion) return _settledResult();
+
+    _validationErrors
+      ..clear()
+      ..addAll(errors);
+    _endValidation();
+    _validationCurrent = true;
+    observerGetter?.call()?.onFieldValidated(_definition.field, errors);
+    notifyListeners();
 
     return errors.isEmpty;
+  }
+
+  /// Whether the field is left out of validation in its current state.
+  bool get _skipsValidation =>
+      (!_isVisible && _definition.excludeWhenHidden) ||
+      (!_isEnabled && _definition.skipValidationWhenDisabled);
+
+  /// The outcome for a run that was overtaken, once no validation is in
+  /// flight any more: the verdict of the run that replaced it. Without one
+  /// the field only passes when it is skipped; a value nobody judged does not.
+  Future<bool> _settledResult() async {
+    while (_isValidating) {
+      await _validationSettled!.future;
+    }
+    if (_skipsValidation) return true;
+    return _validationCurrent && _validationErrors.isEmpty;
+  }
+
+  /// Marks the run in flight as finished and wakes the runs waiting on it.
+  void _endValidation() {
+    _isValidating = false;
+    _activeRun = null;
+    _validationSettled?.complete();
+    _validationSettled = null;
+  }
+
+  /// Makes the last verdict and the result of a validation in flight stale.
+  ///
+  /// Returns the arguments of the cancelled run, or null when none was
+  /// running. Callers notify listeners themselves.
+  _OiAfValidationRun<TField>? _cancelValidation() {
+    _validationVersion++;
+    _validationCurrent = false;
+    final run = _activeRun;
+    if (_isValidating) _endValidation();
+    return run;
+  }
+
+  /// Starts [run] over, unless something else already started a validation.
+  void _restartValidation(_OiAfValidationRun<TField>? run) {
+    if (run == null || _isValidating || _disposed) return;
+    unawaited(
+      validate(
+        effectiveMode: run.effectiveMode,
+        form: run.form,
+        trigger: run.trigger,
+      ),
+    );
   }
 
   String? _checkRequired() {
@@ -456,7 +560,7 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
     _backendErrors.clear();
     _runtimeErrors.clear();
     _validationPhase = OiAfFieldValidationPhase.pristine;
-    _validationVersion++;
+    _cancelValidation();
     if (notify) notifyListeners();
   }
 
@@ -472,7 +576,7 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
     _backendErrors.clear();
     _runtimeErrors.clear();
     _validationPhase = OiAfFieldValidationPhase.pristine;
-    _validationVersion++;
+    _cancelValidation();
     if (notify) notifyListeners();
   }
 
@@ -491,6 +595,25 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
 
   void unregisterFocusNode(FocusNode node) {
     if (registeredFocusNode == node) registeredFocusNode = null;
+  }
+
+  // ── Disposal ───────────────────────────────────────────────────────────
+
+  /// Async validators and focus callbacks can outlive the controller, so a
+  /// notification after [dispose] is dropped instead of throwing.
+  @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _cancelValidation();
+    onValueChanged = null;
+    onFocusChanged = null;
+    super.dispose();
   }
 
   // ── Private ────────────────────────────────────────────────────────────

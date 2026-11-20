@@ -320,6 +320,11 @@ abstract final class OiAfValidators {
   };
 
   /// Valid URL format.
+  ///
+  /// The scheme must be one of [protocols]. Schemes that address a server
+  /// (http, https, ftp, ftps, ws, wss) also need a host, so `http:`,
+  /// `https:foo` and `http://` are rejected. Any other scheme, such as
+  /// `mailto`, needs something after the colon.
   static OiAfValidator<TField, String> url<TField extends Enum>({
     List<String> protocols = const ['http', 'https'],
     String? message,
@@ -327,7 +332,10 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
     final uri = Uri.tryParse(v);
-    if (uri == null || !uri.hasScheme || !protocols.contains(uri.scheme)) {
+    if (uri == null ||
+        !uri.hasScheme ||
+        !protocols.contains(uri.scheme) ||
+        !_hasUrlTarget(uri)) {
       return _oiAfMsg(
         ctx,
         englishFallback: 'Please enter a valid URL.',
@@ -562,10 +570,31 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
     final isV4 = _ipV4Regex.hasMatch(v);
-    final isV6 = v.contains(':') && RegExp(r'^[0-9a-fA-F:]+$').hasMatch(v);
-    if (v4Only && !isV4) return message ?? 'Must be an IPv4 address.';
-    if (v6Only && !isV6) return message ?? 'Must be an IPv6 address.';
-    if (!isV4 && !isV6) return message ?? 'Invalid IP address.';
+    final isV6 = !isV4 && _isIpV6(v);
+    if (v4Only && !isV4) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be an IPv4 address.',
+        message: message,
+        resolve: (r, c) => r.invalidIpV4Address(c),
+      );
+    }
+    if (v6Only && !isV6) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be an IPv6 address.',
+        message: message,
+        resolve: (r, c) => r.invalidIpV6Address(c),
+      );
+    }
+    if (!isV4 && !isV6) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Invalid IP address.',
+        message: message,
+        resolve: (r, c) => r.invalidIpAddress(c),
+      );
+    }
     return null;
   };
 
@@ -702,13 +731,23 @@ abstract final class OiAfValidators {
   };
 
   /// Must be a multiple of the given value.
+  ///
+  /// Fractional factors are compared with a tolerance for binary rounding, so
+  /// `multipleOf(0.1)` accepts 0.3. NaN, infinity and a factor of 0 fail.
   static OiAfValidator<TField, num?> multipleOf<TField extends Enum>(
     num factor, {
     String? message,
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    if (v % factor != 0) return message ?? 'Must be a multiple of $factor.';
+    if (!_isMultipleOf(v, factor)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be a multiple of $factor.',
+        message: message,
+        resolve: (r, c) => r.notMultipleOf(c, factor),
+      );
+    }
     return null;
   };
 
@@ -718,7 +757,7 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    if (v != v.toInt()) {
+    if (v is! int && (!v.isFinite || v != v.truncateToDouble())) {
       return _oiAfMsg(
         ctx,
         englishFallback: 'Must be a whole number.',
@@ -730,6 +769,11 @@ abstract final class OiAfValidators {
   };
 
   /// Must have specific decimal places.
+  ///
+  /// The places are counted on the number, not on how it prints, so `1e-7`
+  /// has seven and `0.1 + 0.2` has one. A value arrives as a number, so
+  /// trailing zeros cannot be counted: 1.50 has one place. NaN and infinity
+  /// fail.
   static OiAfValidator<TField, num?> decimal<TField extends Enum>(
     int minPlaces, {
     int? maxPlaces,
@@ -737,18 +781,26 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    final parts = v.toString().split('.');
-    final places = parts.length > 1 ? parts[1].length : 0;
-    if (places < minPlaces || (maxPlaces != null && places > maxPlaces)) {
+    final places = _decimalPlaces(v);
+    if (places == null ||
+        places < minPlaces ||
+        (maxPlaces != null && places > maxPlaces)) {
       final range = maxPlaces != null
           ? '$minPlaces to $maxPlaces'
           : '$minPlaces';
-      return message ?? 'Must have $range decimal places.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must have $range decimal places.',
+        message: message,
+        resolve: (r, c) => r.decimalPlaces(c, minPlaces, maxPlaces),
+      );
     }
     return null;
   };
 
-  /// Number of digits between min and max.
+  /// Number of digits (of the whole part) between min and max.
+  ///
+  /// NaN and infinity fail.
   static OiAfValidator<TField, num?> digitsBetween<TField extends Enum>(
     int min,
     int max, {
@@ -756,9 +808,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    final digits = v.abs().toInt().toString().length;
-    if (digits < min || digits > max) {
-      return message ?? 'Must have between $min and $max digits.';
+    final digits = v.isFinite ? v.abs().toInt().toString().length : null;
+    if (digits == null || digits < min || digits > max) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must have between $min and $max digits.',
+        message: message,
+        resolve: (r, c) => r.digitsBetween(c, min, max),
+      );
     }
     return null;
   };
@@ -968,7 +1025,12 @@ abstract final class OiAfValidators {
     final today = DateTime(now.year, now.month, now.day);
     final dateOnly = DateTime(v.year, v.month, v.day);
     if (includeToday && dateOnly.isBefore(today)) {
-      return message ?? 'Must be today or later.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be today or later.',
+        message: message,
+        resolve: (r, c) => r.dateTodayOrLater(c),
+      );
     }
     if (!includeToday && !dateOnly.isAfter(today)) {
       return _oiAfMsg(
@@ -992,7 +1054,12 @@ abstract final class OiAfValidators {
     final today = DateTime(now.year, now.month, now.day);
     final dateOnly = DateTime(v.year, v.month, v.day);
     if (includeToday && dateOnly.isAfter(today)) {
-      return message ?? 'Must be today or earlier.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be today or earlier.',
+        message: message,
+        resolve: (r, c) => r.dateTodayOrEarlier(c),
+      );
     }
     if (!includeToday && !dateOnly.isBefore(today)) {
       return _oiAfMsg(
@@ -1100,7 +1167,12 @@ abstract final class OiAfValidators {
         ? v.map((e) => e is String ? e.toLowerCase() : e).toList()
         : v;
     if (items.toSet().length != items.length) {
-      return message ?? 'All items must be unique.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'All items must be unique.',
+        message: message,
+        resolve: (r, c) => r.itemsNotDistinct(c),
+      );
     }
     return null;
   };
@@ -1174,11 +1246,68 @@ abstract final class OiAfValidators {
     return false;
   }
 
+  /// Schemes whose URLs address a server and therefore need a host.
+  static const _hostSchemes = {'http', 'https', 'ftp', 'ftps', 'ws', 'wss'};
+
+  /// Whether [uri] points at something beyond its scheme.
+  static bool _hasUrlTarget(Uri uri) {
+    if (_hostSchemes.contains(uri.scheme)) return uri.host.isNotEmpty;
+    return uri.host.isNotEmpty || uri.path.isNotEmpty;
+  }
+
+  static bool _isIpV6(String value) {
+    try {
+      Uri.parseIPv6Address(value);
+      return true;
+    } on FormatException {
+      return false;
+    }
+  }
+
+  /// The largest distance from a whole number that still counts as rounding
+  /// noise. The relative tolerance below grows with the value and would reach
+  /// half a unit, accepting every number, from about 1e14 on.
+  static const _maxIntegerTolerance = 0.01;
+
+  /// Whether [value] is a whole number once binary rounding noise (a few
+  /// units in the last place) is ignored.
+  static bool _isNearInteger(double value) {
+    if (!value.isFinite) return false;
+    final relative = value.abs() * 4e-15;
+    final tolerance = relative < _maxIntegerTolerance
+        ? relative
+        : _maxIntegerTolerance;
+    return (value - value.roundToDouble()).abs() <= tolerance;
+  }
+
+  static bool _isMultipleOf(num value, num factor) {
+    if (factor == 0 || !factor.isFinite) return false;
+    if (value is int && factor is int) return value % factor == 0;
+    return _isNearInteger(value / factor);
+  }
+
+  /// The number of decimal places of [value], or null for NaN and infinity.
+  static int? _decimalPlaces(num value) {
+    if (value is int) return 0;
+    if (!value.isFinite) return null;
+    // A double carries at most 17 significant digits; beyond roughly twenty
+    // places only subnormal values remain.
+    const maxPlaces = 24;
+    var scaled = value.toDouble();
+    for (var places = 0; places < maxPlaces; places++) {
+      if (_isNearInteger(scaled)) return places;
+      scaled *= 10;
+    }
+    return maxPlaces;
+  }
+
   static String _formatDate(DateTime date) =>
       '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
   static final _emailRegex = RegExp(
-    r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
+    // Local part: dot-separated atoms, so no leading, trailing or doubled
+    // dot. Domain: at least two labels, so a top-level domain is required.
+    r"^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)+$",
   );
 
   static final _uuidRegex = RegExp(
@@ -1192,6 +1321,7 @@ abstract final class OiAfValidators {
   );
 
   static final _ipV4Regex = RegExp(
-    r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+    // Octets are 0-255 without leading zeros (`01` reads as octal elsewhere).
+    r'^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$',
   );
 }

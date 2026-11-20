@@ -81,6 +81,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
 
   bool _initialized = false;
   bool _isAttached = false;
+  bool _disposed = false;
   bool _isEnabled = true;
   bool _isSubmitting = false;
   bool _hasSubmitted = false;
@@ -115,10 +116,27 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
 
   // ── Aggregate state ────────────────────────────────────────────────────
 
+  /// Whether every visible and enabled field is valid and there are no global
+  /// errors.
+  ///
+  /// Hidden and disabled fields are left out, because they are neither
+  /// validated nor shown. [isDirty] and [isTouched] deliberately do not make
+  /// that exception, see there.
   bool get isValid =>
       _activeFieldControllers.every((fc) => fc.isValid) &&
       _globalErrors.isEmpty;
+
+  /// Whether any registered field differs from its initial value.
+  ///
+  /// Unlike [isValid] this counts hidden and disabled fields too: a value the
+  /// user changed before the field was hidden is still an unsaved change, even
+  /// though the field no longer takes part in validation.
   bool get isDirty => _fieldControllers.values.any((fc) => fc.isDirty);
+
+  /// Whether any registered field was touched (blurred or edited by the user).
+  ///
+  /// Like [isDirty], and unlike [isValid], this counts hidden and disabled
+  /// fields too.
   bool get isTouched => _fieldControllers.values.any((fc) => fc.isTouched);
   bool get isEnabled => _isEnabled;
   bool get isSubmitting => _isSubmitting;
@@ -170,15 +188,38 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
 
   // ── Value mutation ─────────────────────────────────────────────────────
 
-  void set<TValue>(TField field, TValue? value, {bool markDirty = true}) {
+  /// Sets the value of [field] from code.
+  ///
+  /// The field becomes dirty when the value differs from its initial value
+  /// (pass `markDirty: false` to leave that alone). It is not marked touched,
+  /// because the user did not interact with it; pass `markTouched: true` to
+  /// treat the change like an edit made by the user.
+  void set<TValue>(
+    TField field,
+    TValue? value, {
+    bool markDirty = true,
+    bool markTouched = false,
+  }) {
     final fc = _fieldControllers[field];
     assert(fc != null, 'Field $field is not registered.');
-    fc!.setValue(value, markDirty: markDirty, fromUser: false);
+    fc!.setValue(
+      value,
+      markDirty: markDirty,
+      markTouched: markTouched,
+      fromUser: false,
+    );
   }
 
+  /// Sets several field values from code, as [set] does for one.
+  ///
+  /// The fields become dirty when their values differ from the initial ones.
+  /// They are not marked touched, so restoring a draft with [restore] leaves
+  /// the form untouched; pass `markTouched: true` to treat the changes like
+  /// edits made by the user.
   void patch(
     Map<TField, Object?> values, {
     bool markDirty = true,
+    bool markTouched = false,
     bool validate = false,
   }) {
     final mutated = <OiAfFieldController<TField>>[];
@@ -188,6 +229,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
         fc.setValue(
           entry.value,
           markDirty: markDirty,
+          markTouched: markTouched,
           fromUser: false,
           notify: false,
         );
@@ -199,17 +241,31 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     if (validate) unawaited(this.validate());
   }
 
+  /// Makes [values] the new initial values of their fields and clears the
+  /// dirty, touched and error state of those fields.
+  ///
+  /// Conditions are re-evaluated and derived fields recomputed from the new
+  /// values, with two exceptions: a derived field that is itself in [values]
+  /// keeps the value given there, and a derived field the user overrode
+  /// (`stopAfterUserEdit`) keeps the user's value unless [values] replaces it.
   void rebase(Map<TField, Object?> values, {bool validate = false}) {
-    final mutated = <OiAfFieldController<TField>>[];
+    final keep = <TField>{
+      ...values.keys,
+      for (final field in _depGraph.sortedOrder)
+        if (_keepsUserEdit(field)) field,
+    };
     for (final entry in values.entries) {
-      final fc = _fieldControllers[entry.key];
-      if (fc != null) {
-        fc.rebaseInitialValue(entry.value, notify: false);
-        mutated.add(fc);
-      }
+      _fieldControllers[entry.key]?.rebaseInitialValue(
+        entry.value,
+        notify: false,
+      );
     }
     _globalErrors.clear();
-    _notifyFields(mutated);
+    // New initial values can flip conditions and feed derived fields, the same
+    // as in reset().
+    _evaluateAllConditions();
+    _computeInitialDerivedFields(except: keep);
+    _notifyFields(_fieldControllers.values);
     notifyListeners();
     if (validate) unawaited(this.validate());
   }
@@ -384,17 +440,70 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
       );
     }
 
-    final results = await Future.wait(
-      _activeFieldControllers.map(
-        (fc) => fc.validate(
-          trigger: trigger,
-          effectiveMode: _effectiveValidateMode(fc.field),
-          form: this,
-        ),
-      ),
-    );
+    // These triggers validate every field whatever its mode, so the verdict
+    // can be held to the state the form is in when it is given: validators
+    // are async, and fields can change, be reset, hidden or shown meanwhile.
+    final strict =
+        trigger == OiAfValidationTrigger.submit ||
+        trigger == OiAfValidationTrigger.manual ||
+        trigger == OiAfValidationTrigger.dependencyChange;
 
-    // Form-level validators
+    var targets = _activeFieldControllers.toList();
+    for (var round = 0; round < _maxValidationRounds; round++) {
+      // Each future resolves once its field has settled: a run overtaken by a
+      // newer one (the user typing meanwhile) reports the newer outcome.
+      final results = await Future.wait(
+        targets.map(
+          (fc) => fc.validate(
+            trigger: trigger,
+            effectiveMode: _effectiveValidateMode(fc.field),
+            form: this,
+          ),
+        ),
+      );
+      if (_disposed) return false;
+
+      if (strict) {
+        // Fields without a verdict for their current value go again first.
+        targets = _fieldsAwaitingValidation();
+        if (targets.isNotEmpty) continue;
+      }
+
+      await _runFormValidators(trigger);
+      if (_disposed) return false;
+
+      if (!strict) {
+        notifyListeners();
+        return results.every((r) => r) && _globalErrors.isEmpty;
+      }
+
+      // A field can also have changed under the form-level validators.
+      targets = _fieldsAwaitingValidation();
+      if (targets.isEmpty) {
+        notifyListeners();
+        return _activeFieldControllers.every((fc) => !fc.hasValidationErrors) &&
+            _globalErrors.isEmpty;
+      }
+    }
+
+    // The fields never stood still, so nothing vouches for their values.
+    notifyListeners();
+    return false;
+  }
+
+  /// How often a form-wide validation starts over for fields that changed
+  /// under it before it gives up and reports the form invalid.
+  static const _maxValidationRounds = 10;
+
+  /// The visible and enabled fields whose current value no validation has
+  /// judged yet.
+  List<OiAfFieldController<TField>> _fieldsAwaitingValidation() {
+    return _activeFieldControllers
+        .where((fc) => !fc.isValidationCurrent)
+        .toList();
+  }
+
+  Future<void> _runFormValidators(OiAfValidationTrigger trigger) async {
     _globalErrors.clear();
     for (final validator in _formValidators) {
       try {
@@ -408,9 +517,6 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
         _globalErrors.add(_resolveValidationFailed());
       }
     }
-
-    notifyListeners();
-    return results.every((r) => r) && _globalErrors.isEmpty;
   }
 
   OiAfValidateMode _effectiveValidateMode(TField field) {
@@ -444,6 +550,17 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
 
     final isValid = await validate(trigger: OiAfValidationTrigger.submit);
 
+    if (_disposed) {
+      // The form went away while validating: nobody is left to submit for.
+      final result = OiAfSubmitFailure<TData>(
+        error: StateError('The form controller was disposed during submit.'),
+        stackTrace: StackTrace.current,
+        globalErrors: const [],
+      );
+      observer?.onSubmitCompleted(result);
+      return result;
+    }
+
     if (!isValid) {
       final result = OiAfSubmitInvalid<TData>(
         fieldErrors: getAllFieldErrors(),
@@ -464,7 +581,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
       final result = OiAfSubmitFailure<TData>(
         error: e,
         stackTrace: st,
-        globalErrors: ['Failed to build form data.'],
+        globalErrors: [_resolveBuildDataFailed()],
       );
       _lastSubmitResult = result;
       observer?.onSubmitCompleted(result);
@@ -689,6 +806,12 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
   // ═══════════════════════════════════════════════════════════════════════
 
   /// Override to define all fields for this form.
+  ///
+  /// Called from the [OiAfController] constructor. Dart runs a subclass's
+  /// field initialisers and initialising formals before that constructor body,
+  /// so `final` fields set in the declaration or the initialiser list are
+  /// available here. Only fields assigned inside the subclass constructor
+  /// *body* are not: that body runs after this method.
   @protected
   void defineFields();
 
@@ -1315,10 +1438,19 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     );
   }
 
-  void _computeInitialDerivedFields() {
+  /// Whether [field] is a derived field holding a value the user typed over
+  /// the derived one, which a recomputation must leave alone.
+  bool _keepsUserEdit(TField field) {
+    return _fieldControllers[field]!.hasUserEdited &&
+        _definitions[field]!.derivedOverrideMode ==
+            OiAfDerivedOverrideMode.stopAfterUserEdit;
+  }
+
+  void _computeInitialDerivedFields({Set<TField> except = const {}}) {
     // Use topologically sorted order so dependencies are computed before
     // their dependents.
     for (final field in _depGraph.sortedOrder) {
+      if (except.contains(field)) continue;
       final def = _definitions[field]!;
       if (def.deriveMode != OiAfDeriveMode.onSubmit) {
         final value = def.derive!(this);
@@ -1471,6 +1603,46 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     _wireFieldMessageGetters();
   }
 
+  /// Applies changed `OiAfForm` props to the already attached controller.
+  ///
+  /// [attach] may only run once per form, so the form calls this when it is
+  /// rebuilt with new props. [enabled] is only passed when the form's own
+  /// `enabled` prop changed, so that an unrelated rebuild does not undo
+  /// [disable] or [enable].
+  ///
+  /// It runs while the form is rebuilding, when listeners must not be called:
+  /// the form's scope tells the widgets below it about the change, and the
+  /// controller's own listeners are notified after the frame, only when
+  /// [enabled] actually changed [isEnabled].
+  void updateAttachment({
+    required OiAfValidateMode validateMode,
+    required bool submitOnEnterFromLastField,
+    required bool focusFirstInvalidFieldOnSubmitFailure,
+    required bool clearGlobalErrorsOnFieldChange,
+    bool? enabled,
+    Future<void> Function(TData, OiAfController<TField, TData>)? onSubmit,
+    void Function(OiAfSubmitResult<TData>, OiAfController<TField, TData>)?
+    onSubmitResult,
+    OiAfSubmitErrorMapper<TField, TData>? errorMapper,
+    OiAfMessageResolver messageResolver = const OiAfDefaultMessageResolver(),
+  }) {
+    assert(_isAttached, 'Controller is not attached to a form.');
+    _validateMode = validateMode;
+    _submitOnEnterFromLastField = submitOnEnterFromLastField;
+    _focusFirstInvalidFieldOnSubmitFailure =
+        focusFirstInvalidFieldOnSubmitFailure;
+    _clearGlobalErrorsOnFieldChange = clearGlobalErrorsOnFieldChange;
+    if (enabled != null && enabled != _isEnabled) {
+      _isEnabled = enabled;
+      // notifyListeners() is a no-op once disposed.
+      WidgetsBinding.instance.addPostFrameCallback((_) => notifyListeners());
+    }
+    _onSubmit = onSubmit;
+    _onSubmitResult = onSubmitResult;
+    _errorMapper = errorMapper;
+    this.messageResolver = messageResolver;
+  }
+
   void detach() {
     _isAttached = false;
     _onSubmit = null;
@@ -1512,11 +1684,47 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     return 'Validation failed.';
   }
 
+  String _resolveBuildDataFailed() {
+    final messages = _validationMessages();
+    if (messages != null) {
+      return messages.resolver.buildDataFailed(messages.context);
+    }
+    return 'Failed to build form data.';
+  }
+
   String _resolveSubmitFailed() {
     final messages = _validationMessages();
     if (messages != null) {
       return messages.resolver.submitFailed(messages.context);
     }
     return 'Submission failed. Please try again.';
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  DISPOSAL
+  // ═══════════════════════════════════════════════════════════════════════
+
+  /// Async validators and a pending submit can outlive the controller, so a
+  /// notification after [dispose] is dropped instead of throwing.
+  @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
+  }
+
+  /// Releases the controller and its field controllers.
+  ///
+  /// Validations still running are abandoned without touching any state. A
+  /// submit still validating resolves to an [OiAfSubmitFailure] without
+  /// calling `onSubmit`; one already inside `onSubmit` finishes, but its
+  /// result is no longer reported to the form's callbacks.
+  @override
+  void dispose() {
+    _disposed = true;
+    detach();
+    for (final fc in _fieldControllers.values) {
+      fc.dispose();
+    }
+    super.dispose();
   }
 }
