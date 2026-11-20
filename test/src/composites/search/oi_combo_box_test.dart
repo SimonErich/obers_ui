@@ -658,6 +658,41 @@ void main() {
       expect(find.text('Abacus'), findsOneWidget);
     });
 
+    testWidgets('Enter while loading picks nothing', (tester) async {
+      final requests = <String, Completer<List<String>>>{};
+      String? selected;
+      String? created;
+      await tester.pumpObers(
+        _comboBox(
+          items: const [],
+          search: (query) =>
+              (requests[query] = Completer<List<String>>()).future,
+          onSelect: (v) => selected = v,
+          onCreate: (v) => created = v,
+        ),
+      );
+      await _open(tester);
+      await tester.pump(const Duration(milliseconds: 250));
+      requests['']!.complete(['Apple', 'Banana']);
+      await _flush(tester);
+      expect(find.text('Apple'), findsOneWidget);
+
+      await tester.enterText(find.byType(EditableText).first, 'Kiwi');
+      await tester.pump();
+      expect(find.text('Loading…'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      expect(selected, isNull);
+      expect(created, isNull);
+
+      await tester.pump(const Duration(milliseconds: 250));
+      requests['Kiwi']!.complete(const []);
+      await _flush(tester);
+    });
+
     testWidgets('an earlier search answering while the next one is debounced '
         'is dropped', (tester) async {
       final requests = <String, Completer<List<String>>>{};

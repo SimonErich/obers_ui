@@ -539,6 +539,15 @@ class _OiSmartInputState extends State<OiSmartInput> {
       // hardware Enter or Tab there may be ignored until the word is
       // committed.
       if (_controller.value.composing.isValid) return KeyEventResult.ignored;
+      // Only the plain key accepts: Shift+Tab moves focus back, and a
+      // modified Enter belongs to the field or its shortcuts.
+      final keyboard = HardwareKeyboard.instance;
+      if (keyboard.isShiftPressed ||
+          keyboard.isControlPressed ||
+          keyboard.isAltPressed ||
+          keyboard.isMetaPressed) {
+        return KeyEventResult.ignored;
+      }
       _selectSuggestion(_suggestions[_selectedSuggestionIndex]);
       if (mounted) setState(() {});
       return KeyEventResult.handled;

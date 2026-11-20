@@ -468,6 +468,21 @@ void main() {
         expect(find.text('Alice'), findsNothing);
       });
 
+      testWidgets('a modified Tab or Enter does not insert', (tester) async {
+        final changes = await pumpWithPopup(tester);
+
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
+
+        expect(changes, isNot(contains('@alice')));
+      });
+
       testWidgets('Enter follows the arrow keys', (tester) async {
         final changes = await pumpWithPopup(tester);
 

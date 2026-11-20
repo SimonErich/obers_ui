@@ -453,6 +453,15 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
       return KeyEventResult.ignored;
     }
 
+    // While a search runs the dropdown shows the loading text, not the old
+    // options, so there is nothing on screen to move through or pick.
+    if (_loading &&
+        (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+            event.logicalKey == LogicalKeyboardKey.arrowUp ||
+            event.logicalKey == LogicalKeyboardKey.enter)) {
+      return KeyEventResult.handled;
+    }
+
     final options = _visibleOptions();
 
     if (event.logicalKey == LogicalKeyboardKey.arrowDown ||

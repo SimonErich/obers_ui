@@ -277,6 +277,15 @@ class _OiSearchState extends State<OiSearch> {
       return KeyEventResult.ignored;
     }
 
+    // While a search runs the loading state replaces the old results, so
+    // there is nothing on screen to move through or pick.
+    if (_loading &&
+        (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+            event.logicalKey == LogicalKeyboardKey.arrowUp ||
+            event.logicalKey == LogicalKeyboardKey.enter)) {
+      return KeyEventResult.handled;
+    }
+
     final results = _allResults;
 
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {

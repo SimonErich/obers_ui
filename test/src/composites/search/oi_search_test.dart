@@ -354,6 +354,32 @@ void main() {
       expect(find.text('Searching…'), findsNothing);
     });
 
+    testWidgets('Enter while searching picks nothing', (tester) async {
+      final selected = <OiSearchResult>[];
+      await tester.pumpObers(
+        _search(sources: [source], onSelect: selected.add),
+      );
+      final input = find.byType(EditableText).first;
+
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 10));
+      requests['a']!.complete(const [OiSearchResult(id: '1', title: 'Apple')]);
+      await _flush(tester);
+      expect(find.text('Apple'), findsOneWidget);
+
+      await tester.enterText(input, 'ab');
+      await tester.pump();
+      expect(find.text('Searching…'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(selected, isEmpty);
+
+      await tester.pump(const Duration(milliseconds: 10));
+      requests['ab']!.complete(const []);
+      await _flush(tester);
+    });
+
     testWidgets('an earlier search answering while the next one is debounced '
         'is dropped', (tester) async {
       await tester.pumpObers(
