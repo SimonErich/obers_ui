@@ -9,10 +9,11 @@ import 'package:flutter/widgets.dart';
 /// stays shut until one of these happens:
 ///
 /// * the position leaves the zone,
-/// * the scroll extent changes (more content was laid out),
-/// * the owner calls [reset] because its data changed, or
-/// * a load started through [track] has completed and the owner calls
-///   [rearmAfterUpdate] on its next update.
+/// * the scroll extent changes (more content was laid out), or
+/// * the owner calls [reset] because it has new items.
+///
+/// A rebuild on its own does not re-arm it: a load that failed or brought
+/// nothing must not be retried in a loop while the screen sits idle.
 ///
 /// Owners call [shouldFire] from their scroll listener and once after layout
 /// (first frame and after each update), which covers the short-first-page
@@ -22,7 +23,6 @@ import 'package:flutter/widgets.dart';
 /// `OiChatWindow`. Not exported from the package.
 class OiLoadMoreLatch {
   bool _busy = false;
-  bool _settled = false;
   double? _firedExtent;
 
   /// Whether a load started through [track] is still running.
@@ -42,7 +42,6 @@ class OiLoadMoreLatch {
     }
     if (_busy || _firedExtent == extent) return false;
     _firedExtent = extent;
-    _settled = false;
     return true;
   }
 
@@ -55,23 +54,11 @@ class OiLoadMoreLatch {
       await load;
     } finally {
       _busy = false;
-      _settled = true;
     }
   }
 
-  /// Re-arms the latch if a tracked load has completed since it last fired.
-  ///
-  /// Call from `didUpdateWidget`: a rebuild after a finished load usually
-  /// means new content, which may still not fill the viewport.
-  void rearmAfterUpdate() {
-    if (!_settled) return;
-    _settled = false;
-    _firedExtent = null;
-  }
-
-  /// Re-arms the latch unconditionally, e.g. after the item count changed.
+  /// Re-arms the latch, e.g. after the item count changed.
   void reset() {
-    _settled = false;
     _firedExtent = null;
   }
 }

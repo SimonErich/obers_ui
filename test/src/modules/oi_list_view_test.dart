@@ -351,6 +351,37 @@ void main() {
       expect(loads, 1);
     });
 
+    testWidgets('a load that ends without new items is not repeated', (
+      tester,
+    ) async {
+      var loads = 0;
+      Widget build({required bool loading}) => OiListView<int>(
+        items: const [0, 1],
+        itemBuilder: (i) => SizedBox(height: 40, child: Text('Item $i')),
+        itemKey: (i) => i,
+        label: 'Test list',
+        moreAvailable: true,
+        loading: loading,
+        onLoadMore: () async => loads++,
+      );
+      await tester.pumpObers(
+        build(loading: false),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      expect(loads, 1);
+
+      // The fetch runs and fails: loading goes on and off, nothing arrives.
+      await tester.pumpObers(build(loading: true));
+      await tester.pump();
+      await tester.pumpObers(build(loading: false));
+      for (var frame = 0; frame < 5; frame++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+
+      expect(loads, 1);
+    });
+
     testWidgets('loads again when the next page is still too short', (
       tester,
     ) async {

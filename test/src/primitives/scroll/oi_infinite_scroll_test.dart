@@ -285,6 +285,74 @@ void main() {
     expect(loads, 1);
   });
 
+  testWidgets('a failed load that rebuilds the parent is not repeated', (
+    tester,
+  ) async {
+    var loads = 0;
+    var errors = 0;
+    late StateSetter rebuild;
+    await tester.pumpObers(
+      StatefulBuilder(
+        builder: (context, setState) {
+          rebuild = setState;
+          return OiInfiniteScroll(
+            moreAvailable: true,
+            onLoadMore: () async {
+              loads++;
+              await Future<void>.delayed(const Duration(milliseconds: 50));
+              // The fetch failed: show an error, no new items.
+              rebuild(() => errors++);
+            },
+            child: ListView.builder(
+              itemCount: 2,
+              itemBuilder: (_, i) => SizedBox(height: 60, child: Text('$i')),
+            ),
+          );
+        },
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+    for (var frame = 0; frame < 60; frame++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+
+    expect(loads, 1);
+    expect(errors, 1);
+  });
+
+  testWidgets('a vertical list inside a horizontal scroller loads', (
+    tester,
+  ) async {
+    var loads = 0;
+    await tester.pumpObers(
+      OiInfiniteScroll(
+        moreAvailable: true,
+        onLoadMore: () async => loads++,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(
+            width: 800,
+            height: 300,
+            child: ListView.builder(
+              key: const Key('inner'),
+              itemCount: 40,
+              itemBuilder: (_, i) => SizedBox(height: 60, child: Text('r$i')),
+            ),
+          ),
+        ),
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+    await tester.pumpAndSettle();
+    expect(loads, 0);
+
+    // The inner list is wider than the screen: drag from a visible point.
+    await tester.dragFrom(const Offset(200, 150), const Offset(0, -5000));
+    await tester.pumpAndSettle();
+
+    expect(loads, 1);
+  });
+
   testWidgets('dragging a nested horizontal list does not load', (
     tester,
   ) async {

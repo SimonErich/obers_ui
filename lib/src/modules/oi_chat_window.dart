@@ -300,15 +300,16 @@ class _OiChatWindowState extends State<OiChatWindow> {
   void initState() {
     super.initState();
     _scrollController.addListener(_handleScroll);
-    _checkScrollToTopAfterLayout();
   }
 
   @override
   void didUpdateWidget(OiChatWindow oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // New messages may mean older ones arrived: the next scroll to the top
+    // reports again. Nothing is reported without a scroll, so a short
+    // conversation does not ask for history on mount or on every message.
     if (widget.messages.length != oldWidget.messages.length) {
       _scrollToTopLatch.reset();
-      _checkScrollToTopAfterLayout();
     }
     if (widget.autoScrollToBottom &&
         widget.messages.length > oldWidget.messages.length) {
@@ -330,14 +331,6 @@ class _OiChatWindowState extends State<OiChatWindow> {
       ..removeListener(_handleScroll)
       ..dispose();
     super.dispose();
-  }
-
-  /// Checks once the list is laid out, so a conversation that does not fill
-  /// the viewport asks for older messages without the user scrolling.
-  void _checkScrollToTopAfterLayout() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _handleScroll();
-    });
   }
 
   void _handleScroll() {

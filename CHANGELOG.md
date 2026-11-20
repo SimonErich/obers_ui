@@ -69,8 +69,8 @@ from the git history, using the commits that changed `version:` in
 - `OiCalendar` follows a new `mode` or `initialDate` from its parent, and its all-day row only lists events on the dates in view
 - Android, iOS and Fuchsia start in touch mode, so tappables have their 48 dp touch target from the first frame instead of growing on the first touch
 - `OiVirtualList` pull-to-refresh works at every density and with bouncing scroll physics (iOS, macOS), and calls `onRefresh` once per pull
-- `OiInfiniteScroll`, `OiListView`, `OiActivityFeed` and `OiChatWindow` load the next page when the first one does not fill the viewport, and once per arrival at the end instead of on every scroll tick
-- `OiInfiniteScroll` ignores nested scrollables and scrollables on the other axis; pass `scrollDirection: Axis.horizontal` for a horizontal list
+- `OiInfiniteScroll`, `OiListView` and `OiActivityFeed` load the next page when the first one does not fill the viewport, and once per arrival at the end instead of on every scroll tick; a load that fails or brings nothing is not retried until new items arrive or the user scrolls away and back. `OiChatWindow.onScrollToTop` fires once per arrival at the top
+- `OiInfiniteScroll` watches the nearest scrollable on its axis, also inside a scroller on the other axis, and ignores scrollables on the other axis; pass `scrollDirection: Axis.horizontal` for a horizontal list
 - `context.isCompact`, `isMedium`, `isExpanded`, `isLarge` and `isExtraLarge` are ranges, so exactly one is true on scales with extra breakpoints (`OiBreakpointScale.extended()`: 480 is compact, 1920 is extraLarge)
 - `OiGrid` counts the gaps when deriving the column count from `minColumnWidth`, and lays its columns out right-to-left under an RTL `Directionality`
 - `OiApp` without an explicit `locale` takes its text direction from the resolved device locale
@@ -113,7 +113,7 @@ from the git history, using the commits that changed `version:` in
 - `OiApp` reuses and disposes one `HeroController`
 - `OiGrid` no longer throws when the gaps are wider than the available width
 - `OiResponsive` without a value for the smallest breakpoint falls back to the nearest larger one instead of throwing; equal instances have equal hash codes
-- `?` opens help on real keyboards (it is Shift+/ on most layouts) and is left alone in text fields
+- The `?` shortcut (`OiShortcutScopeState.helpActive`) works on real keyboards (it is Shift+/ on most layouts) and is left alone in text fields
 - `OiDecorationTheme`, `OiFileExplorerThemeData` and `OiContextMenuThemeData` compare every field, and collections by content
 
 ### Removed

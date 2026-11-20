@@ -245,28 +245,21 @@ void main() {
       ),
     );
 
-    testWidgets('a conversation shorter than the viewport reports once', (
+    testWidgets('a short conversation does not report without a scroll', (
       tester,
     ) async {
+      // There is no "more history" flag, so reporting on mount or on every
+      // new message would make callers fetch history each time.
       var calls = 0;
       await tester.pumpObers(chat(1, () => calls++));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 16));
+      for (var count = 2; count <= 4; count++) {
+        await tester.pumpObers(chat(count, () => calls++));
+        await tester.pumpAndSettle();
+      }
 
-      expect(calls, 1);
-    });
-
-    testWidgets('reports again after older messages arrive and it is still '
-        'short', (tester) async {
-      var calls = 0;
-      await tester.pumpObers(chat(1, () => calls++));
-      await tester.pump();
-      expect(calls, 1);
-
-      await tester.pumpObers(chat(2, () => calls++));
-      await tester.pump();
-
-      expect(calls, 2);
+      expect(calls, 0);
     });
 
     testWidgets('one arrival at the top reports once, not once per tick', (

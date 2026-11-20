@@ -286,15 +286,18 @@ class _OiVisibilityState extends State<OiVisibility>
       return const SizedBox.shrink();
     }
 
-    // A faded-out child is still laid out and hit-testable, so make it inert
-    // while hidden. The wrappers stay in place when visible so the child's
-    // State survives the toggle.
+    // A faded-out child is still laid out, hit-testable and in the semantics
+    // tree, so make it inert while hidden. The wrappers stay in place when
+    // visible so the child's State survives the toggle.
     final hidden = !widget.visible;
     return IgnorePointer(
       ignoring: hidden,
       child: ExcludeFocus(
         excluding: hidden,
-        child: _buildTransitionedChild(transition, widget.child),
+        child: ExcludeSemantics(
+          excluding: hidden,
+          child: _buildTransitionedChild(transition, widget.child),
+        ),
       ),
     );
   }

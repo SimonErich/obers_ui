@@ -316,6 +316,29 @@ void main() {
       expect(node.hasFocus, isFalse);
     });
 
+    testWidgets('fade + maintainState: is not announced while fading out', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      Widget build({required bool visible}) => OiVisibility(
+        visible: visible,
+        child: const Text('Secret'),
+      );
+      await tester.pumpObers(build(visible: true));
+      await tester.pumpAndSettle();
+      expect(find.semantics.byLabel('Secret'), findsOne);
+
+      // Halfway through the fade the child is still painted, but it is
+      // already hidden and must not be read out.
+      await tester.pumpObers(build(visible: false));
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(find.semantics.byLabel('Secret'), findsNothing);
+
+      await tester.pumpAndSettle();
+      expect(find.semantics.byLabel('Secret'), findsNothing);
+      semantics.dispose();
+    });
+
     testWidgets('becomes interactive again when shown', (tester) async {
       var taps = 0;
       Widget build({required bool visible}) => Center(

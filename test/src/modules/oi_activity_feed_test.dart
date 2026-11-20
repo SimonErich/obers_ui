@@ -232,6 +232,35 @@ void main() {
       expect(loads, 0);
     });
 
+    testWidgets('a load that ends without new events is not repeated', (
+      tester,
+    ) async {
+      var loads = 0;
+      Widget feed({required bool loading}) => OiActivityFeed(
+        events: events(2),
+        label: 'Feed',
+        moreAvailable: true,
+        loading: loading,
+        onLoadMore: () async => loads++,
+      );
+      await tester.pumpObers(
+        feed(loading: false),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      expect(loads, 1);
+
+      // The fetch runs and fails: loading goes on and off, nothing arrives.
+      await tester.pumpObers(feed(loading: true));
+      await tester.pump();
+      await tester.pumpObers(feed(loading: false));
+      for (var frame = 0; frame < 5; frame++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+
+      expect(loads, 1);
+    });
+
     testWidgets('loads again when the next page is still too short', (
       tester,
     ) async {

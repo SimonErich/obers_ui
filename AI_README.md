@@ -1105,7 +1105,7 @@ Conditional widget visibility with optional animation. With `maintainState` (def
 **Tags:** `scroll`, `infinite`, `pagination`, `load-more`
 **Tier:** Primitive
 
-Detects scroll-to-edge and fires load callback. Also loads when the first page does not fill the viewport. `onLoadMore` runs once per arrival at the end. Only the outermost scrollable on `scrollDirection` (default vertical) counts; nested scrollables are ignored.
+Detects scroll-to-edge and fires load callback. Also loads when the first page does not fill the viewport. `onLoadMore` runs once per arrival at the end, and a load that brings nothing is not retried until the content changes or the user scrolls away and back. The nearest scrollable on `scrollDirection` (default vertical) counts, also inside a scroller on the other axis; scrollables on the other axis are ignored.
 
 **Use When:** Infinite scrolling lists.
 **Combine With:** `OiVirtualList`, `OiListView`

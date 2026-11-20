@@ -313,10 +313,16 @@ class _OiListViewState<T> extends State<OiListView<T>>
   @override
   void didUpdateWidget(OiListView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // Only new items or more becoming available re-arm the latch. A load
+    // that ends (loading back to false) without new items must not start
+    // the next one by itself, or a failing fetch repeats forever.
+    if (oldWidget.items.length != widget.items.length ||
+        (widget.moreAvailable && !oldWidget.moreAvailable)) {
+      _loadMoreLatch.reset();
+    }
     if (oldWidget.items.length != widget.items.length ||
         oldWidget.loading != widget.loading ||
         oldWidget.moreAvailable != widget.moreAvailable) {
-      _loadMoreLatch.reset();
       _checkLoadMoreAfterLayout();
     }
   }
