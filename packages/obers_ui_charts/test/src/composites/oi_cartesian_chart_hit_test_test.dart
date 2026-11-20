@@ -1,6 +1,3 @@
-// Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
-
 import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/widgets.dart';

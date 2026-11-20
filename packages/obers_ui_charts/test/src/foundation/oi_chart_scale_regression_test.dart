@@ -1,6 +1,3 @@
-// Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui_charts/src/foundation/oi_linear_scale.dart';
 import 'package:obers_ui_charts/src/foundation/oi_logarithmic_scale.dart';

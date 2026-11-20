@@ -1,6 +1,3 @@
-// Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,7 +44,7 @@ const _barCategories = [
   OiBarCategory(label: 'Q2', values: [55, 30]),
 ];
 
-final _polarData = [
+final List<Map<String, Object>> _polarData = [
   {'category': 'North', 'value': 120.0},
   {'category': 'South', 'value': 80.0},
   {'category': 'East', 'value': 200.0},
