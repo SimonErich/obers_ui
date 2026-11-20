@@ -232,6 +232,7 @@ export 'src/composites/scheduling/oi_timeline.dart';
 
 export 'src/composites/search/oi_autocomplete.dart';
 export 'src/composites/search/oi_combo_box.dart';
+export 'src/composites/search/oi_combo_box_labels.dart';
 export 'src/composites/search/oi_command_bar.dart';
 export 'src/composites/search/oi_search.dart';
 // ── Composites: Shop ────────────────────────────────────────────────────────

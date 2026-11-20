@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
+import 'package:obers_ui/src/composites/search/oi_combo_box_labels.dart';
+import 'package:obers_ui/src/foundation/_oi_latest_request.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
@@ -24,6 +27,7 @@ class OiComboBox<T> extends StatefulWidget {
     this.noResultsLabel = 'No results',
     this.recentLabel = 'Recent',
     this.favoritesLabel = 'Favorites',
+    this.labels = const OiComboBoxLabels(),
     super.key,
     this.items = const [],
     this.value,
@@ -133,6 +137,9 @@ class OiComboBox<T> extends StatefulWidget {
   /// Heading of the favorite options.
   final String favoritesLabel;
 
+  /// The texts of the dropdown; pass translations to localize it.
+  final OiComboBoxLabels labels;
+
   /// Custom option builder.
   final Widget Function(T, {required bool highlighted, required bool selected})?
   optionBuilder;
@@ -144,82 +151,182 @@ class OiComboBox<T> extends StatefulWidget {
 class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   late TextEditingController _textController;
   late FocusNode _inputFocusNode;
+  late FocusNode _triggerFocusNode;
   bool _open = false;
+  bool _triggerFocused = false;
+
+  /// Position of the highlighted option in [_visibleOptions], or -1.
   int _highlightedIndex = -1;
   List<T> _filteredItems = [];
   List<T> _asyncResults = [];
   bool _loading = false;
   Timer? _debounce;
+  final OiLatestRequest _searches = OiLatestRequest();
+  final OiLatestRequest _loadMores = OiLatestRequest();
+
+  /// Whether a "load more" page is on its way.
+  bool _loadingMore = false;
 
   @override
   void initState() {
     super.initState();
     _textController = TextEditingController();
     _inputFocusNode = FocusNode(onKeyEvent: _handleKeyEvent);
+    _triggerFocusNode = FocusNode(onKeyEvent: _handleTriggerKeyEvent)
+      ..addListener(_handleTriggerFocusChange);
     _filteredItems = List<T>.from(widget.items);
   }
 
   @override
   void didUpdateWidget(OiComboBox<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.items != widget.items) {
-      _applyFilter(_textController.text);
+    // Compared by content: a parent that builds its list inline passes a new
+    // instance on every rebuild. With a search callback the options come from
+    // the search, so the static items do not matter.
+    final itemsChanged =
+        widget.search == null && !listEquals(oldWidget.items, widget.items);
+    final pinnedChanged =
+        !listEquals(oldWidget.recentItems, widget.recentItems) ||
+        !listEquals(oldWidget.favoriteItems, widget.favoriteItems);
+    if (!itemsChanged && !pinnedChanged) return;
+
+    // Keep the highlight on the tile it was on: the same item in the same
+    // section, wherever that tile is now. An item can be listed twice, pinned
+    // and in the main list, and each copy is its own tile.
+    final oldSections = [
+      oldWidget.recentItems ?? const [],
+      oldWidget.favoriteItems ?? const [],
+      _mainOptions(),
+    ];
+    var section = 0;
+    var offset = _highlightedIndex;
+    while (section < oldSections.length &&
+        offset >= oldSections[section].length) {
+      offset -= oldSections[section].length;
+      section++;
     }
+    final highlighted = offset >= 0 && section < oldSections.length;
+    final item = highlighted ? oldSections[section][offset] : null;
+
+    if (itemsChanged) {
+      // The page on its way belongs to the old list.
+      _cancelLoadMore();
+      _filteredItems = _filterItems(_textController.text);
+    }
+
+    if (!highlighted) {
+      _highlightedIndex = _initialHighlight();
+      return;
+    }
+    final newSections = [
+      widget.recentItems ?? const [],
+      widget.favoriteItems ?? const [],
+      _mainOptions(),
+    ];
+    final index = newSections[section].indexOf(item as T);
+    _highlightedIndex = index < 0
+        ? _initialHighlight()
+        : index +
+              newSections
+                  .take(section)
+                  .fold<int>(0, (sum, list) => sum + list.length);
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
+    _searches.cancel();
+    _loadMores.cancel();
     _textController.dispose();
     _inputFocusNode.dispose();
+    _triggerFocusNode
+      ..removeListener(_handleTriggerFocusChange)
+      ..dispose();
     super.dispose();
   }
 
   // ── Filtering ─────────────────────────────────────────────────────────────
 
+  List<T> _filterItems(String query) {
+    if (query.isEmpty) return List<T>.from(widget.items);
+    final lower = query.toLowerCase();
+    return widget.items
+        .where((item) => widget.labelOf(item).toLowerCase().contains(lower))
+        .toList();
+  }
+
   void _applyFilter(String query) {
+    // A page still on its way belongs to the list being replaced.
+    _cancelLoadMore();
+
     if (widget.search != null) {
       _debounce?.cancel();
+      // The search in flight answers a query that is no longer the current
+      // one. It is dropped now, not when the next search starts: otherwise
+      // its answer would be shown, and end the loading state, during the
+      // debounce.
+      _searches.cancel();
+      setState(() => _loading = true);
       _debounce = Timer(const Duration(milliseconds: 200), () {
         unawaited(_performAsyncSearch(query));
       });
       return;
     }
 
-    final lower = query.toLowerCase();
     setState(() {
-      if (query.isEmpty) {
-        _filteredItems = List<T>.from(widget.items);
-      } else {
-        _filteredItems = widget.items
-            .where((item) => widget.labelOf(item).toLowerCase().contains(lower))
-            .toList();
-      }
-      _highlightedIndex = _filteredItems.isEmpty ? -1 : 0;
+      _filteredItems = _filterItems(query);
+      _highlightedIndex = _initialHighlight();
     });
   }
 
-  Future<void> _performAsyncSearch(String query) async {
+  Future<void> _performAsyncSearch(String query) {
     setState(() => _loading = true);
-    try {
-      final results = await widget.search!(query);
-      if (mounted) {
-        setState(() {
-          _asyncResults = results;
-          _filteredItems = results;
-          _loading = false;
-          _highlightedIndex = _filteredItems.isEmpty ? -1 : 0;
-        });
-      }
-    } on Exception {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-          _filteredItems = [];
-          _asyncResults = [];
-        });
-      }
-    }
+    return _searches.run(
+      () => widget.search!(query),
+      active: () => mounted,
+      onResult: (results) => setState(() {
+        // Copied: "load more" appends to both lists, and the caller's list
+        // may be unmodifiable.
+        _asyncResults = List<T>.of(results);
+        _filteredItems = List<T>.of(results);
+        _loading = false;
+        _highlightedIndex = _initialHighlight();
+      }),
+      onError: (_, _) => setState(() {
+        _loading = false;
+        _filteredItems = [];
+        _asyncResults = [];
+        _highlightedIndex = _initialHighlight();
+      }),
+    );
+  }
+
+  /// Loads the next page and appends it to the list it was asked for.
+  ///
+  /// Taps while a page is loading are ignored, and a page that arrives after
+  /// the query or the items changed is dropped (see [_cancelLoadMore]).
+  void _loadMore() {
+    final loadMore = widget.loadMore;
+    if (loadMore == null || _loadingMore) return;
+    _loadingMore = true;
+    unawaited(
+      _loadMores.run(
+        loadMore,
+        active: () => mounted,
+        onResult: (more) => setState(() {
+          _loadingMore = false;
+          _filteredItems = [..._filteredItems, ...more];
+          _asyncResults = [..._asyncResults, ...more];
+        }),
+        // The list stays as it is and the row can be tapped again.
+        onError: (_, _) => _loadingMore = false,
+      ),
+    );
+  }
+
+  void _cancelLoadMore() {
+    _loadMores.cancel();
+    _loadingMore = false;
   }
 
   // ── Effective items list ──────────────────────────────────────────────────
@@ -227,6 +334,33 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   List<T> get _effectiveItems {
     if (widget.search != null) return _asyncResults;
     return _filteredItems;
+  }
+
+  /// Number of recent and favorite options shown above the main list.
+  int get _pinnedCount =>
+      (widget.recentItems?.length ?? 0) + (widget.favoriteItems?.length ?? 0);
+
+  /// The main list in the order the dropdown shows it, group by group.
+  List<T> _mainOptions() => [
+    for (final section in _buildGroupedSections()) ...section.items,
+  ];
+
+  /// Every option in the order the dropdown shows it: recent, favorites, then
+  /// the main list. The keyboard highlight walks this list.
+  List<T> _visibleOptions() => [
+    ...?widget.recentItems,
+    ...?widget.favoriteItems,
+    ..._mainOptions(),
+  ];
+
+  /// Where the highlight starts: the first match while a query is typed (so
+  /// Enter picks it rather than a recent item, and still creates when nothing
+  /// matches), otherwise the first option on screen.
+  int _initialHighlight() {
+    if (_effectiveItems.isNotEmpty) {
+      return _textController.text.isEmpty ? 0 : _pinnedCount;
+    }
+    return _textController.text.isEmpty && _pinnedCount > 0 ? 0 : -1;
   }
 
   // ── Grouped items ─────────────────────────────────────────────────────────
@@ -262,16 +396,20 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     _applyFilter('');
     setState(() {
       _open = true;
-      _highlightedIndex = _filteredItems.isEmpty ? -1 : 0;
+      _highlightedIndex = _initialHighlight();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _inputFocusNode.requestFocus();
     });
   }
 
-  void _closeDropdown() {
+  /// Closes the dropdown. [restoreFocus] hands focus back to the trigger, for
+  /// closes that come from the dropdown itself; a click elsewhere keeps the
+  /// focus where the click put it.
+  void _closeDropdown({bool restoreFocus = false}) {
     setState(() => _open = false);
     _textController.clear();
+    if (restoreFocus && widget.enabled) _triggerFocusNode.requestFocus();
   }
 
   // ── Selection ─────────────────────────────────────────────────────────────
@@ -290,7 +428,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     }
 
     widget.onSelect?.call(item);
-    _closeDropdown();
+    _closeDropdown(restoreFocus: true);
   }
 
   void _clearSelection() {
@@ -315,38 +453,82 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
       return KeyEventResult.ignored;
     }
 
-    final items = _effectiveItems;
-
-    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-      setState(() {
-        _highlightedIndex = (_highlightedIndex + 1).clamp(0, items.length - 1);
-      });
+    // While a search runs the dropdown shows the loading text, not the old
+    // options, so there is nothing on screen to move through or pick.
+    if (_loading &&
+        (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+            event.logicalKey == LogicalKeyboardKey.arrowUp ||
+            event.logicalKey == LogicalKeyboardKey.enter)) {
       return KeyEventResult.handled;
     }
 
-    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+    final options = _visibleOptions();
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+        event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      // Nothing to move through; clamping to an empty range would throw.
+      if (options.isEmpty) return KeyEventResult.handled;
+      final step = event.logicalKey == LogicalKeyboardKey.arrowDown ? 1 : -1;
       setState(() {
-        _highlightedIndex = (_highlightedIndex - 1).clamp(0, items.length - 1);
+        _highlightedIndex = (_highlightedIndex + step).clamp(
+          0,
+          options.length - 1,
+        );
       });
       return KeyEventResult.handled;
     }
 
     if (event.logicalKey == LogicalKeyboardKey.enter) {
-      if (_highlightedIndex >= 0 && _highlightedIndex < items.length) {
-        _selectItem(items[_highlightedIndex]);
+      if (_highlightedIndex >= 0 && _highlightedIndex < options.length) {
+        _selectItem(options[_highlightedIndex]);
       } else if (widget.onCreate != null && _textController.text.isNotEmpty) {
         widget.onCreate!(_textController.text);
-        _closeDropdown();
+        _closeDropdown(restoreFocus: true);
       }
       return KeyEventResult.handled;
     }
 
     if (event.logicalKey == LogicalKeyboardKey.escape) {
+      _closeDropdown(restoreFocus: true);
+      return KeyEventResult.handled;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      // Tab leaves the combo box: the dropdown closes and focus moves to the
+      // trigger's neighbour. The search field lives in an overlay, so the
+      // traversal has to start from the trigger, which is where the user
+      // was. Traversal goes from the scope's focused child; the request below
+      // makes that the trigger and is itself replaced by the move.
       _closeDropdown();
+      _triggerFocusNode.requestFocus();
+      if (HardwareKeyboard.instance.isShiftPressed) {
+        _triggerFocusNode.previousFocus();
+      } else {
+        _triggerFocusNode.nextFocus();
+      }
       return KeyEventResult.handled;
     }
 
     return KeyEventResult.ignored;
+  }
+
+  /// Opens the dropdown from the focused trigger.
+  KeyEventResult _handleTriggerKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent || !widget.enabled || _open) {
+      return KeyEventResult.ignored;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space ||
+        event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      _openDropdown();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  void _handleTriggerFocusChange() {
+    final focused = _triggerFocusNode.hasPrimaryFocus;
+    if (focused != _triggerFocused) setState(() => _triggerFocused = focused);
   }
 
   // ── Build dropdown ────────────────────────────────────────────────────────
@@ -362,6 +544,12 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
         widget.recentItems != null && widget.recentItems!.isNotEmpty;
     final hasFavorite =
         widget.favoriteItems != null && widget.favoriteItems!.isNotEmpty;
+
+    // Position of the next option tile in the on-screen order; it matches the
+    // tile's index in [_visibleOptions], which the highlight refers to.
+    var position = 0;
+    Widget nextTile(T item) =>
+        _buildOptionTile(context, item, position++, effectiveItemHeight);
 
     return UnconstrainedBox(
       alignment: Alignment.topLeft,
@@ -388,7 +576,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
               child: OiRawInput(
                 controller: _textController,
                 focusNode: _inputFocusNode,
-                placeholder: 'Search\u2026',
+                placeholder: widget.labels.searchPlaceholder,
                 onChanged: _applyFilter,
               ),
             ),
@@ -397,7 +585,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
-                  'Loading\u2026',
+                  widget.labels.loading,
                   style: TextStyle(color: colors.textMuted, fontSize: 14),
                 ),
               )
@@ -419,10 +607,10 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                       GestureDetector(
                         onTap: () {
                           widget.onCreate!(_textController.text);
-                          _closeDropdown();
+                          _closeDropdown(restoreFocus: true);
                         },
                         child: Text(
-                          'Create "${_textController.text}"',
+                          widget.labels.create(_textController.text),
                           style: TextStyle(
                             color: colors.primary.base,
                             fontSize: 14,
@@ -444,54 +632,28 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                       // Recent section
                       if (hasRecent) ...[
                         _buildSectionHeader(context, widget.recentLabel),
-                        ...widget.recentItems!.map(
-                          (item) => _buildOptionTile(
-                            context,
-                            item,
-                            effectiveItemHeight,
-                          ),
-                        ),
+                        ...widget.recentItems!.map(nextTile),
                       ],
                       // Favorites section
                       if (hasFavorite) ...[
                         _buildSectionHeader(context, widget.favoritesLabel),
-                        ...widget.favoriteItems!.map(
-                          (item) => _buildOptionTile(
-                            context,
-                            item,
-                            effectiveItemHeight,
-                          ),
-                        ),
+                        ...widget.favoriteItems!.map(nextTile),
                       ],
                       // Main sections (possibly grouped)
                       for (final section in sections) ...[
                         if (section.header != null)
                           _buildSectionHeader(context, section.header!),
-                        ...section.items.map(
-                          (item) => _buildOptionTile(
-                            context,
-                            item,
-                            effectiveItemHeight,
-                          ),
-                        ),
+                        ...section.items.map(nextTile),
                       ],
                       // Load more
                       if (widget.moreAvailable && widget.loadMore != null)
                         GestureDetector(
-                          onTap: () async {
-                            final more = await widget.loadMore!();
-                            if (mounted) {
-                              setState(() {
-                                _filteredItems.addAll(more);
-                                _asyncResults.addAll(more);
-                              });
-                            }
-                          },
+                          onTap: _loadMore,
                           child: Container(
                             height: effectiveItemHeight,
                             alignment: Alignment.center,
                             child: Text(
-                              'Load more\u2026',
+                              widget.labels.loadMore,
                               style: TextStyle(
                                 color: colors.primary.base,
                                 fontSize: 14,
@@ -524,10 +686,14 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     );
   }
 
-  Widget _buildOptionTile(BuildContext context, T item, double height) {
-    final items = _effectiveItems;
-    final index = items.indexOf(item);
-    final isHighlighted = index == _highlightedIndex;
+  /// Builds the tile of [item], the [position]-th option on screen.
+  Widget _buildOptionTile(
+    BuildContext context,
+    T item,
+    int position,
+    double height,
+  ) {
+    final isHighlighted = position == _highlightedIndex;
     final selected = _isSelected(item);
 
     if (widget.optionBuilder != null) {
@@ -647,20 +813,26 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
       color: colors.textMuted,
     );
 
+    // The trigger takes keyboard focus so the dropdown can be opened without
+    // a pointer; the frame's focused border shows where the focus is.
     final anchor = Semantics(
       label: widget.label,
       enabled: widget.enabled,
-      child: GestureDetector(
-        onTap: widget.enabled ? _openDropdown : null,
-        behavior: HitTestBehavior.opaque,
-        child: OiInputFrame(
-          label: widget.label,
-          hint: widget.hint,
-          error: widget.error,
-          focused: _open,
-          enabled: widget.enabled,
-          trailing: chevron,
-          child: _buildTrigger(context),
+      child: Focus(
+        focusNode: _triggerFocusNode,
+        canRequestFocus: widget.enabled,
+        child: GestureDetector(
+          onTap: widget.enabled ? _openDropdown : null,
+          behavior: HitTestBehavior.opaque,
+          child: OiInputFrame(
+            label: widget.label,
+            hint: widget.hint,
+            error: widget.error,
+            focused: _open || _triggerFocused,
+            enabled: widget.enabled,
+            trailing: chevron,
+            child: _buildTrigger(context),
+          ),
         ),
       ),
     );

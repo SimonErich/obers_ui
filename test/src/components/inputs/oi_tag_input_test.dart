@@ -172,6 +172,120 @@ void main() {
       expect(find.text('database'), findsOneWidget);
     });
 
+    group('async suggestion races', () {
+      late Map<String, Completer<List<String>>> requests;
+
+      Widget tagInput() => OiTagInput(
+        tags: const [],
+        asyncSuggestions: (query) =>
+            (requests[query] = Completer<List<String>>()).future,
+        suggestionDebounce: const Duration(milliseconds: 50),
+      );
+
+      setUp(() => requests = {});
+
+      testWidgets('a slow earlier fetch does not replace newer suggestions', (
+        tester,
+      ) async {
+        await tester.pumpObers(tagInput());
+        await tester.enterText(find.byType(EditableText), 'd');
+        await tester.pump(const Duration(milliseconds: 60));
+        await tester.enterText(find.byType(EditableText), 'da');
+        await tester.pump(const Duration(milliseconds: 60));
+        expect(requests.keys, ['d', 'da']);
+
+        // The newer fetch answers first, the older one afterwards.
+        requests['da']!.complete(['dart']);
+        await tester.pump();
+        await tester.pump();
+        expect(find.text('dart'), findsOneWidget);
+
+        requests['d']!.complete(['docker', 'django']);
+        await tester.pump();
+        await tester.pump();
+
+        expect(find.text('dart'), findsOneWidget);
+        expect(find.text('docker'), findsNothing);
+        expect(find.text('django'), findsNothing);
+      });
+
+      testWidgets('a stale fetch does not end the loading state', (
+        tester,
+      ) async {
+        await tester.pumpObers(tagInput());
+        await tester.enterText(find.byType(EditableText), 'd');
+        await tester.pump(const Duration(milliseconds: 60));
+        await tester.enterText(find.byType(EditableText), 'da');
+        await tester.pump(const Duration(milliseconds: 60));
+
+        requests['d']!.complete(['docker']);
+        await tester.pump();
+        await tester.pump();
+
+        expect(find.byType(OiShimmer), findsOneWidget);
+        expect(find.text('docker'), findsNothing);
+
+        requests['da']!.complete(['dart']);
+        await tester.pump();
+        await tester.pump();
+        expect(find.byType(OiShimmer), findsNothing);
+        expect(find.text('dart'), findsOneWidget);
+      });
+
+      testWidgets('an earlier fetch answering while the next one is debounced '
+          'is dropped', (tester) async {
+        await tester.pumpObers(
+          OiTagInput(
+            tags: const [],
+            suggestions: const ['dart', 'docker'],
+            asyncSuggestions: (query) =>
+                (requests[query] = Completer<List<String>>()).future,
+            suggestionDebounce: const Duration(milliseconds: 50),
+          ),
+        );
+        await tester.enterText(find.byType(EditableText), 'd');
+        await tester.pump(const Duration(milliseconds: 60));
+        // Typed, but its fetch has not started yet.
+        await tester.enterText(find.byType(EditableText), 'da');
+        await tester.pump(const Duration(milliseconds: 10));
+        expect(requests.keys, ['d']);
+        expect(find.text('dart'), findsOneWidget);
+        expect(find.text('docker'), findsNothing);
+
+        requests['d']!.complete(['django']);
+        await tester.pump();
+        await tester.pump();
+
+        // Still the static matches for "da", with the loading row below.
+        expect(find.text('dart'), findsOneWidget);
+        expect(find.text('django'), findsNothing);
+        expect(find.byType(OiShimmer), findsOneWidget);
+
+        await tester.pump(const Duration(milliseconds: 60));
+        requests['da']!.complete(['database']);
+        await tester.pump();
+        await tester.pump();
+        expect(find.byType(OiShimmer), findsNothing);
+        expect(find.text('database'), findsOneWidget);
+      });
+
+      testWidgets('a fetch that throws an Error ends the loading state', (
+        tester,
+      ) async {
+        await tester.pumpObers(tagInput());
+        await tester.enterText(find.byType(EditableText), 'da');
+        await tester.pump(const Duration(milliseconds: 60));
+        expect(find.byType(OiShimmer), findsOneWidget);
+
+        requests['da']!.completeError(StateError('backend down'));
+        await tester.pump();
+        await tester.pump();
+
+        expect(tester.takeException(), isNull);
+        expect(find.byType(OiShimmer), findsNothing);
+      });
+    });
+
     testWidgets('dropdown closes after tag selected', (tester) async {
       await tester.pumpObers(
         OiTagInput(

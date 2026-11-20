@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/foundation/_oi_latest_request.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
@@ -99,6 +100,7 @@ class _OiTagInputState extends State<OiTagInput> {
   bool _suggestionsLoading = false;
   bool _showSuggestions = false;
   Timer? _debounceTimer;
+  final OiLatestRequest _suggestionFetches = OiLatestRequest();
 
   @override
   void initState() {
@@ -122,6 +124,7 @@ class _OiTagInputState extends State<OiTagInput> {
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _suggestionFetches.cancel();
     _ctrl.removeListener(_onTextChanged);
     _focusNode
       ..removeListener(_handleFocusChange)
@@ -148,6 +151,12 @@ class _OiTagInputState extends State<OiTagInput> {
   void _onTextChanged() {
     if (!widget._hasSuggestions) return;
     final query = _ctrl.text;
+
+    // The fetch in flight answers a query that is no longer the current one.
+    // It is dropped on every change, not when the next fetch starts:
+    // otherwise its answer would replace the suggestions, and end the loading
+    // state, during the debounce.
+    _suggestionFetches.cancel();
 
     if (query.isEmpty) {
       _debounceTimer?.cancel();
@@ -188,21 +197,21 @@ class _OiTagInputState extends State<OiTagInput> {
     _debounceTimer?.cancel();
     setState(() => _suggestionsLoading = true);
 
-    _debounceTimer = Timer(widget.suggestionDebounce, () async {
+    _debounceTimer = Timer(widget.suggestionDebounce, () {
       if (!mounted) return;
-      try {
-        final results = await widget.asyncSuggestions!(query);
-        if (!mounted) return;
-        setState(() {
-          _filteredSuggestions = results
-              .where((s) => !widget.tags.contains(s))
-              .toList();
-          _suggestionsLoading = false;
-        });
-      } on Exception catch (_) {
-        if (!mounted) return;
-        setState(() => _suggestionsLoading = false);
-      }
+      unawaited(
+        _suggestionFetches.run(
+          () => widget.asyncSuggestions!(query),
+          active: () => mounted,
+          onResult: (results) => setState(() {
+            _filteredSuggestions = results
+                .where((s) => !widget.tags.contains(s))
+                .toList();
+            _suggestionsLoading = false;
+          }),
+          onError: (_, _) => setState(() => _suggestionsLoading = false),
+        ),
+      );
     });
   }
 

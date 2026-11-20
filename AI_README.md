@@ -2230,6 +2230,9 @@ Searchable dropdown with async option loading, fuzzy match, virtual scroll.
 - `loadMore` (Future<List<T>> Function()?)
 - `moreAvailable` (bool, default: false)
 - `optionBuilder` (Widget Function(T)?) — Custom option rendering
+- `labels` (OiComboBoxLabels, default: English) — Dropdown texts: `searchPlaceholder`, `loading`, `create` (String Function(String query)), `loadMore`. `noResultsLabel`, `recentLabel`, `favoritesLabel` stay flat parameters
+
+Keyboard: the trigger is focusable; Enter, Space or Arrow Down opens the dropdown, the arrow keys follow the on-screen order (recent, favorites, then groups), Enter selects, Escape closes and returns focus to the trigger, Tab / Shift+Tab closes and moves focus to the next / previous field.
 
 **Use When:** Large option lists, async search, user/entity pickers.
 **Avoid When:** Small static lists (<20 options) — use `OiSelect`.
@@ -5318,7 +5321,7 @@ User profile page with avatar upload, editable fields, linked accounts (OAuth), 
 
 Full-screen search overlay with recent searches, async suggestions, category filters, and keyboard navigation. Cmd+K style.
 
-**Props:** `label` (a11y, required), `onSearch: Function(String)?`, `onSuggestionTap: Function(OiSearchSuggestion)?`, `onRecentTap: Function(String)?`, `onClearRecents`, `categories: List<OiSearchCategory>?`, `recentSearches: List<String>?`, `placeholder`, `debounce: Duration?`, `maxRecents`, `emptyStateTitle`, `emptyStateDescription`, `maxWidth`
+**Props:** `label` (a11y, required), `onSearch: Function(String)?`, `onSuggestionTap: Function(OiSearchSuggestion)?`, `onRecentTap: Function(String)?`, `onClearRecents`, `categories: List<OiSearchCategory>?`, `recentSearches: List<String>?`, `placeholder`, `debounce: Duration?`, `maxRecents`, `emptyStateTitle`, `emptyStateDescription`, `errorStateTitle`, `errorStateDescription` (shown when `onSearch` throws), `maxWidth`
 
 **Sub-types:** `OiSearchSuggestion` (key, title, subtitle, icon, category), `OiSearchCategory` (key, label, icon)
 

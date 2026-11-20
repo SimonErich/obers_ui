@@ -266,4 +266,199 @@ void main() {
     // No crash — navigation works.
     expect(find.byType(OiSearch), findsOneWidget);
   });
+
+  testWidgets('arrow keys do nothing when there are no results', (
+    tester,
+  ) async {
+    final emptySource = OiSearchSource(
+      category: 'Empty',
+      icon: const IconData(0xe873, fontFamily: 'MaterialIcons'),
+      search: (query) async => [],
+    );
+
+    await tester.pumpObers(_search(sources: [emptySource]));
+
+    await tester.enterText(find.byType(EditableText).first, 'nothing');
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('No results found'), findsOneWidget);
+  });
+
+  // ── Regression: async races ────────────────────────────────────────────────
+
+  group('async search', () {
+    late Map<String, Completer<List<OiSearchResult>>> requests;
+    late OiSearchSource source;
+
+    setUp(() {
+      requests = {};
+      source = OiSearchSource(
+        category: 'Slow',
+        icon: const IconData(0xe873, fontFamily: 'MaterialIcons'),
+        search: (query) =>
+            (requests[query] = Completer<List<OiSearchResult>>()).future,
+      );
+    });
+
+    testWidgets('a slow earlier search does not replace newer results', (
+      tester,
+    ) async {
+      await tester.pumpObers(_search(sources: [source]));
+      final input = find.byType(EditableText).first;
+
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 10));
+      await tester.enterText(input, 'ab');
+      await tester.pump(const Duration(milliseconds: 10));
+      expect(requests.keys, ['a', 'ab']);
+
+      // The newer search answers first, the older one afterwards.
+      requests['ab']!.complete(const [
+        OiSearchResult(id: '2', title: 'Abacus'),
+      ]);
+      await _flush(tester);
+      expect(find.text('Abacus'), findsOneWidget);
+
+      requests['a']!.complete(const [OiSearchResult(id: '1', title: 'Apple')]);
+      await _flush(tester);
+
+      expect(find.text('Abacus'), findsOneWidget);
+      expect(find.text('Apple'), findsNothing);
+    });
+
+    testWidgets('a stale search does not end the loading state', (
+      tester,
+    ) async {
+      await tester.pumpObers(_search(sources: [source]));
+      final input = find.byType(EditableText).first;
+
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 10));
+      await tester.enterText(input, 'ab');
+      await tester.pump(const Duration(milliseconds: 10));
+
+      requests['a']!.complete(const [OiSearchResult(id: '1', title: 'Apple')]);
+      await _flush(tester);
+
+      expect(find.text('Searching…'), findsOneWidget);
+      expect(find.text('Apple'), findsNothing);
+
+      requests['ab']!.complete(const []);
+      await _flush(tester);
+      expect(find.text('Searching…'), findsNothing);
+    });
+
+    testWidgets('Enter while searching picks nothing', (tester) async {
+      final selected = <OiSearchResult>[];
+      await tester.pumpObers(
+        _search(sources: [source], onSelect: selected.add),
+      );
+      final input = find.byType(EditableText).first;
+
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 10));
+      requests['a']!.complete(const [OiSearchResult(id: '1', title: 'Apple')]);
+      await _flush(tester);
+      expect(find.text('Apple'), findsOneWidget);
+
+      await tester.enterText(input, 'ab');
+      await tester.pump();
+      expect(find.text('Searching…'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(selected, isEmpty);
+
+      await tester.pump(const Duration(milliseconds: 10));
+      requests['ab']!.complete(const []);
+      await _flush(tester);
+    });
+
+    testWidgets('an earlier search answering while the next one is debounced '
+        'is dropped', (tester) async {
+      await tester.pumpObers(
+        _search(sources: [source], debounce: const Duration(milliseconds: 300)),
+      );
+      final input = find.byType(EditableText).first;
+
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 350));
+      // Typed, but its search has not started yet.
+      await tester.enterText(input, 'ab');
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(requests.keys, ['a']);
+
+      requests['a']!.complete(const [OiSearchResult(id: '1', title: 'Apple')]);
+      await _flush(tester);
+
+      expect(find.text('Apple'), findsNothing);
+      expect(find.text('Searching…'), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 300));
+      requests['ab']!.complete(const [
+        OiSearchResult(id: '2', title: 'Abacus'),
+      ]);
+      await _flush(tester);
+      expect(find.text('Searching…'), findsNothing);
+      expect(find.text('Abacus'), findsOneWidget);
+    });
+
+    testWidgets('a search answering after the query was cleared is dropped', (
+      tester,
+    ) async {
+      OiSearchResult? selected;
+      await tester.pumpObers(
+        _search(sources: [source], onSelect: (r) => selected = r),
+      );
+      final input = find.byType(EditableText).first;
+
+      await tester.enterText(input, 'a');
+      await tester.pump(const Duration(milliseconds: 10));
+      await tester.enterText(input, '');
+      await tester.pump();
+      expect(find.text('Type to search'), findsOneWidget);
+
+      requests['a']!.complete(const [OiSearchResult(id: '1', title: 'Apple')]);
+      await _flush(tester);
+
+      expect(find.text('Apple'), findsNothing);
+      expect(find.text('Type to search'), findsOneWidget);
+
+      // The dropped result is not sitting behind the empty state either:
+      // Enter has nothing to select.
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(selected, isNull);
+    });
+
+    testWidgets('a source that throws an Error ends the loading state', (
+      tester,
+    ) async {
+      await tester.pumpObers(_search(sources: [source]));
+
+      await tester.enterText(find.byType(EditableText).first, 'a');
+      await tester.pump(const Duration(milliseconds: 10));
+      expect(find.text('Searching…'), findsOneWidget);
+
+      requests['a']!.completeError(StateError('backend down'));
+      await _flush(tester);
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Searching…'), findsNothing);
+      expect(find.text('No results found'), findsOneWidget);
+    });
+  });
+}
+
+/// Lets a completed future deliver its result, then builds the frame showing
+/// it. A single pump draws its frame before it runs the pending microtasks.
+Future<void> _flush(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump();
 }

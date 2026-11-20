@@ -168,6 +168,9 @@ class _OiSmartInputState extends State<OiSmartInput> {
   bool _ownsFocusNode = false;
   bool _focused = false;
 
+  /// The text last passed to [OiSmartInput.onChange], or the initial text.
+  String _lastReportedText = '';
+
   // ── Suggestion overlay state ──────────────────────────────────────────────
 
   final LayerLink _layerLink = LayerLink();
@@ -195,6 +198,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
       _focusNode = widget.focusNode!;
     }
     _focusNode.addListener(_handleFocusChange);
+    _lastReportedText = _controller.text;
     _controller.addListener(_handleTextChange);
   }
 
@@ -213,6 +217,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
         _controller = widget.controller!;
         _ownsController = false;
       }
+      _lastReportedText = _controller.text;
       _controller.addListener(_handleTextChange);
     }
     if (oldWidget.focusNode != widget.focusNode) {
@@ -252,9 +257,15 @@ class _OiSmartInputState extends State<OiSmartInput> {
     }
   }
 
+  /// Runs on every controller notification, which includes caret and
+  /// selection moves; [OiSmartInput.onChange] is only told about new text.
   void _handleTextChange() {
     setState(() {});
-    widget.onChange?.call(_controller.text);
+    final text = _controller.text;
+    if (text != _lastReportedText) {
+      _lastReportedText = text;
+      widget.onChange?.call(text);
+    }
     _checkForTrigger();
   }
 
@@ -469,13 +480,13 @@ class _OiSmartInputState extends State<OiSmartInput> {
         text.substring(cursorOffset);
     final newCursorPos = triggerIdx + suggestion.value.length;
 
+    // The controller listener reports the new text to onChange.
     _controller.value = TextEditingValue(
       text: newText,
       selection: TextSelection.collapsed(offset: newCursorPos),
     );
 
     _hideSuggestions();
-    widget.onChange?.call(newText);
   }
 
   Widget _buildOverlayContent() {
@@ -516,6 +527,29 @@ class _OiSmartInputState extends State<OiSmartInput> {
             _suggestions.length;
       });
       _overlayEntry?.markNeedsBuild();
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+        event.logicalKey == LogicalKeyboardKey.tab) {
+      // Mid-composition the key belongs to the input method.
+      //
+      // Known risk, not reproducible in a widget test: Android keyboards keep
+      // a composing region on the word being typed for Latin text too, so a
+      // hardware Enter or Tab there may be ignored until the word is
+      // committed.
+      if (_controller.value.composing.isValid) return KeyEventResult.ignored;
+      // Only the plain key accepts: Shift+Tab moves focus back, and a
+      // modified Enter belongs to the field or its shortcuts.
+      final keyboard = HardwareKeyboard.instance;
+      if (keyboard.isShiftPressed ||
+          keyboard.isControlPressed ||
+          keyboard.isAltPressed ||
+          keyboard.isMetaPressed) {
+        return KeyEventResult.ignored;
+      }
+      _selectSuggestion(_suggestions[_selectedSuggestionIndex]);
+      if (mounted) setState(() {});
       return KeyEventResult.handled;
     }
     if (event.logicalKey == LogicalKeyboardKey.escape) {

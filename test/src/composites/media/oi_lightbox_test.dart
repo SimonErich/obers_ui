@@ -241,5 +241,67 @@ void main() {
       // Should clamp to the last valid index (2).
       expect(find.byKey(const ValueKey('oi_lightbox_image_2')), findsOneWidget);
     });
+
+    testWidgets('falls back to the last image when the items shrink', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        _lightbox(initialIndex: 2),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pump();
+      expect(find.byKey(const ValueKey('oi_lightbox_image_2')), findsOneWidget);
+
+      await tester.pumpObers(
+        _lightbox(items: _items.sublist(0, 1), initialIndex: 2),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byKey(const ValueKey('oi_lightbox_image_0')), findsOneWidget);
+    });
+
+    testWidgets('keeps its place when items are added', (tester) async {
+      await tester.pumpObers(
+        _lightbox(items: _items.sublist(0, 2), initialIndex: 1),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pump();
+
+      await tester.pumpObers(
+        _lightbox(initialIndex: 1),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pump();
+
+      expect(find.byKey(const ValueKey('oi_lightbox_image_1')), findsOneWidget);
+    });
+
+    testWidgets('survives the items becoming empty and coming back', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        _lightbox(initialIndex: 2),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pump();
+
+      await tester.pumpObers(
+        _lightbox(items: const [], initialIndex: 2),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pump();
+      expect(find.byKey(const Key('oi_lightbox')), findsNothing);
+
+      await tester.pumpObers(
+        _lightbox(items: _items.sublist(0, 1), initialIndex: 2),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byKey(const ValueKey('oi_lightbox_image_0')), findsOneWidget);
+    });
   });
 }
