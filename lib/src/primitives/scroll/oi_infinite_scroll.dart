@@ -16,8 +16,9 @@ import 'package:obers_ui/src/primitives/scroll/oi_load_more_latch.dart';
 /// The position is also checked after layout, so a first page that does not
 /// fill the viewport loads the next one without the user scrolling. Each
 /// arrival near the end calls [onLoadMore] once; it is called again after the
-/// content grows, after the user scrolls away and back, or after this widget
-/// is rebuilt following a completed load.
+/// content grows, after the user scrolls away and back, or after
+/// [moreAvailable] turns from false to true. A rebuild alone does not call it
+/// again, so a load that fails or brings nothing is not retried in a loop.
 ///
 /// ```dart
 /// OiInfiniteScroll(

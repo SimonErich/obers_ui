@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
@@ -262,6 +263,57 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(refreshes, 0);
+    });
+
+    testWidgets('a trackpad scroll past the top does not refresh on macOS', (
+      tester,
+    ) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+      var refreshes = 0;
+      await tester.pumpWidget(list(onRefresh: () async => refreshes++));
+      final position = tester
+          .state<ScrollableState>(find.byType(Scrollable))
+          .position;
+
+      final gesture = await tester.createGesture(
+        kind: PointerDeviceKind.trackpad,
+      );
+      await gesture.panZoomStart(const Offset(200, 150));
+      var mostBeyondTop = 0.0;
+      for (var step = 1; step <= 30; step++) {
+        await gesture.panZoomUpdate(
+          const Offset(200, 150),
+          pan: Offset(0, 10.0 * step),
+        );
+        await tester.pump(const Duration(milliseconds: 16));
+        if (-position.pixels > mostBeyondTop) mostBeyondTop = -position.pixels;
+      }
+      await gesture.panZoomEnd();
+      await tester.pumpAndSettle();
+      debugDefaultTargetPlatformOverride = null;
+
+      // The bouncing physics did let the trackpad pull the list far past its
+      // top, further than a touch pull needs to refresh.
+      expect(mostBeyondTop, greaterThan(60));
+      expect(refreshes, 0);
+    });
+
+    testWidgets('a stylus pull refreshes', (tester) async {
+      var refreshes = 0;
+      await tester.pumpWidget(list(onRefresh: () async => refreshes++));
+
+      final gesture = await tester.startGesture(
+        const Offset(200, 150),
+        kind: PointerDeviceKind.stylus,
+      );
+      for (var step = 0; step < 30; step++) {
+        await gesture.moveBy(const Offset(0, 10));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      expect(refreshes, 1);
     });
 
     testWidgets('does not refresh again while a refresh is running', (

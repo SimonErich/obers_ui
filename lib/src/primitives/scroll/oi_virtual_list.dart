@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -17,6 +18,9 @@ const double _kRefreshTriggerDistance = 60;
 /// pull and shows a loading indicator at the top of the list until the
 /// returned future completes. It works with both clamping and bouncing
 /// scroll physics and at every density.
+///
+/// Only touch input pulls (a finger or a stylus). Scrolling past the top with
+/// a mouse or a trackpad, as bouncing physics on macOS allow, never refreshes.
 ///
 /// ```dart
 /// OiVirtualList(
@@ -52,7 +56,8 @@ class OiVirtualList extends StatefulWidget {
   /// Cache extent in pixels beyond the viewport.
   final double? cacheExtent;
 
-  /// Called when the user pulls the list down past its top edge.
+  /// Called when the user pulls the list down past its top edge with touch
+  /// input (a finger or a stylus).
   ///
   /// Called once per pull, and not again while a previous call is still
   /// running. A loading indicator is shown until the future completes.
@@ -108,6 +113,19 @@ class _OiVirtualListState extends State<OiVirtualList> {
     }
   }
 
+  /// Whether [details] belong to a drag by a finger or a stylus.
+  ///
+  /// Checked per drag rather than through the app's input modality, which
+  /// only switches to touch a frame after the first touch lands. A trackpad
+  /// scroll past the top with bouncing physics is not a pull.
+  static bool _isTouchDrag(DragUpdateDetails? details) =>
+      switch (details?.kind) {
+        PointerDeviceKind.touch ||
+        PointerDeviceKind.stylus ||
+        PointerDeviceKind.invertedStylus => true,
+        _ => false,
+      };
+
   bool _handleScrollNotification(ScrollNotification notification) {
     if (widget.onRefresh == null) return false;
     // Only this list's own vertical scrolling counts, not a nested scrollable.
@@ -124,7 +142,8 @@ class _OiVirtualListState extends State<OiVirtualList> {
     if (notification is OverscrollNotification) {
       // Clamping physics: the position stays at the edge and the unused drag
       // is reported as overscroll (negative past the leading edge).
-      if (notification.dragDetails != null && notification.overscroll < 0) {
+      if (_isTouchDrag(notification.dragDetails) &&
+          notification.overscroll < 0) {
         _pullDistance += -notification.overscroll;
       }
     } else if (notification is ScrollUpdateNotification) {
@@ -132,7 +151,7 @@ class _OiVirtualListState extends State<OiVirtualList> {
       // past the leading edge instead.
       final metrics = notification.metrics;
       final beyond = metrics.minScrollExtent - metrics.pixels;
-      if (notification.dragDetails != null && beyond > 0) {
+      if (_isTouchDrag(notification.dragDetails) && beyond > 0) {
         if (beyond > _pullDistance) _pullDistance = beyond;
       }
     }

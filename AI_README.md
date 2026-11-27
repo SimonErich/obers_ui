@@ -1130,7 +1130,7 @@ Virtualized scrolling for large lists. Only renders visible items.
 - `itemCount` (int, required)
 - `itemBuilder` (IndexedWidgetBuilder, required)
 - `cacheExtent` (double?)
-- `onRefresh` (Future<void> Function()?) — pull-to-refresh on vertical lists: dragging past the top edge calls it once per pull, at any density and with clamping or bouncing physics; spinner colour and trigger distance come from `OiRefreshIndicatorThemeData`
+- `onRefresh` (Future<void> Function()?) — pull-to-refresh on vertical lists: dragging past the top edge with a finger or stylus calls it once per pull (mouse and trackpad never do), at any density and with clamping or bouncing physics; spinner colour and trigger distance come from `OiRefreshIndicatorThemeData`
 - `controller` (ScrollController?)
 - `scrollDirection` (Axis, default: vertical)
 - `padding` (EdgeInsetsGeometry?)
