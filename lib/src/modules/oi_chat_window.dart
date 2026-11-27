@@ -12,6 +12,7 @@ import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_radius_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
+import 'package:obers_ui/src/primitives/scroll/oi_load_more_latch.dart';
 
 part 'oi_chat_window/oi_chat_window_widgets.part.dart';
 part 'oi_chat_window/oi_chat_window_input.part.dart';
@@ -288,6 +289,7 @@ class OiChatWindow extends StatefulWidget {
 class _OiChatWindowState extends State<OiChatWindow> {
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final OiLoadMoreLatch _scrollToTopLatch = OiLoadMoreLatch();
   final TextEditingController _editController = TextEditingController();
   final FocusNode _keyboardFocusNode = FocusNode();
 
@@ -303,6 +305,12 @@ class _OiChatWindowState extends State<OiChatWindow> {
   @override
   void didUpdateWidget(OiChatWindow oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // New messages may mean older ones arrived: the next scroll to the top
+    // reports again. Nothing is reported without a scroll, so a short
+    // conversation does not ask for history on mount or on every message.
+    if (widget.messages.length != oldWidget.messages.length) {
+      _scrollToTopLatch.reset();
+    }
     if (widget.autoScrollToBottom &&
         widget.messages.length > oldWidget.messages.length) {
       _scrollToBottom();
@@ -326,12 +334,16 @@ class _OiChatWindowState extends State<OiChatWindow> {
   }
 
   void _handleScroll() {
+    if (widget.onScrollToTop == null) return;
+    if (!_scrollController.hasClients) return;
     // In a reversed ListView, maxScrollExtent corresponds to the top
-    // (oldest messages).
-    if (_scrollController.hasClients &&
-        _scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent) {
-      widget.onScrollToTop?.call();
+    // (oldest messages). The latch reports each arrival there once instead
+    // of on every scroll tick.
+    if (_scrollToTopLatch.shouldFire(
+      _scrollController.position,
+      threshold: 0,
+    )) {
+      widget.onScrollToTop!();
     }
   }
 

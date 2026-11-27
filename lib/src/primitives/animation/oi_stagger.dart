@@ -65,6 +65,12 @@ class OiStaggerState extends State<OiStagger>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
+  /// One interval animation per child, built once and disposed with the
+  /// state. A [CurvedAnimation] registers a status listener on its parent, so
+  /// creating them during build would grow the controller's listener list on
+  /// every frame.
+  List<CurvedAnimation> _intervals = const [];
+
   @override
   void initState() {
     super.initState();
@@ -73,6 +79,7 @@ class OiStaggerState extends State<OiStagger>
       vsync: this,
       duration: Duration(milliseconds: totalMs),
     );
+    _buildIntervals();
     if (widget.autoPlay) {
       // Defer until after the first frame so the context is fully available.
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -88,9 +95,44 @@ class OiStaggerState extends State<OiStagger>
   }
 
   @override
+  void didUpdateWidget(OiStagger oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.children.length != widget.children.length ||
+        oldWidget.staggerDelay != widget.staggerDelay ||
+        oldWidget.duration != widget.duration) {
+      _controller.duration = _totalDuration();
+      _buildIntervals();
+    }
+  }
+
+  @override
   void dispose() {
+    _disposeIntervals();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _disposeIntervals() {
+    for (final interval in _intervals) {
+      interval.dispose();
+    }
+    _intervals = const [];
+  }
+
+  /// Rebuilds [_intervals] for the current children and timing.
+  void _buildIntervals() {
+    _disposeIntervals();
+    final totalMs = _totalDuration().inMilliseconds.toDouble();
+    _intervals = List.generate(widget.children.length, (i) {
+      final startMs = widget.staggerDelay.inMilliseconds * i;
+      final endMs = startMs + widget.duration.inMilliseconds;
+      final start = totalMs > 0 ? startMs / totalMs : 0.0;
+      final end = totalMs > 0 ? endMs / totalMs : 1.0;
+      return CurvedAnimation(
+        parent: _controller,
+        curve: Interval(start, end, curve: Curves.easeOut),
+      );
+    }, growable: false);
   }
 
   /// Total controller duration: last child offset + one child duration.
@@ -187,34 +229,22 @@ class OiStaggerState extends State<OiStagger>
     final n = widget.children.length;
     if (n == 0) return const SizedBox.shrink();
 
-    final totalMs = _totalDuration().inMilliseconds.toDouble();
-
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate(n, (i) {
-            if (reduced) {
-              return widget.children[i];
-            }
-            final startMs = widget.staggerDelay.inMilliseconds * i;
-            final endMs = startMs + widget.duration.inMilliseconds;
-            final start = totalMs > 0 ? startMs / totalMs : 0.0;
-            final end = totalMs > 0 ? endMs / totalMs : 1.0;
-            final interval = CurvedAnimation(
-              parent: _controller,
-              curve: Interval(start, end, curve: Curves.easeOut),
-            );
-            return _applyTransition(
+    // The transitions listen to their interval themselves, so nothing here
+    // needs rebuilding per frame.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < n; i++)
+          if (reduced)
+            widget.children[i]
+          else
+            _applyTransition(
               widget.transition,
-              interval,
+              _intervals[i],
               widget.children[i],
-            );
-          }),
-        );
-      },
+            ),
+      ],
     );
   }
 }

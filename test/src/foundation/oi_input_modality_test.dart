@@ -1,8 +1,11 @@
 // Tests are internal; doc comments on local helpers are not required.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/oi_input_modality_detector.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 
@@ -25,11 +28,71 @@ void main() {
   }
 
   group('OiInputModalityDetector', () {
-    testWidgets('defaults to pointer (non-web)', (tester) async {
+    // The suite pins the starting modality to pointer in
+    // flutter_test_config.dart; these tests exercise the platform seed itself.
+    for (final (platform, expected) in [
+      (TargetPlatform.android, OiInputModality.touch),
+      (TargetPlatform.iOS, OiInputModality.touch),
+      (TargetPlatform.fuchsia, OiInputModality.touch),
+      (TargetPlatform.linux, OiInputModality.pointer),
+      (TargetPlatform.macOS, OiInputModality.pointer),
+      (TargetPlatform.windows, OiInputModality.pointer),
+    ]) {
+      testWidgets('starts in ${expected.name} on ${platform.name}', (
+        tester,
+      ) async {
+        final pinned = OiInputModalityDetector.debugInitialModalityOverride;
+        OiInputModalityDetector.debugInitialModalityOverride = null;
+        addTearDown(
+          () => OiInputModalityDetector.debugInitialModalityOverride = pinned,
+        );
+        debugDefaultTargetPlatformOverride = platform;
+        late OiInputModality modality;
+
+        await tester.pumpWidget(buildDetector(onBuild: (m) => modality = m));
+        debugDefaultTargetPlatformOverride = null;
+
+        expect(modality, expected);
+      });
+    }
+
+    testWidgets('a phone has 48 dp touch targets on the first frame', (
+      tester,
+    ) async {
+      final pinned = OiInputModalityDetector.debugInitialModalityOverride;
+      OiInputModalityDetector.debugInitialModalityOverride = null;
+      addTearDown(
+        () => OiInputModalityDetector.debugInitialModalityOverride = pinned,
+      );
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      late double minTarget;
+
+      await tester.pumpWidget(
+        OiApp(
+          home: Builder(
+            builder: (ctx) {
+              minTarget = OiA11y.minTouchTarget(ctx);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      debugDefaultTargetPlatformOverride = null;
+
+      expect(minTarget, 48);
+    });
+
+    testWidgets('debugInitialModalityOverride pins the starting modality', (
+      tester,
+    ) async {
       late OiInputModality modality;
 
       await tester.pumpWidget(buildDetector(onBuild: (m) => modality = m));
 
+      expect(
+        OiInputModalityDetector.debugInitialModalityOverride,
+        OiInputModality.pointer,
+      );
       expect(modality, OiInputModality.pointer);
     });
 
@@ -182,18 +245,6 @@ void main() {
 
       expect(modality, OiInputModality.touch);
       await gesture.up();
-    });
-
-    testWidgets('web hover detection stub returns pointer (non-web default)', (
-      tester,
-    ) async {
-      // On non-web (IO), supportsHoverMediaQuery() returns true,
-      // so the initial modality is pointer.
-      late OiInputModality modality;
-
-      await tester.pumpWidget(buildDetector(onBuild: (m) => modality = m));
-
-      expect(modality, OiInputModality.pointer);
     });
   });
 }

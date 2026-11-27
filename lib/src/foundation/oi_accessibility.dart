@@ -38,8 +38,11 @@ abstract final class OiA11y {
   /// modality detected by [OiPlatform] rather than `defaultTargetPlatform`, so
   /// web-on-touch-device scenarios (where the host platform reports desktop but
   /// the user interacts via touch) correctly receive 48 dp enforcement.
+  ///
+  /// Depends on the input modality only, so callers are not rebuilt while the
+  /// on-screen keyboard animates.
   static double minTouchTarget(BuildContext context) {
-    final modality = OiPlatform.of(context).inputModality;
+    final modality = OiPlatform.inputModalityOf(context);
     return modality == OiInputModality.touch ? 48 : 0;
   }
 

@@ -185,4 +185,82 @@ void main() {
       expect(copy.borderRadius, isNull);
     });
   });
+
+  group('OiFileExplorerThemeData equality', () {
+    const red = Color(0xFFFF0000);
+    const blue = Color(0xFF0000FF);
+
+    test('every field takes part in ==', () {
+      const base = OiFileExplorerThemeData();
+      final variants = <OiFileExplorerThemeData>[
+        const OiFileExplorerThemeData(sidebarWidth: 1),
+        const OiFileExplorerThemeData(sidebarBackground: red),
+        const OiFileExplorerThemeData(contentBackground: red),
+        const OiFileExplorerThemeData(fileTileHeight: 1),
+        const OiFileExplorerThemeData(fileTileHoverColor: red),
+        const OiFileExplorerThemeData(fileTileSelectedColor: red),
+        const OiFileExplorerThemeData(
+          fileGridCardBorderRadius: BorderRadius.all(Radius.circular(3)),
+        ),
+        const OiFileExplorerThemeData(fileGridCardHoverElevation: 1),
+        const OiFileExplorerThemeData(dropHighlightColor: red),
+        const OiFileExplorerThemeData(dropHighlightBorderColor: red),
+        const OiFileExplorerThemeData(pathBarBackground: red),
+        const OiFileExplorerThemeData(toolbarBackground: red),
+        const OiFileExplorerThemeData(toolbarHeight: 1),
+        const OiFileExplorerThemeData(selectionToolbarColor: red),
+        const OiFileExplorerThemeData(iconCategoryColors: {'image': red}),
+        const OiFileExplorerThemeData(folderIconColor: red),
+        const OiFileExplorerThemeData(renamingFieldBackground: red),
+      ];
+
+      for (final variant in variants) {
+        expect(variant, isNot(equals(base)));
+      }
+      // And no two variants are equal to each other.
+      expect(variants.toSet(), hasLength(variants.length));
+    });
+
+    test('iconCategoryColors is compared by content', () {
+      final a = OiFileExplorerThemeData(
+        iconCategoryColors: {
+          'image': red,
+          'video': [blue].first,
+        },
+      );
+      final b = OiFileExplorerThemeData(
+        iconCategoryColors: {
+          'video': [blue].first,
+          'image': red,
+        },
+      );
+
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+      expect(
+        a,
+        isNot(
+          equals(
+            const OiFileExplorerThemeData(iconCategoryColors: {'image': blue}),
+          ),
+        ),
+      );
+    });
+  });
+
+  group('OiContextMenuThemeData equality', () {
+    List<BoxShadow> shadow(double blur) => [
+      BoxShadow(color: const Color(0x33000000), blurRadius: blur),
+    ];
+
+    test('shadow lists are compared by content', () {
+      final a = OiContextMenuThemeData(shadow: shadow(4));
+      final b = OiContextMenuThemeData(shadow: shadow(4));
+
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+      expect(a, isNot(equals(OiContextMenuThemeData(shadow: shadow(8)))));
+      expect(a, isNot(equals(const OiContextMenuThemeData())));
+    });
+  });
 }

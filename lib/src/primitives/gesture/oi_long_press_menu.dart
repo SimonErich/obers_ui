@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
+import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 
 /// A menu item for the long-press context menu.
 ///
@@ -24,10 +26,14 @@ class OiLongPressMenuItem {
 
 /// A widget that shows a context menu overlay when its [child] is long-pressed.
 ///
-/// When the user long-presses [child], an overlay menu containing [items] is
-/// inserted near the press location. Tapping any item invokes its
-/// [OiLongPressMenuItem.onTap] and closes the menu. Tapping outside the menu
-/// also closes it. When [enabled] is `false` the long press is ignored.
+/// When the user long-presses [child], a menu containing [items] opens at
+/// the press location, moved as far as needed to stay inside the screen.
+/// Tapping any item invokes its [OiLongPressMenuItem.onTap] and closes the
+/// menu. Tapping outside the menu, or scrolling an ancestor, also closes it.
+/// When [enabled] is `false` the long press is ignored.
+///
+/// The menu is positioned with [OiFloating] and takes its colours, radius
+/// and shadow from the theme.
 ///
 /// ```dart
 /// OiLongPressMenu(
@@ -76,36 +82,30 @@ class OiLongPressMenu extends StatefulWidget {
 }
 
 class _OiLongPressMenuState extends State<OiLongPressMenu> {
-  OverlayEntry? _overlayEntry;
+  /// Identifies the box the menu is anchored to, so the press point can be
+  /// expressed relative to it.
+  final GlobalKey _anchorKey = GlobalKey();
+
+  bool _open = false;
   Offset _pressPosition = Offset.zero;
 
-  void _showMenu() {
-    _removeMenu();
-    final overlay = Overlay.maybeOf(context);
-    if (overlay == null) return;
+  /// Offset that moves the menu from its default spot (below the child's
+  /// bottom-left corner) to the press point.
+  Offset _menuOffset = Offset.zero;
 
-    _overlayEntry = OverlayEntry(
-      builder: (_) => _OiLongPressMenuOverlay(
-        position: _pressPosition,
-        items: widget.items,
-        onClose: _removeMenu,
-        direction: widget.direction,
-        trailing: widget.trailing,
-      ),
-    );
-    overlay.insert(_overlayEntry!);
+  void _showMenu() {
+    final box = _anchorKey.currentContext?.findRenderObject();
+    if (box is! RenderBox || !box.hasSize) return;
+    final local = box.globalToLocal(_pressPosition);
+    setState(() {
+      _menuOffset = Offset(local.dx, local.dy - box.size.height);
+      _open = true;
+    });
   }
 
   void _removeMenu() {
-    _overlayEntry?.remove();
-    _overlayEntry?.dispose();
-    _overlayEntry = null;
-  }
-
-  @override
-  void dispose() {
-    _removeMenu();
-    super.dispose();
+    if (!_open || !mounted) return;
+    setState(() => _open = false);
   }
 
   @override
@@ -118,52 +118,31 @@ class _OiLongPressMenuState extends State<OiLongPressMenu> {
                 _pressPosition = details.globalPosition;
               }
             : null,
-        child: widget.child,
-      ),
-    );
-  }
-}
-
-/// Internal overlay widget that positions and renders the menu.
-class _OiLongPressMenuOverlay extends StatelessWidget {
-  const _OiLongPressMenuOverlay({
-    required this.position,
-    required this.items,
-    required this.onClose,
-    required this.direction,
-    this.trailing,
-  });
-
-  final Offset position;
-  final List<OiLongPressMenuItem> items;
-  final VoidCallback onClose;
-  final Axis direction;
-  final Widget? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Full-screen transparent barrier — tap outside dismisses the menu.
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: onClose,
-            child: const ColoredBox(color: Color(0x00000000)),
+        // OiFloating keeps the menu inside the screen (with its default
+        // margin) whatever the press point, and renders it in the overlay.
+        child: OiFloating(
+          visible: _open,
+          gap: 0,
+          offset: _menuOffset,
+          // No flipping or edge snapping relative to the child: the menu
+          // belongs to the press point and is only clamped to the screen.
+          overflow: OiFloatingOverflow.none,
+          onDismiss: _removeMenu,
+          anchor: Listener(
+            key: _anchorKey,
+            // OiFloating leaves taps on the anchor alone; for a context menu
+            // a tap on the child is a tap outside the menu.
+            onPointerDown: _open ? (_) => _removeMenu() : null,
+            child: widget.child,
           ),
-        ),
-        // Menu panel positioned near the press point.
-        Positioned(
-          left: position.dx,
-          top: position.dy,
           child: _OiMenuPanel(
-            items: items,
-            onClose: onClose,
-            direction: direction,
-            trailing: trailing,
+            items: widget.items,
+            onClose: _removeMenu,
+            direction: widget.direction,
+            trailing: widget.trailing,
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -184,8 +163,11 @@ class _OiMenuPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final horizontal = direction == Axis.horizontal;
+
     final itemWidgets = items
-        .map(
+        .map<Widget>(
           (item) => GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {
@@ -193,14 +175,12 @@ class _OiMenuPanel extends StatelessWidget {
               item.onTap();
             },
             child: Padding(
-              padding: direction == Axis.horizontal
+              padding: horizontal
                   ? const EdgeInsets.symmetric(horizontal: 5, vertical: 5)
                   : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Text(
                 item.label,
-                style: direction == Axis.horizontal
-                    ? const TextStyle(fontSize: 20)
-                    : null,
+                style: horizontal ? const TextStyle(fontSize: 20) : null,
               ),
             ),
           ),
@@ -212,7 +192,7 @@ class _OiMenuPanel extends StatelessWidget {
         GestureDetector(
           behavior: HitTestBehavior.opaque,
           child: Padding(
-            padding: direction == Axis.horizontal
+            padding: horizontal
                 ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
                 : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: trailing,
@@ -222,26 +202,26 @@ class _OiMenuPanel extends StatelessWidget {
     }
 
     return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.all(Radius.circular(8)),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x33000000),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
+      key: const ValueKey('oi_long_press_menu_panel'),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: context.radius.md,
+        boxShadow: context.shadows.md,
       ),
-      child: direction == Axis.horizontal
-          ? Row(mainAxisSize: MainAxisSize.min, children: itemWidgets)
-          : IntrinsicWidth(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: itemWidgets,
+      // The panel sits in the overlay, outside the page's text style, so set
+      // a readable one for its surface colour.
+      child: DefaultTextStyle(
+        style: context.textTheme.body.copyWith(color: colors.text),
+        child: horizontal
+            ? Row(mainAxisSize: MainAxisSize.min, children: itemWidgets)
+            : IntrinsicWidth(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: itemWidgets,
+                ),
               ),
-            ),
+      ),
     );
   }
 }

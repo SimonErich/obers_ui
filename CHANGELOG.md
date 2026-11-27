@@ -18,6 +18,11 @@ from the git history, using the commits that changed `version:` in
 - `OiCalendarUtils.addDays`, `daysBetween` and `fractionalDaysBetween`: day arithmetic on calendar dates that is not thrown off by daylight-saving changes
 - `OiClockDial`: a clock face that picks a time of day by tapping the hour, then the minute (drag for the exact one)
 - `OiSelect` opens its menu with the selected option in view instead of at the top
+- `OiPlatform.inputModalityOf`, `platformOf` and `keyboardHeightOf` (with `OiPlatformAspect`): read one part of the platform data and rebuild only when that part changes
+- `OiInfiniteScroll.scrollDirection`: the axis of the scrollable that drives loading (default vertical)
+- `OiRedoIntent`: Ctrl+Shift+Z, Cmd+Shift+Z and Ctrl+Y redo the `OiUndoStack`
+- `OiShortcutScopeState.helpActive`: set when the user presses `?`
+- `OiInputModalityDetector.debugInitialModalityOverride` (tests only): pins the modality an app starts in
 - `OiComboBox.labels` (`OiComboBoxLabels`): the dropdown's search placeholder, loading text, create action and load-more row can be translated
 - `OiComboBox` opens from the keyboard: the trigger takes focus and Enter, Space or Arrow Down opens the dropdown
 - `OiSearchOverlay.errorStateTitle` and `errorStateDescription`: a failed search shows an error state instead of "no results"
@@ -62,6 +67,15 @@ from the git history, using the commits that changed `version:` in
 - `obers_ui_autoforms`: a circular or unregistered derived-field dependency throws a `StateError` instead of failing an assertion
 - `OiGanttTask.end` is now documented and treated as exclusive everywhere: the timeline no longer adds an empty day after the last task, and bars are positioned by time of day (a 09:00 to 17:00 task is a third of a day wide instead of a sliver)
 - `OiCalendar` follows a new `mode` or `initialDate` from its parent, and its all-day row only lists events on the dates in view
+- Android, iOS and Fuchsia start in touch mode, so tappables have their 48 dp touch target from the first frame instead of growing on the first touch
+  - Widget tests are affected too: `flutter test` reports Android, so apps' tests now start in touch mode and lay tappables out at 48 dp. Tests or goldens that expect desktop sizes can pin the old starting mode in `test/flutter_test_config.dart` with `OiInputModalityDetector.debugInitialModalityOverride = OiInputModality.pointer;`
+- `OiVirtualList` pull-to-refresh works at every density and with bouncing scroll physics (iOS), calls `onRefresh` once per pull, and only reacts to touch input: scrolling past the top with a mouse or trackpad does not refresh
+- `OiInfiniteScroll`, `OiListView` and `OiActivityFeed` load the next page when the first one does not fill the viewport, and once per arrival at the end instead of on every scroll tick; a load that fails or brings nothing is not retried until new items arrive or the user scrolls away and back. `OiChatWindow.onScrollToTop` fires once per arrival at the top
+- `OiInfiniteScroll` watches the nearest scrollable on its axis, also inside a scroller on the other axis, and ignores scrollables on the other axis; pass `scrollDirection: Axis.horizontal` for a horizontal list
+- `context.isCompact`, `isMedium`, `isExpanded`, `isLarge` and `isExtraLarge` are ranges, so exactly one is true on scales with extra breakpoints (`OiBreakpointScale.extended()`: 480 is compact, 1920 is extraLarge)
+- `OiGrid` counts the gaps when deriving the column count from `minColumnWidth`, and lays its columns out right-to-left under an RTL `Directionality`
+- `OiApp` without an explicit `locale` takes its text direction from the resolved device locale
+- `OiLongPressMenu` is positioned with `OiFloating`: it stays on screen and takes its colours, radius and shadow from the theme
 
 ### Fixed
 
@@ -92,6 +106,16 @@ from the git history, using the commits that changed `version:` in
 - `OiCalendar`: week and day views dropped events shorter than an hour, events past midnight and events spanning the focused day
 - `OiCalendar` and `OiGantt`: dates were repeated or a day off after a daylight-saving change (month grid, week numbers, navigation, bar and today-line positions)
 - `OiGantt`: scrolling the timeline threw "ScrollController attached to multiple scroll views" and the header did not follow the body; a saved scroll position was never restored
+- `OiThemeData.fromBrand` sets `colors.textOnPrimary` from the brand swatch, so a light brand colour gets dark text
+- Keyboard insets no longer rebuild every tappable on each frame of the keyboard animation
+- `OiStagger` no longer adds animation listeners on every frame
+- A hidden `OiVisibility` child no longer receives taps or focus, and keeps its state with `transition: none`
+- `OiOptimisticAction` rolls back and completes when `commit` throws an `Error`; a pending action no longer leaks into another app or test
+- `OiApp` reuses and disposes one `HeroController`
+- `OiGrid` no longer throws when the gaps are wider than the available width
+- `OiResponsive` without a value for the smallest breakpoint falls back to the nearest larger one instead of throwing; equal instances have equal hash codes
+- The `?` shortcut (`OiShortcutScopeState.helpActive`) works on real keyboards (it is Shift+/ on most layouts) and is left alone in text fields
+- `OiDecorationTheme`, `OiFileExplorerThemeData` and `OiContextMenuThemeData` compare every field, and collections by content
 
 ### Removed
 

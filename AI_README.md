@@ -103,6 +103,7 @@ OiThemeData.dark()
 // Level 2: Brand it (generates full palette from one color)
 OiThemeData.fromBrand(color: Color(0xFF8B6914))
 OiThemeData.fromBrand(color: Color(0xFF8B6914), brightness: Brightness.dark)
+// colors.textOnPrimary follows the brand colour: dark text on a light brand.
 
 // Level 3: Full control
 OiThemeData.light().copyWith(
@@ -370,11 +371,20 @@ context.isCompact   // bool
 context.isMedium
 context.isExpanded  // etc.
 ```
+The five tier getters are ranges of the active breakpoint's `minWidth` (compact 0–599, medium 600–839, expanded 840–1199, large 1200–1599, extraLarge 1600+), so exactly one is true at any width, also on scales with extra breakpoints such as `OiBreakpointScale.extended()`.
+
+A breakpoint map without a value for the smallest breakpoint (`{OiBreakpoint.medium: 2}.responsive`) resolves smaller breakpoints to the nearest larger value; pass `defaultValue` to choose another base.
 
 ### OiPlatform & OiInputModality
 **Tags:** `platform`, `ios`, `android`, `web`, `desktop`, `touch`, `pointer`
 
 Detects platform (iOS/Android/macOS/Windows/Web) and input modality (touch vs pointer) independently of screen size.
+
+- `OiPlatform.of(context)` — the whole `OiPlatformData`; rebuilds on every change, including each frame of the keyboard animation
+- `OiPlatform.inputModalityOf(context)` / `context.inputModality` — rebuilds only when the modality changes
+- `OiPlatform.platformOf(context)`, `OiPlatform.keyboardHeightOf(context)` — the other aspects
+- Initial modality: touch on Android, iOS and Fuchsia, pointer on desktop, the `hover` media query on web; the first pointer event of the other kind switches it
+- In widget tests `flutter test` reports Android, so apps start in touch mode; set `OiInputModalityDetector.debugInitialModalityOverride = OiInputModality.pointer` in `flutter_test_config.dart` to test desktop layouts
 
 ### OiAccessibility
 **Tags:** `a11y`, `accessibility`, `screen-reader`, `reduced-motion`
@@ -400,6 +410,8 @@ Static utility for optimistic UI updates with undo and automatic rollback.
 - `undoDuration` (Duration, default: 5s) — Undo window
 - `errorMessage` (String?) — Error toast on commit failure
 
+Anything `commit` throws (an `Exception` or an `Error`) rolls back and completes the returned future with `false`. One action can be pending per `OiApp`.
+
 **Use When:** Delete, archive, move, mark-as-read, status changes — any async mutation with undo.
 **Avoid When:** Operations requiring confirmation — use `OiDialog.confirm()`. Irreversible ops.
 **Combine With:** `OiSnackBar`, `OiToast`, `OiListView`, `OiTable`, `OiActionBar`
@@ -409,12 +421,14 @@ Static utility for optimistic UI updates with undo and automatic rollback.
 ### OiUndoStack
 **Tags:** `undo`, `redo`, `history`, `ctrl-z`
 
-Global undo/redo with Ctrl+Z / Ctrl+Shift+Z. Max history configurable via `OiApp.undoStackMaxHistory`.
+Global undo/redo with Ctrl+Z / Ctrl+Shift+Z (also Cmd on macOS, and Ctrl+Y for redo). In a focused text field the keys undo and redo the typing instead. Max history configurable via `OiApp.undoStackMaxHistory`.
 
 ### OiShortcutScope
 **Tags:** `keyboard`, `shortcut`, `hotkey`
 
 Register keyboard shortcuts scoped to a widget subtree.
+
+`OiApp` registers Ctrl/Cmd+Z (`OiUndoIntent`), Ctrl/Cmd+Shift+Z and Ctrl+Y (`OiRedoIntent`), Ctrl/Cmd+K (`OiCommandBarIntent`) and `?` (`OiHelpIntent`). `OiShortcutScope.of(context)` exposes `commandBarActive` and `helpActive` notifiers: listen to them to show your command bar or help overlay, and set them back to `false` when it closes. `?` is typed as usual in text fields.
 
 ### OiTourScope
 **Tags:** `tour`, `onboarding`, `spotlight`, `tutorial`
@@ -801,7 +815,7 @@ Double-tap gesture detection.
 **Tags:** `gesture`, `long-press`, `context-menu`, `mobile`
 **Tier:** Primitive
 
-Long-press gesture with optional menu trigger.
+Long-press gesture with optional menu trigger. The menu opens at the press point, is kept inside the screen by `OiFloating`, and uses the theme's surface colour, radius and shadow. A tap outside (or on the child) closes it.
 
 **Combine With:** `OiContextMenu`
 
@@ -1077,7 +1091,7 @@ Renders widget into a separate overlay layer.
 **Tags:** `visibility`, `show`, `hide`, `conditional`
 **Tier:** Primitive
 
-Conditional widget visibility with optional animation.
+Conditional widget visibility with optional animation. With `maintainState` (default) the hidden child keeps its State but takes no taps, focus or semantics.
 
 **Use When:** Show/hide content based on state. Responsive visibility.
 
@@ -1091,7 +1105,7 @@ Conditional widget visibility with optional animation.
 **Tags:** `scroll`, `infinite`, `pagination`, `load-more`
 **Tier:** Primitive
 
-Detects scroll-to-edge and fires load callback.
+Detects scroll-to-edge and fires load callback. Also loads when the first page does not fill the viewport. `onLoadMore` runs once per arrival at the end, and a load that brings nothing is not retried until the content changes or the user scrolls away and back. The nearest scrollable on `scrollDirection` (default vertical) counts, also inside a scroller on the other axis; scrollables on the other axis are ignored.
 
 **Use When:** Infinite scrolling lists.
 **Combine With:** `OiVirtualList`, `OiListView`
@@ -1116,7 +1130,7 @@ Virtualized scrolling for large lists. Only renders visible items.
 - `itemCount` (int, required)
 - `itemBuilder` (IndexedWidgetBuilder, required)
 - `cacheExtent` (double?)
-- `onRefresh` (Future<void> Function()?)
+- `onRefresh` (Future<void> Function()?) — pull-to-refresh on vertical lists: dragging past the top edge with a finger or stylus calls it once per pull (mouse and trackpad never do), at any density and with clamping or bouncing physics; spinner colour and trigger distance come from `OiRefreshIndicatorThemeData`
 - `controller` (ScrollController?)
 - `scrollDirection` (Axis, default: vertical)
 - `padding` (EdgeInsetsGeometry?)

@@ -167,4 +167,140 @@ void main() {
       expect(find.bySemanticsLabel('Activity Feed'), findsOneWidget);
     });
   });
+
+  Future<void> dragInSteps(WidgetTester tester, Offset step, int steps) async {
+    final gesture = await tester.startGesture(const Offset(200, 300));
+    for (var i = 0; i < steps; i++) {
+      await gesture.moveBy(step);
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await gesture.up();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+  }
+
+  group('OiActivityFeed load more', () {
+    List<OiActivityEvent> events(int count) => [
+      for (var i = 0; i < count; i++)
+        OiActivityEvent(key: '$i', title: 'Event $i'),
+    ];
+
+    testWidgets('a first page shorter than the viewport loads the next one', (
+      tester,
+    ) async {
+      var loads = 0;
+      await tester.pumpObers(
+        OiActivityFeed(
+          events: events(2),
+          label: 'Feed',
+          moreAvailable: true,
+          onLoadMore: () async => loads++,
+        ),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 16));
+      await tester.pump(const Duration(milliseconds: 16));
+
+      expect(loads, 1);
+    });
+
+    testWidgets('does not load while loading or when nothing more exists', (
+      tester,
+    ) async {
+      var loads = 0;
+      await tester.pumpObers(
+        OiActivityFeed(
+          events: events(2),
+          label: 'Feed',
+          moreAvailable: true,
+          loading: true,
+          onLoadMore: () async => loads++,
+        ),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      await tester.pumpObers(
+        OiActivityFeed(
+          events: events(2),
+          label: 'Feed',
+          onLoadMore: () async => loads++,
+        ),
+      );
+      await tester.pump();
+
+      expect(loads, 0);
+    });
+
+    testWidgets('a load that ends without new events is not repeated', (
+      tester,
+    ) async {
+      var loads = 0;
+      Widget feed({required bool loading}) => OiActivityFeed(
+        events: events(2),
+        label: 'Feed',
+        moreAvailable: true,
+        loading: loading,
+        onLoadMore: () async => loads++,
+      );
+      await tester.pumpObers(
+        feed(loading: false),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      expect(loads, 1);
+
+      // The fetch runs and fails: loading goes on and off, nothing arrives.
+      await tester.pumpObers(feed(loading: true));
+      await tester.pump();
+      await tester.pumpObers(feed(loading: false));
+      for (var frame = 0; frame < 5; frame++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+
+      expect(loads, 1);
+    });
+
+    testWidgets('loads again when the next page is still too short', (
+      tester,
+    ) async {
+      var loads = 0;
+      Widget feed(int count) => OiActivityFeed(
+        events: events(count),
+        label: 'Feed',
+        moreAvailable: true,
+        onLoadMore: () async => loads++,
+      );
+      await tester.pumpObers(feed(1), surfaceSize: const Size(400, 600));
+      await tester.pump();
+      expect(loads, 1);
+
+      await tester.pumpObers(feed(2));
+      await tester.pump();
+
+      expect(loads, 2);
+    });
+
+    testWidgets('one arrival at the end loads once, not once per tick', (
+      tester,
+    ) async {
+      var loads = 0;
+      await tester.pumpObers(
+        OiActivityFeed(
+          events: events(60),
+          label: 'Feed',
+          moreAvailable: true,
+          onLoadMore: () async => loads++,
+        ),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      expect(loads, 0);
+
+      // Small steps, so several scroll ticks land inside the 100 px zone.
+      await dragInSteps(tester, const Offset(0, -20), 300);
+
+      expect(loads, 1);
+    });
+  });
 }

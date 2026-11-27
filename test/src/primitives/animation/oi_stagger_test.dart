@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/primitives/animation/oi_stagger.dart';
@@ -104,5 +105,65 @@ void main() {
     expect(find.text('n'), findsOneWidget);
     // With reducedMotion the children are returned directly — no FadeTransition.
     expect(find.byType(FadeTransition), findsNothing);
+  });
+
+  // ── Leak tracking: one CurvedAnimation per child, all disposed ────────────
+
+  group('interval animations', () {
+    late int created;
+    late int disposed;
+
+    void track(ObjectEvent event) {
+      if (event.object is! CurvedAnimation) return;
+      if (event is ObjectCreated) created++;
+      if (event is ObjectDisposed) disposed++;
+    }
+
+    setUp(() {
+      created = 0;
+      disposed = 0;
+      FlutterMemoryAllocations.instance.addListener(track);
+    });
+
+    tearDown(() => FlutterMemoryAllocations.instance.removeListener(track));
+
+    testWidgets('are created once per child, not once per frame', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const OiStagger(children: [Text('a'), Text('b'), Text('c')]),
+      );
+      for (var frame = 0; frame < 10; frame++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+
+      expect(created, 3);
+
+      await tester.pumpAndSettle();
+      await tester.pumpObers(const SizedBox.shrink());
+
+      expect(created, 3);
+      expect(disposed, 3, reason: 'every interval is disposed on unmount');
+    });
+
+    testWidgets('are rebuilt and the old ones disposed when children change', (
+      tester,
+    ) async {
+      await tester.pumpObers(const OiStagger(children: [Text('a'), Text('b')]));
+      await tester.pumpAndSettle();
+      expect(created, 2);
+
+      await tester.pumpObers(
+        const OiStagger(children: [Text('a'), Text('b'), Text('c')]),
+      );
+      await tester.pumpAndSettle();
+
+      expect(created, 5);
+      expect(disposed, 2);
+      expect(find.text('c'), findsOneWidget);
+
+      await tester.pumpObers(const SizedBox.shrink());
+      expect(disposed, 5);
+    });
   });
 }

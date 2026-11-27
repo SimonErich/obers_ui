@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// Theme data for context menu components.
@@ -65,14 +66,13 @@ class OiContextMenuThemeData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! OiContextMenuThemeData) return false;
-    // BoxShadow lists require deep comparison; use toString as pragmatic check.
     return other.borderRadius == borderRadius &&
         other.minWidth == minWidth &&
         other.maxWidth == maxWidth &&
         other.maxHeight == maxHeight &&
         other.backgroundColor == backgroundColor &&
         other.borderColor == borderColor &&
-        '${other.shadow}' == '$shadow';
+        listEquals(other.shadow, shadow);
   }
 
   @override
@@ -83,6 +83,6 @@ class OiContextMenuThemeData {
     maxHeight,
     backgroundColor,
     borderColor,
-    shadow.toString(),
+    shadow == null ? null : Object.hashAll(shadow!),
   );
 }

@@ -313,4 +313,107 @@ void main() {
       expect(find.byKey(const Key('action-btn')), findsOneWidget);
     });
   });
+
+  Future<void> dragInSteps(WidgetTester tester, Offset step, int steps) async {
+    final gesture = await tester.startGesture(const Offset(200, 300));
+    for (var i = 0; i < steps; i++) {
+      await gesture.moveBy(step);
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await gesture.up();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+  }
+
+  group('OiListView load more', () {
+    Widget list(int count, {required Future<void> Function() onLoadMore}) =>
+        OiListView<int>(
+          items: [for (var i = 0; i < count; i++) i],
+          itemBuilder: (i) => SizedBox(height: 40, child: Text('Item $i')),
+          itemKey: (i) => i,
+          label: 'Test list',
+          moreAvailable: true,
+          onLoadMore: onLoadMore,
+        );
+
+    testWidgets('a first page shorter than the viewport loads the next one', (
+      tester,
+    ) async {
+      var loads = 0;
+      await tester.pumpObers(
+        list(2, onLoadMore: () async => loads++),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 16));
+      await tester.pump(const Duration(milliseconds: 16));
+
+      expect(loads, 1);
+    });
+
+    testWidgets('a load that ends without new items is not repeated', (
+      tester,
+    ) async {
+      var loads = 0;
+      Widget build({required bool loading}) => OiListView<int>(
+        items: const [0, 1],
+        itemBuilder: (i) => SizedBox(height: 40, child: Text('Item $i')),
+        itemKey: (i) => i,
+        label: 'Test list',
+        moreAvailable: true,
+        loading: loading,
+        onLoadMore: () async => loads++,
+      );
+      await tester.pumpObers(
+        build(loading: false),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      expect(loads, 1);
+
+      // The fetch runs and fails: loading goes on and off, nothing arrives.
+      await tester.pumpObers(build(loading: true));
+      await tester.pump();
+      await tester.pumpObers(build(loading: false));
+      for (var frame = 0; frame < 5; frame++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+
+      expect(loads, 1);
+    });
+
+    testWidgets('loads again when the next page is still too short', (
+      tester,
+    ) async {
+      var loads = 0;
+      await tester.pumpObers(
+        list(1, onLoadMore: () async => loads++),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      expect(loads, 1);
+
+      await tester.pumpObers(list(2, onLoadMore: () async => loads++));
+      await tester.pump();
+
+      expect(loads, 2);
+    });
+
+    testWidgets('one arrival at the end loads once, not once per tick', (
+      tester,
+    ) async {
+      var loads = 0;
+      await tester.pumpObers(
+        list(60, onLoadMore: () async => loads++),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pump();
+      expect(loads, 0);
+
+      // Small steps, so several scroll ticks land inside the 100 px zone.
+      await dragInSteps(tester, const Offset(0, -20), 300);
+
+      expect(loads, 1);
+    });
+  });
 }

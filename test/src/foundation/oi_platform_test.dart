@@ -2,6 +2,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 
 /// Wraps [child] with [OiPlatform] providing [data], plus a [Directionality].
@@ -306,6 +307,121 @@ void main() {
       );
 
       expect(captured.inputModality, OiInputModality.pointer);
+    });
+  });
+
+  group('OiPlatform aspects', () {
+    Widget host({required double inset, required Widget child}) {
+      return MediaQuery(
+        data: MediaQueryData(viewInsets: EdgeInsets.only(bottom: inset)),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Builder(
+            builder: (ctx) =>
+                OiPlatform.fromContext(context: ctx, child: child),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('minTouchTarget readers are not rebuilt by keyboard insets', (
+      tester,
+    ) async {
+      var builds = 0;
+      final probe = Builder(
+        builder: (ctx) {
+          builds++;
+          OiA11y.minTouchTarget(ctx);
+          return const SizedBox.shrink();
+        },
+      );
+
+      for (var frame = 0; frame <= 10; frame++) {
+        await tester.pumpWidget(host(inset: frame * 30.0, child: probe));
+      }
+
+      expect(builds, 1);
+    });
+
+    testWidgets('inputModalityOf and context.inputModality ignore insets', (
+      tester,
+    ) async {
+      var builds = 0;
+      final probe = Builder(
+        builder: (ctx) {
+          builds++;
+          OiPlatform.inputModalityOf(ctx);
+          ctx.inputModality;
+          OiPlatform.platformOf(ctx);
+          return const SizedBox.shrink();
+        },
+      );
+
+      for (var frame = 0; frame <= 10; frame++) {
+        await tester.pumpWidget(host(inset: frame * 30.0, child: probe));
+      }
+
+      expect(builds, 1);
+    });
+
+    testWidgets('keyboardHeightOf and of() still follow the insets', (
+      tester,
+    ) async {
+      final heights = <double>[];
+      var fullBuilds = 0;
+      final probe = Column(
+        children: [
+          Builder(
+            builder: (ctx) {
+              heights.add(OiPlatform.keyboardHeightOf(ctx));
+              return const SizedBox.shrink();
+            },
+          ),
+          Builder(
+            builder: (ctx) {
+              fullBuilds++;
+              OiPlatform.of(ctx);
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
+      );
+
+      for (var frame = 0; frame < 3; frame++) {
+        await tester.pumpWidget(host(inset: frame * 30.0, child: probe));
+      }
+
+      expect(heights, [0.0, 30.0, 60.0]);
+      expect(fullBuilds, 3);
+    });
+
+    testWidgets('inputModalityOf rebuilds when the modality changes', (
+      tester,
+    ) async {
+      final seen = <OiInputModality>[];
+      final probe = Builder(
+        builder: (ctx) {
+          seen.add(OiPlatform.inputModalityOf(ctx));
+          return const SizedBox.shrink();
+        },
+      );
+      Widget withModality(OiInputModality modality) => Directionality(
+        textDirection: TextDirection.ltr,
+        child: OiPlatform(
+          data: OiPlatformData(
+            platform: TargetPlatform.android,
+            keyboardHeight: 0,
+            keyboardVisible: false,
+            inputModality: modality,
+          ),
+          child: probe,
+        ),
+      );
+
+      await tester.pumpWidget(withModality(OiInputModality.pointer));
+      await tester.pumpWidget(withModality(OiInputModality.touch));
+
+      expect(seen, [OiInputModality.pointer, OiInputModality.touch]);
     });
   });
 }

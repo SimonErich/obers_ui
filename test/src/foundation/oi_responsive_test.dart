@@ -1827,4 +1827,184 @@ void main() {
       });
     });
   });
+
+  group('OiResponsive without a base value', () {
+    final scale = OiBreakpointScale.standard();
+
+    test('falls back to the nearest larger breakpoint', () {
+      final value = {OiBreakpoint.medium: 2}.responsive;
+
+      expect(value.resolve(OiBreakpoint.compact, scale), 2);
+      expect(value.resolve(OiBreakpoint.medium, scale), 2);
+      expect(value.resolve(OiBreakpoint.extraLarge, scale), 2);
+    });
+
+    test('prefers the smaller breakpoint, then the nearest larger one', () {
+      final value = {
+        OiBreakpoint.expanded: 3,
+        OiBreakpoint.extraLarge: 5,
+      }.responsive;
+
+      expect(value.resolve(OiBreakpoint.compact, scale), 3);
+      expect(value.resolve(OiBreakpoint.medium, scale), 3);
+      expect(value.resolve(OiBreakpoint.large, scale), 3);
+      expect(value.resolve(OiBreakpoint.extraLarge, scale), 5);
+    });
+
+    test('an explicit defaultValue still wins below the first key', () {
+      final value = OiResponsive<int>.breakpoints({
+        OiBreakpoint.medium: 2,
+      }, defaultValue: 1);
+
+      expect(value.resolve(OiBreakpoint.compact, scale), 1);
+    });
+
+    test('a nullable value keeps resolving to null below the first key', () {
+      final value = OiResponsive<int?>.breakpoints({OiBreakpoint.medium: 2});
+
+      expect(value.resolve(OiBreakpoint.compact, scale), isNull);
+    });
+
+    test('an empty map without a default reports a clear error', () {
+      const value = OiResponsive<int>.breakpoints({});
+
+      expect(
+        () => value.resolve(OiBreakpoint.compact, scale),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('no value'),
+          ),
+        ),
+      );
+    });
+  });
+
+  group('OiResponsive hashCode', () {
+    test('equal breakpoint maps have equal hash codes', () {
+      // Built at runtime so the two maps are distinct objects.
+      final a = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.large: [4].first,
+      });
+      final b = OiResponsive<int>.breakpoints({
+        OiBreakpoint.large: [4].first,
+        OiBreakpoint.compact: 1,
+      });
+
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+      expect({a}.contains(b), isTrue);
+    });
+
+    test('different maps usually hash differently', () {
+      final a = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: [1].first,
+      });
+      final b = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: [2].first,
+      });
+
+      expect(a == b, isFalse);
+      expect(a.hashCode == b.hashCode, isFalse);
+    });
+  });
+
+  group('tier getters are ranges', () {
+    final extended = OiThemeData.light().copyWith(
+      breakpoints: OiBreakpointScale.extended(),
+    );
+
+    Future<List<bool>> tiers(
+      WidgetTester tester,
+      double width,
+      OiThemeData theme,
+    ) async {
+      late List<bool> result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          width,
+          Builder(
+            builder: (ctx) {
+              result = [
+                ctx.isCompact,
+                ctx.isMedium,
+                ctx.isExpanded,
+                ctx.isLarge,
+                ctx.isExtraLarge,
+              ];
+              return const SizedBox.shrink();
+            },
+          ),
+          theme: theme,
+        ),
+      );
+      return result;
+    }
+
+    testWidgets('extended scale: tablet (480) counts as compact', (
+      tester,
+    ) async {
+      expect(await tiers(tester, 500, extended), [
+        true,
+        false,
+        false,
+        false,
+        false,
+      ]);
+    });
+
+    testWidgets('extended scale: ultraWide (1920) counts as extraLarge', (
+      tester,
+    ) async {
+      expect(await tiers(tester, 2000, extended), [
+        false,
+        false,
+        false,
+        false,
+        true,
+      ]);
+    });
+
+    testWidgets('exactly one tier is true at every width, on both scales', (
+      tester,
+    ) async {
+      for (final theme in [OiThemeData.light(), extended]) {
+        for (final width in <double>[
+          0,
+          320,
+          479,
+          480,
+          599,
+          600,
+          839,
+          840,
+          1199,
+          1200,
+          1599,
+          1600,
+          1919,
+          1920,
+          4000,
+        ]) {
+          final result = await tiers(tester, width, theme);
+          expect(
+            result.where((t) => t).length,
+            1,
+            reason: 'width $width on ${theme.breakpoints}',
+          );
+        }
+      }
+    });
+
+    testWidgets('standard scale keeps its tier boundaries', (tester) async {
+      final standard = OiThemeData.light();
+      expect((await tiers(tester, 599, standard)).indexOf(true), 0);
+      expect((await tiers(tester, 600, standard)).indexOf(true), 1);
+      expect((await tiers(tester, 840, standard)).indexOf(true), 2);
+      expect((await tiers(tester, 1200, standard)).indexOf(true), 3);
+      expect((await tiers(tester, 1600, standard)).indexOf(true), 4);
+    });
+  });
 }

@@ -123,7 +123,9 @@ class OiThemeData {
   /// Creates a theme derived from a brand color.
   ///
   /// The brand [color] is used as the primary swatch, and all other
-  /// semantic colors are derived automatically.
+  /// semantic colors are derived automatically. `colors.textOnPrimary` is
+  /// taken from the swatch's foreground, so a light brand colour gets dark
+  /// text on top of it.
   factory OiThemeData.fromBrand({
     required Color color,
     Brightness brightness = Brightness.light,
@@ -152,9 +154,12 @@ class OiThemeData {
             breakpoints: breakpoints,
           );
 
-    // Override primary color with the brand color
+    // Override primary color with the brand color. Text drawn on top of it
+    // has to follow the swatch, or a light brand colour gets white text.
+    final primary = OiColorSwatch.from(color);
     final brandColors = base.colors.copyWith(
-      primary: OiColorSwatch.from(color),
+      primary: primary,
+      textOnPrimary: primary.foreground,
       borderFocus: color,
     );
 

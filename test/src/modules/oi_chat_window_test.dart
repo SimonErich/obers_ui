@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
@@ -227,5 +228,63 @@ void main() {
     expect(find.text('Option A'), findsOneWidget);
     expect(find.text('Option B'), findsOneWidget);
     expect(find.byType(OiBadge), findsNWidgets(2));
+  });
+
+  group('onScrollToTop', () {
+    Widget chat(int count, VoidCallback onScrollToTop) => SizedBox(
+      width: 500,
+      height: 700,
+      child: OiChatWindow(
+        messages: [
+          for (var i = 0; i < count; i++)
+            msg(id: '$i', content: 'Message number $i'),
+        ],
+        label: 'Chat',
+        autoScrollToBottom: false,
+        onScrollToTop: onScrollToTop,
+      ),
+    );
+
+    testWidgets('a short conversation does not report without a scroll', (
+      tester,
+    ) async {
+      // There is no "more history" flag, so reporting on mount or on every
+      // new message would make callers fetch history each time.
+      var calls = 0;
+      await tester.pumpObers(chat(1, () => calls++));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 16));
+      for (var count = 2; count <= 4; count++) {
+        await tester.pumpObers(chat(count, () => calls++));
+        await tester.pumpAndSettle();
+      }
+
+      expect(calls, 0);
+    });
+
+    testWidgets('one arrival at the top reports once, not once per tick', (
+      tester,
+    ) async {
+      // Bouncing physics keep moving past the top edge, so every tick of the
+      // drag is at or beyond maxScrollExtent.
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      var calls = 0;
+      await tester.pumpObers(chat(80, () => calls++));
+      await tester.pump();
+      expect(calls, 0);
+
+      // The list is reversed: dragging down moves towards the oldest message.
+      final gesture = await tester.startGesture(const Offset(250, 200));
+      for (var i = 0; i < 60; i++) {
+        await gesture.moveBy(const Offset(0, 300));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await gesture.up();
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      debugDefaultTargetPlatformOverride = null;
+
+      expect(calls, 1);
+    });
   });
 }

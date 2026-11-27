@@ -25,7 +25,18 @@ import 'package:obers_ui/src/foundation/oi_overlays.dart';
 class OiOptimisticAction {
   OiOptimisticAction._();
 
-  static _PendingAction? _pending;
+  /// The pending action of each overlays service.
+  ///
+  /// Scoped to the service rather than the process, so two apps (or two
+  /// tests) do not commit or cancel each other's pending action.
+  static final Expando<_PendingAction> _pendingByScope =
+      Expando<_PendingAction>('OiOptimisticAction.pending');
+
+  /// Scope used when the context has no [OiOverlays] ancestor.
+  static final Object _unscoped = Object();
+
+  static Object _scopeOf(BuildContext context) =>
+      OiOverlays.maybeOf(context) ?? _unscoped;
 
   /// Execute an optimistic action with undo support.
   ///
@@ -33,7 +44,8 @@ class OiOptimisticAction {
   /// 2. Shows an [OiSnackBar] with [message] and an Undo button.
   /// 3. If Undo is tapped within [undoDuration], calls [onRollback].
   /// 4. If the timer expires, calls [commit].
-  /// 5. If [commit] throws, calls [onRollback] and shows an error toast.
+  /// 5. If [commit] throws anything (an [Exception] or an [Error]), calls
+  ///    [onRollback] and shows an error toast.
   ///
   /// Returns `true` if the commit succeeded, `false` if undone or failed.
   static Future<bool> execute(
@@ -49,10 +61,10 @@ class OiOptimisticAction {
     String? semanticLabel,
     OiSnackBarPosition position = OiSnackBarPosition.bottom,
   }) {
-    // If there's a pending action, commit it immediately.
-    if (_pending != null) {
-      _pending!.commitImmediately();
-    }
+    final scope = _scopeOf(context);
+
+    // If this app already has a pending action, commit it immediately.
+    _pendingByScope[scope]?.commitImmediately();
 
     // Apply the optimistic change immediately.
     apply();
@@ -66,7 +78,7 @@ class OiOptimisticAction {
       errorLevel: errorLevel,
       context: context,
     );
-    _pending = action;
+    _pendingByScope[scope] = action;
 
     // Show snackbar with undo.
     final handle = OiSnackBar.show(
@@ -74,8 +86,8 @@ class OiOptimisticAction {
       message: message,
       actionLabel: undoLabel,
       onAction: () {
-        if (_pending == action) {
-          _pending = null;
+        if (_pendingByScope[scope] == action) {
+          _pendingByScope[scope] = null;
         }
         action.undo();
       },
@@ -93,13 +105,15 @@ class OiOptimisticAction {
     return completer.future;
   }
 
-  /// Cancel any pending optimistic action in the current context.
+  /// Cancel the pending optimistic action of the app [context] belongs to.
   /// Rolls back the pending change if one exists.
   static void cancelPending(BuildContext context) {
-    if (_pending != null) {
-      _pending!.snackBarHandle?.dismiss();
-      _pending!.undo();
-      _pending = null;
+    final scope = _scopeOf(context);
+    final pending = _pendingByScope[scope];
+    if (pending != null) {
+      pending.snackBarHandle?.dismiss();
+      pending.undo();
+      _pendingByScope[scope] = null;
     }
   }
 }
@@ -149,7 +163,9 @@ class _PendingAction {
     try {
       await commit();
       if (!completer.isCompleted) completer.complete(true);
-    } on Exception catch (e, st) {
+    } on Object catch (e, st) {
+      // Errors (StateError, TypeError, ...) count as a failed commit too:
+      // the optimistic change must be rolled back and the future completed.
       log(
         'OiOptimisticAction commit failed',
         error: e,
@@ -158,7 +174,7 @@ class _PendingAction {
       );
       try {
         onRollback();
-      } on Exception catch (rollbackError, rollbackSt) {
+      } on Object catch (rollbackError, rollbackSt) {
         log(
           'OiOptimisticAction rollback also failed',
           error: rollbackError,
